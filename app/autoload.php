@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @category   Totsy
+ * @author     Tharsan Bhuvanendran <tbhuvanendran@totsy.com>
+ * @copyright  Copyright (c) 2012 Totsy LLC
+ */
+
 use Doctrine\Common\ClassLoader;
 require 'Doctrine/Common/ClassLoader.php';
 

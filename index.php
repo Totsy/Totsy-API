@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @category   Totsy
+ * @author     Tharsan Bhuvanendran <tbhuvanendran@totsy.com>
+ * @copyright  Copyright (c) 2012 Totsy LLC
+ */
+
 require_once '../app/Mage.php';
 require_once 'app/autoload.php';
 

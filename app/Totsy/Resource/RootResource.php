@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * @category   Totsy
+ * @package    Totsy\Resource
+ * @author     Tharsan Bhuvanendran <tbhuvanendran@totsy.com>
+ * @copyright  Copyright (c) 2012 Totsy LLC
+ */
+
 namespace Totsy\Resource;
 
 use Sonno\Annotation\GET,

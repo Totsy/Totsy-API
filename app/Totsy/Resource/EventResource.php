@@ -24,12 +24,12 @@ class EventResource extends AbstractResource
 {
     protected $_fields = array(
         'name',
-        'blurb'  => 'description',
+        'description',
+        'department',
+        'tag',
+        'age',
         'start'  => 'event_start_date',
         'end'    => 'event_end_date',
-        'department',
-        'category',
-        'age',
         'image',
     );
 
@@ -61,6 +61,29 @@ class EventResource extends AbstractResource
             'event_start_date' => array('notnull' => true)
         );
 
+        if ($when = $this->_request->getQueryParam('when')) {
+            switch($when) {
+                case 'past':
+                    break;
+                case 'current':
+                    break;
+                case 'upcoming':
+                    break;
+            }
+        }
+
+        if ($tag = $this->_request->getQueryParam('tag')) {
+            // @TODO: Add filter
+        }
+
+        if ($age = $this->_request->getQueryParam('age')) {
+            // @TODO: Add filter
+        }
+
+        if ($department = $this->_request->getQueryParam('department')) {
+            // @TODO: Add filter
+        }
+
         return $this->getCollection($filters);
     }
 
@@ -86,12 +109,34 @@ class EventResource extends AbstractResource
      */
     protected function _formatItem(array $item, $fields = NULL, $links = NULL)
     {
-        $item['department'] = explode(',', $item['departments']);
-        $item['age'] = explode(',', $item['ages']);
+        $imageBaseUrl = 'http://' . API_WEB_URL . '/media/catalog/category/';
 
-        $item['image'] = array(
-            'med' => "http://magento.totsy.com/media/product/category/$item[image]"
-        );
+        $item['department'] = isset($item['departments'])
+            ? explode(',', $item['departments'])
+            : null;
+        $item['tag'] = isset($item['tags'])
+            ? explode(',', $item['tags'])
+            : null;
+        $item['age'] = isset($item['ages'])
+            ? explode(',', $item['ages'])
+            : null;
+
+        if (isset($item['image'])) {
+            $item['default_image'] = $item['image'];
+        }
+        $item['image'] = array();
+        if (isset($item['default_image'])) {
+            $item['image']['default'] = $imageBaseUrl . $item['default_image'];
+        }
+        if (isset($item['small_image'])) {
+            $item['image']['small'] = $imageBaseUrl . $item['small_image'];
+        }
+        if (isset($item['thumbnail'])) {
+            $item['image']['thumbnail'] = $imageBaseUrl . $item['thumbnail'];
+        }
+        if (isset($item['logo'])) {
+            $item['image']['logo'] = $imageBaseUrl . $item['logo'];
+        }
 
         return parent::_formatItem($item, $fields, $links);
     }

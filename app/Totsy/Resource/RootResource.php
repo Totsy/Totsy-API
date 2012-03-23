@@ -17,10 +17,8 @@ use Sonno\Annotation\GET,
 
 /**
  * The root resource is the default resource.
- *
- * @Path("/")
  */
-class RootResource
+class RootResource extends AbstractResource
 {
     /**
      * @Context("UriInfo")
@@ -29,29 +27,27 @@ class RootResource
 
     /**
      * @GET
+     * @Path("/")
      * @Produces({"application/json"})
      */
     public function root()
     {
-        $builder = $this->_uriInfo->getAbsolutePathBuilder();
-
-        return json_encode(
+        $links = array(
             array(
-                'links' => array(
-                    array(
-                        'rel' => 'http://rel.totsy.com/user',
-                        'href' => $builder->resourcePath(
-                            'Totsy\Resource\UserResource'
-                        )->build()
-                    ),
-                    array(
-                        'rel' => 'http://rel.totsy.com/event',
-                        'href' => $builder->resourcePath(
-                            'Totsy\Resource\EventResource'
-                        )->build()
-                    )
+                'rel' => 'http://rel.totsy.com/auth',
+                'resource' => array(
+                    'class' => 'Totsy\Resource\AuthResource',
+                    'method' => 'login'
                 )
-            )
+            ),
+            array(
+                'rel' => 'http://rel.totsy.com/event',
+                'resource' => array(
+                    'class' => 'Totsy\Resource\EventResource',
+                    'method' => 'getEventCollection'
+                )
+            ),
         );
+        return json_encode($this->_formatItem(array(), null, $links));
     }
 }

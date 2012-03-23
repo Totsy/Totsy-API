@@ -18,7 +18,7 @@ use Sonno\Annotation\GET,
     Sonno\Http\Response\Response;
 
 /**
- * The base class for all supported Totsy resources.
+ * The base class for all supported Totsy resource classes.
  */
 class AbstractResource
 {
@@ -54,7 +54,7 @@ class AbstractResource
      * @param $offset int
      * @return string json-encoded
      */
-    public function getCollection($filters = array(), $limit = 10, $offset = 0)
+    public function getCollection($filters = array())
     {
         // hollow items are ID values only
         $hollowItems = $this->_model->getCollection();
@@ -64,14 +64,9 @@ class AbstractResource
         }
 
         $results = array();
-        $i = 0;
         foreach ($hollowItems as $hollowItem) {
             $item = $this->_model->load($hollowItem->getId());
             $results[] = $this->_formatItem($item->getData());
-// print_r($item->getData());
-            if (++$i == $limit) {
-                break;
-            }
         }
 
         return json_encode($results);
@@ -130,12 +125,20 @@ class AbstractResource
             }
         }
 
-        if (isset($links) && count($links)) {
+        if ($links && count($links)) {
             $itemData['links'] = array();
 
             foreach ($links as $link) {
                 $builder = $this->_uriInfo->getAbsolutePathBuilder();
-                $builder->replacePath($link['href']);
+                if (isset($link['href'])) {
+                    $builder->replacePath($link['href']);
+                } else if (isset($link['resource'])) {
+                    $builder->replacePath(null)->resourcePath(
+                        $link['resource']['class'],
+                        $link['resource']['method']
+                    );
+                    unset($link['resource']);
+                }
 
                 $link['href'] = $builder->buildFromMap($item);
                 $itemData['links'][] = $link;

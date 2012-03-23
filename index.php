@@ -18,10 +18,19 @@ use Sonno\Configuration\Driver\AnnotationDriver,
     Doctrine\Common\Annotations\AnnotationReader,
     Doctrine\Common\Annotations\AnnotationRegistry;
 
+define(
+    'API_ENV',
+    getenv('API_ENV') ? getenv('API_ENV') : 'dev'
+);
+define(
+    'API_WEB_URL',
+    getenv('API_WEB_URL') ? getenv('API_WEB_URL') : $_SERVER['SERVER_NAME']
+);
+
 define('APC_CONFIG_KEY', 'api_config');
 
 // inspect the APC cache for configuration first
-if (apc_exists(APC_CONFIG_KEY)) {
+if ('dev' === getenv('API_ENV') && apc_exists(APC_CONFIG_KEY)) {
     $config = apc_fetch(APC_CONFIG_KEY);
 
 // build a new Configuration object using Doctrine Annotations
@@ -37,12 +46,15 @@ if (apc_exists(APC_CONFIG_KEY)) {
         'Totsy\Resource\RootResource',
         'Totsy\Resource\EventResource',
         'Totsy\Resource\ProductResource',
+        'Totsy\Resource\AuthResource',
     );
 
     $driver = new AnnotationDriver($resources, $annotationReader);
     $config = $driver->parseConfig();
 
-    apc_add(APC_CONFIG_KEY, $config);
+    if ('dev' !== getenv('API_ENV')) {
+        apc_add(APC_CONFIG_KEY, $config);
+    }
 }
 
 // run the Sonno application

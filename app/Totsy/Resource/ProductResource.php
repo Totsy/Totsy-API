@@ -22,21 +22,30 @@ use Sonno\Annotation\GET,
  */
 class ProductResource extends AbstractResource
 {
-    protected $_event;
+    /**
+     * The unique identifier for the Event that a product belongs to.
+     *
+     * @var int
+     */
+    protected $_eventId;
 
     protected $_fields = array(
         'name',
-        'description',
+        'description' => 'short_description',
         'department',
         'category',
         'age',
         'vendor_style',
         'sku',
+        'weight',
         'price' => array(
             'price',
             'orig' => 'original_price',
             'msrp'
         ),
+        'hot',
+        'featured',
+        'image',
     );
 
     protected $_links = array(
@@ -73,6 +82,9 @@ class ProductResource extends AbstractResource
      */
     public function getProductEntity($id)
     {
+        $product = $this->_model->load($id);
+        $this->_eventId = $product->getCategoryId();
+
         return $this->getItem($id);
     }
 
@@ -81,10 +93,11 @@ class ProductResource extends AbstractResource
      * @Path("/product/{id}/quantity")
      * @Produces({"application/json"})
      * @PathParam("id")
+     *
+     * @todo Implement this
      */
     public function getProductQuantity($id)
     {
-
     }
 
     /**
@@ -95,15 +108,16 @@ class ProductResource extends AbstractResource
      */
     public function getEventProductCollection($id)
     {
+        $this->_eventId = $id;
+
         $model = Mage::getModel('catalog/category');
-        $this->_event = $model->load($id);
-        $products = $this->_event->getProductCollection();
+        $event = $model->load($id);
+        $products = $event->getProductCollection();
 
         $results = array();
         foreach ($products as $product) {
             $item = $this->_model->load($product->getId());
             $results[] = $this->_formatItem($item->getData());
-            // print_r($item->getData());
         }
 
         return json_encode($results);
@@ -120,10 +134,27 @@ class ProductResource extends AbstractResource
      */
     protected function _formatItem(array $item, $fields = NULL, $links = NULL)
     {
-        $item['event_id'] = $this->_event->getId();
-        $item['department'] = explode(',', $this->_event->getDepartments());
-        $item['age'] = explode(',', $this->_event->getAges());
-        $item['category'] = explode(',', $this->_event->getCategories());
+        $imageBaseUrl = 'http://' . API_WEB_URL . '/media/catalog/product';
+
+        $item['event_id'] = $this->_eventId;
+
+        $item['department'] = isset($item['departments'])
+            ? explode(',', $item['departments'])
+            : null;
+        $item['category'] = isset($item['categories'])
+            ? explode(',', $item['categories'])
+            : null;
+        $item['age'] = isset($item['ages'])
+            ? explode(',', $item['ages'])
+            : null;
+
+        $item['hot'] = isset($item['hot_list']) && $item['hot_list'];
+        $item['featured'] = isset($item['featured']) && $item['featured'];
+
+        $item['image'] = array();
+        foreach ($item['media_gallery']['images'] as $image) {
+            $item['image'][] = $imageBaseUrl . $image['file'];
+        }
 
         return parent::_formatItem($item, $fields, $links);
     }

@@ -21,11 +21,6 @@ use Sonno\Annotation\GET,
 class RootResource extends AbstractResource
 {
     /**
-     * @Context("UriInfo")
-     */
-    protected $_uriInfo;
-
-    /**
      * @GET
      * @Path("/")
      * @Produces({"application/json"})
@@ -34,14 +29,14 @@ class RootResource extends AbstractResource
     {
         $links = array(
             array(
-                'rel' => 'http://rel.totsy.com/auth',
+                'rel' => 'http://rel.totsy.com/entity/auth',
                 'resource' => array(
                     'class' => 'Totsy\Resource\AuthResource',
                     'method' => 'login'
                 )
             ),
             array(
-                'rel' => 'http://rel.totsy.com/event',
+                'rel' => 'http://rel.totsy.com/collection/event',
                 'resource' => array(
                     'class' => 'Totsy\Resource\EventResource',
                     'method' => 'getEventCollection'

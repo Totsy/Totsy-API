@@ -104,6 +104,7 @@ class AbstractResource
             $links = $this->_links;
         }
 
+        // add selected data from the incoming $item to the output $itemData
         foreach ($fields as $outputFieldName => $dataFieldName) {
             if (is_int($outputFieldName)) {
                 $outputFieldName = $dataFieldName;
@@ -123,15 +124,17 @@ class AbstractResource
             }
         }
 
+        // populate hyperlinks if necessary
         if ($links && count($links)) {
             $itemData['links'] = array();
 
             foreach ($links as $link) {
-                $builder = $this->_uriInfo->getAbsolutePathBuilder();
+                $builder = $this->_uriInfo->getBaseUriBuilder();
+
                 if (isset($link['href'])) {
-                    $builder->replacePath($link['href']);
+                    $builder->path($link['href']);
                 } else if (isset($link['resource'])) {
-                    $builder->replacePath(null)->resourcePath(
+                    $builder->resourcePath(
                         $link['resource']['class'],
                         $link['resource']['method']
                     );
@@ -144,13 +147,5 @@ class AbstractResource
         }
 
         return $itemData;
-    }
-
-    protected function _authorize()
-    {
-        $headers = $this->_request->getHeaders();
-        $authToken = $headers['authorization'];
-
-        var_dump($authToken); exit;
     }
 }

@@ -55,7 +55,7 @@ class ProductResource extends AbstractResource
             'href' => '/product/{entity_id}'
         ),
         array(
-            'rel' => 'http://rel.totsy.com/event',
+            'rel' => 'http://rel.totsy.com/entity/event',
             'href' => '/event/{event_id}'
         ),
     );

@@ -39,7 +39,7 @@ class EventResource extends AbstractResource
             'href' => '/event/{entity_id}'
         ),
         array(
-            'rel' => 'http://rel.totsy.com/product',
+            'rel' => 'http://rel.totsy.com/collection/product',
             'href' => '/event/{entity_id}/product'
         ),
     );

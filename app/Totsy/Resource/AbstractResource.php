@@ -49,9 +49,7 @@ class AbstractResource
      * Construct a response (application/json) of a entity collection from the
      * local model.
      *
-     * @param $filters array
-     * @param $limit int
-     * @param $offset int
+     * @param $filters array The set of Magento ORM filters to apply.
      * @return string json-encoded
      */
     public function getCollection($filters = array())
@@ -82,7 +80,7 @@ class AbstractResource
     {
         $item = $this->_model->load($id);
 
-        if (!$item) {
+        if ($item->isObjectNew()) {
             return new Response(404);
         }
 
@@ -146,5 +144,13 @@ class AbstractResource
         }
 
         return $itemData;
+    }
+
+    protected function _authorize()
+    {
+        $headers = $this->_request->getHeaders();
+        $authToken = $headers['authorization'];
+
+        var_dump($authToken); exit;
     }
 }

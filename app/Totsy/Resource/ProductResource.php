@@ -14,6 +14,7 @@ use Sonno\Annotation\GET,
     Sonno\Annotation\Produces,
     Sonno\Annotation\Context,
     Sonno\Annotation\PathParam,
+    Sonno\Http\Response\Response,
 
     Mage;
 
@@ -66,16 +67,6 @@ class ProductResource extends AbstractResource
 
     /**
      * @GET
-     * @Path("/product")
-     * @Produces({"application/json"})
-     */
-    public function getProductCollection()
-    {
-        return $this->getCollection();
-    }
-
-    /**
-     * @GET
      * @Path("/product/{id}")
      * @Produces({"application/json"})
      * @PathParam("id")
@@ -83,7 +74,11 @@ class ProductResource extends AbstractResource
     public function getProductEntity($id)
     {
         $product = $this->_model->load($id);
-        $this->_eventId = $product->getCategoryId();
+
+        $event = $product->getCategoryCollection()->getFirstItem();
+        if ($event) {
+            $this->_eventId = $event->getId();
+        }
 
         return $this->getItem($id);
     }
@@ -93,11 +88,18 @@ class ProductResource extends AbstractResource
      * @Path("/product/{id}/quantity")
      * @Produces({"application/json"})
      * @PathParam("id")
-     *
-     * @todo Implement this
      */
     public function getProductQuantity($id)
     {
+        $product = $this->_model->load($id);
+
+        if ($product->isObjectNew()) {
+            return new Response(404);
+        }
+
+        return json_encode(
+            array('quantity' => $product->getStockItem()->getStockQty())
+        );
     }
 
     /**

@@ -61,27 +61,44 @@ class EventResource extends AbstractResource
             'event_start_date' => array('notnull' => true)
         );
 
+        // setup filters on event start & end dates using the 'when' parameter
         if ($when = $this->_request->getQueryParam('when')) {
             switch($when) {
                 case 'past':
+                    $filters['event_end_date'] = array(
+                        'to' => date('Y-m-d H:m:s'),
+                        'datetime' => true,
+                    );
                     break;
                 case 'current':
+                    $filters['event_start_date'] = array(
+                        'to' => date('Y-m-d H:m:s'),
+                        'datetime' => true,
+                    );
+                    $filters['event_end_date'] = array(
+                        'from' => date('Y-m-d H:m:s'),
+                        'datetime' => true,
+                    );
                     break;
                 case 'upcoming':
+                    $filters['event_start_date'] = array(
+                        'from' => date('Y-m-d H:m:s'),
+                        'datetime' => true,
+                    );
                     break;
             }
         }
 
         if ($tag = $this->_request->getQueryParam('tag')) {
-            // @TODO: Add filter
+            $filters['tags'] = array('in' => explode(',', $tag));
         }
 
         if ($age = $this->_request->getQueryParam('age')) {
-            // @TODO: Add filter
+            $filters['ages'] = array('in' => explode(',', $age));
         }
 
         if ($department = $this->_request->getQueryParam('department')) {
-            // @TODO: Add filter
+            $filters['departments'] = array('in' => explode(',', $department));
         }
 
         return $this->getCollection($filters);

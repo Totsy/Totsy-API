@@ -29,6 +29,28 @@ define(
 
 define('APC_CONFIG_KEY', 'api_config');
 
+/**
+ * Authorize the incoming request.
+ *
+ * @todo Store authorization identifiers in a persistence layer (sqlite)
+ */
+
+$authToken = $_SERVER['HTTP_AUTHORIZATION'];
+if (is_null($authToken)) {
+    header('HTTP/1.1 401 Unauthorized');
+    header('X-API-Error: "An Authorization identifier must be supplied."');
+    exit;
+}
+if ('08c59d86-ec9b-4cfd-b783-71a51e718b65' != $authToken) {
+    header('HTTP/1.1 401 Unauthorized');
+    header('X-API-Error: "An invalid Authorization identifier was found."');
+    exit;
+}
+
+/**
+ * Construct a Sonno Configuration object.
+ */
+
 // inspect the APC cache for configuration first
 if ('dev' === getenv('API_ENV') && apc_exists(APC_CONFIG_KEY)) {
     $config = apc_fetch(APC_CONFIG_KEY);
@@ -57,6 +79,9 @@ if ('dev' === getenv('API_ENV') && apc_exists(APC_CONFIG_KEY)) {
     }
 }
 
-// run the Sonno application
+/**
+ * Run a Sonno application!
+ */
+
 $application = new Application($config);
 $application->run(Request::getInstanceOfCurrentRequest());

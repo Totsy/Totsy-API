@@ -130,6 +130,7 @@ class AbstractResource
 
             foreach ($links as $link) {
                 $builder = $this->_uriInfo->getBaseUriBuilder();
+                $builder->replaceQuery(null);
 
                 if (isset($link['href'])) {
                     $builder->path($link['href']);

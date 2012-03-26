@@ -15,13 +15,23 @@ use Sonno\Annotation\GET,
     Sonno\Annotation\Context,
     Sonno\Annotation\PathParam,
     Sonno\Annotation\QueryParam,
-    Sonno\Http\Response\Response;
+    Sonno\Http\Response\Response,
+    Sonno\Application\WebApplicationException,
+
+    Mage;
 
 /**
  * The base class for all supported Totsy resource classes.
  */
 class AbstractResource
 {
+    /**
+     * The Magento model group name that this resource represents.
+     *
+     * @var string
+     */
+    protected $_modelGroupName;
+
     /**
      * The Magento model that this resource represents.
      *
@@ -44,6 +54,11 @@ class AbstractResource
      * @Context("UriInfo")
      */
     protected $_uriInfo;
+
+    public function __construct()
+    {
+        $this->_model = Mage::getSingleton($this->_modelGroupName);
+    }
 
     /**
      * Construct a response (application/json) of a entity collection from the
@@ -148,5 +163,44 @@ class AbstractResource
         }
 
         return $itemData;
+    }
+
+    /**
+     * Populate a Magento model object with an array of data, and persist the
+     * updated object.
+     *
+     * @param $obj Mage_Core_Model_Abstract
+     * @param $data array The data to populate, or NULL which will use the
+     *                    incoming request data.
+     * @return bool
+     * @throws Sonno\Application\WebApplicationException
+     */
+    protected function _populateModelInstance($obj, $data = NULL)
+    {
+        if (is_null($data)) {
+            $data = json_decode($this->_request->getRequestBody(), true);
+            if (is_null($data)) {
+                $error = 'Malformed entity representation in request body';
+                $e = new WebApplicationException(400);
+                $e->getResponse()->setHeaders(
+                    array('X-API-Error' => $error)
+                );
+                throw $e;
+            }
+        }
+
+        $obj->addData($data);
+
+        try {
+            $obj->save();
+        } catch(\Mage_Core_Exception $mageException) {
+            $e = new WebApplicationException(400);
+            $e->getResponse()->setHeaders(
+                array('X-API-Error' => $mageException->getMessage())
+            );
+            throw $e;
+        }
+
+        return true;
     }
 }

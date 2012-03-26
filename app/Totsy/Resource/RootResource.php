@@ -43,6 +43,7 @@ class RootResource extends AbstractResource
                 )
             ),
         );
+
         return json_encode($this->_formatItem(array(), null, $links));
     }
 }

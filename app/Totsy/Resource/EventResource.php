@@ -13,15 +13,15 @@ use Sonno\Annotation\GET,
     Sonno\Annotation\Path,
     Sonno\Annotation\Produces,
     Sonno\Annotation\Context,
-    Sonno\Annotation\PathParam,
-
-    Mage;
+    Sonno\Annotation\PathParam;
 
 /**
  * An Event is a time-limited sale of zero or more Product items.
  */
 class EventResource extends AbstractResource
 {
+    protected $_modelGroupName = 'catalog/category';
+
     protected $_fields = array(
         'name',
         'description',
@@ -44,12 +44,9 @@ class EventResource extends AbstractResource
         ),
     );
 
-    public function __construct()
-    {
-        $this->_model = Mage::getModel('catalog/category');
-    }
-
     /**
+     * Retrieve a collection of all active/current Event instances.
+     *
      * @GET
      * @Path("/event")
      * @Produces({"application/json"})
@@ -105,6 +102,8 @@ class EventResource extends AbstractResource
     }
 
     /**
+     * A single sale Event instance.
+     *
      * @GET
      * @Path("/event/{id}")
      * @Produces({"application/json"})

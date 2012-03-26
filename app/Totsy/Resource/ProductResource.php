@@ -14,9 +14,7 @@ use Sonno\Annotation\GET,
     Sonno\Annotation\Produces,
     Sonno\Annotation\Context,
     Sonno\Annotation\PathParam,
-    Sonno\Http\Response\Response,
-
-    Mage;
+    Sonno\Http\Response\Response;
 
 /**
  * A Product is a single item that is available for sale.
@@ -25,10 +23,14 @@ class ProductResource extends AbstractResource
 {
     /**
      * The unique identifier for the Event that a product belongs to.
+     * This instance variable is set by a resource method, and referred to in
+     * _formatItem to setup the event ID for URI template substitution.
      *
      * @var int
      */
     protected $_eventId;
+
+    protected $_modelGroupName = 'catalog/product';
 
     protected $_fields = array(
         'name',
@@ -60,12 +62,9 @@ class ProductResource extends AbstractResource
         ),
     );
 
-    public function __construct()
-    {
-        $this->_model = Mage::getModel('catalog/product');
-    }
-
     /**
+     * A single Product instance.
+     *
      * @GET
      * @Path("/product/{id}")
      * @Produces({"application/json"})
@@ -84,6 +83,8 @@ class ProductResource extends AbstractResource
     }
 
     /**
+     * The available quantity of a single product.
+     *
      * @GET
      * @Path("/product/{id}/quantity")
      * @Produces({"application/json"})
@@ -103,6 +104,8 @@ class ProductResource extends AbstractResource
     }
 
     /**
+     * Products that are part of an Event.
+     * 
      * @GET
      * @Path("/event/{id}/product")
      * @Produces({"application/json"})

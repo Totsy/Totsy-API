@@ -9,7 +9,7 @@
 require_once '../app/Mage.php';
 require_once 'app/autoload.php';
 
-Mage::app();
+Mage::app('default');
 
 use Sonno\Configuration\Driver\AnnotationDriver,
     Sonno\Annotation\Reader\DoctrineReader,
@@ -36,14 +36,9 @@ define('APC_CONFIG_KEY', 'api_config');
  */
 
 $authToken = $_SERVER['HTTP_AUTHORIZATION'];
-if (is_null($authToken)) {
-    header('HTTP/1.1 401 Unauthorized');
-    header('X-API-Error: "An Authorization identifier must be supplied."');
-    exit;
-}
-if ('08c59d86-ec9b-4cfd-b783-71a51e718b65' != $authToken) {
-    header('HTTP/1.1 401 Unauthorized');
-    header('X-API-Error: "An invalid Authorization identifier was found."');
+if (!$authToken || '08c59d86-ec9b-4cfd-b783-71a51e718b65' != $authToken) {
+    header('HTTP/1.0 401 Unauthorized');
+    header('WWW-Authenticate: Basic realm="Totsy API"');
     exit;
 }
 
@@ -52,7 +47,7 @@ if ('08c59d86-ec9b-4cfd-b783-71a51e718b65' != $authToken) {
  */
 
 // inspect the APC cache for configuration first
-if ('dev' === getenv('API_ENV') && apc_exists(APC_CONFIG_KEY)) {
+if ('dev' !== getenv('API_ENV') && apc_exists(APC_CONFIG_KEY)) {
     $config = apc_fetch(APC_CONFIG_KEY);
 
 // build a new Configuration object using Doctrine Annotations
@@ -69,6 +64,7 @@ if ('dev' === getenv('API_ENV') && apc_exists(APC_CONFIG_KEY)) {
         'Totsy\Resource\EventResource',
         'Totsy\Resource\ProductResource',
         'Totsy\Resource\AuthResource',
+        'Totsy\Resource\UserResource',
     );
 
     $driver = new AnnotationDriver($resources, $annotationReader);

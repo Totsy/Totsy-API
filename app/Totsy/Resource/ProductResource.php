@@ -14,7 +14,9 @@ use Sonno\Annotation\GET,
     Sonno\Annotation\Produces,
     Sonno\Annotation\Context,
     Sonno\Annotation\PathParam,
-    Sonno\Http\Response\Response;
+    Sonno\Http\Response\Response,
+
+    Mage;
 
 /**
  * A Product is a single item that is available for sale.

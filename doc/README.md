@@ -22,7 +22,7 @@ Events and Products are a read-only interface to the Totsy product catalog.
 
 ### Retrieve Products ###
 `GET /event/123/product` responds with a collection of Products that are part of some event.
-`GET /product` responds with a collection of all Products.
+`GET /product/567` responds with a single Product.
 
 ### Retrieve Product Quantity ###
 `GET /product/567/quantity` responds with the current quantity of a product.

@@ -12,6 +12,7 @@ namespace Totsy\Resource;
 use Sonno\Annotation\GET,
     Sonno\Annotation\POST,
     Sonno\Annotation\PUT,
+    Sonno\Annotation\DELETE,
     Sonno\Annotation\Path,
     Sonno\Annotation\Consumes,
     Sonno\Annotation\Produces,
@@ -72,8 +73,16 @@ class UserResource extends AbstractResource
         $user = Mage::getModel($this->_modelGroupName);
         $this->_populateModelInstance($user);
 
-        return json_encode(
-            $this->_formatItem($user->getData(), $this->_fields, $this->_links)
+        $response = $this->_formatItem(
+            $user->getData(),
+            $this->_fields,
+            $this->_links
+        );
+        $responseBody = json_encode($response);
+
+        return new Response(201,
+            $responseBody,
+            array('Location' => $response['links'][0]['href'])
         );
     }
 
@@ -111,6 +120,31 @@ class UserResource extends AbstractResource
         return json_encode(
             $this->_formatItem($user->getData(), $this->_fields, $this->_links)
         );
+    }
+
+    /**
+     * Remove the record of an existing system User.
+     *
+     * @DELETE
+     * @Path("/user/{id}")
+     * @Produces({"*\/*"})
+     * @PathParam("id")
+     */
+    public function deleteUserEntity($id)
+    {
+        $user = self::authorizeUser($id);
+
+        try {
+            $user->delete();
+        } catch(\Mage_Core_Exception $mageException) {
+            Mage::logException($mageException);
+
+            $e = new WebApplicationException(500);
+            $e->getResponse()->setHeaders(
+                array('X-API-Error' => $mageException->getMessage())
+            );
+            throw $e;
+        }
     }
 
     /**

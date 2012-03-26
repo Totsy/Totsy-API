@@ -135,7 +135,9 @@ class AbstractResource
 
             // data field is an alias of an existing field
             } else if (is_string($dataFieldName)) {
-                $itemData[$outputFieldName] = $item[$dataFieldName];
+                $itemData[$outputFieldName] = isset($item[$dataFieldName])
+                    ? $item[$dataFieldName]
+                    : NULL;
             }
         }
 
@@ -189,12 +191,30 @@ class AbstractResource
             }
         }
 
+        // rewrite keys in the data array for any aliased keys
+        foreach ($this->_fields as $outputFieldName => $dataFieldName) {
+            if (is_string($outputFieldName)) {
+                $data[$dataFieldName] = $data[$outputFieldName];
+                unset($data[$outputFieldName]);
+            }
+        }
+
         $obj->addData($data);
 
         try {
             $obj->save();
         } catch(\Mage_Core_Exception $mageException) {
+            Mage::logException($mageException);
+
             $e = new WebApplicationException(400);
+            $e->getResponse()->setHeaders(
+                array('X-API-Error' => $mageException->getMessage())
+            );
+            throw $e;
+        } catch(\Exception $mageException) {
+            Mage::logException($mageException);
+
+            $e = new WebApplicationException(500);
             $e->getResponse()->setHeaders(
                 array('X-API-Error' => $mageException->getMessage())
             );

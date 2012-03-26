@@ -6,17 +6,18 @@
  * @copyright  Copyright (c) 2012 Totsy LLC
  */
 
-require_once '../app/Mage.php';
-require_once 'app/autoload.php';
-
-Mage::app('default');
-
 use Sonno\Configuration\Driver\AnnotationDriver,
     Sonno\Annotation\Reader\DoctrineReader,
     Sonno\Application\Application,
     Sonno\Http\Request\Request,
     Doctrine\Common\Annotations\AnnotationReader,
     Doctrine\Common\Annotations\AnnotationRegistry;
+
+/**
+ * Setup autoloaders for the API application, and other application settings as
+ * global constants.
+ */
+require_once 'app/autoload.php';
 
 define(
     'API_ENV',
@@ -43,11 +44,21 @@ if (!$authToken || '08c59d86-ec9b-4cfd-b783-71a51e718b65' != $authToken) {
 }
 
 /**
+ * Bootstrap the Magento environment.
+ */
+
+require_once '../app/Mage.php';
+Mage::app('default');
+if ('dev' === API_ENV) {
+    Mage::setIsDeveloperMode(true);
+}
+
+/**
  * Construct a Sonno Configuration object.
  */
 
 // inspect the APC cache for configuration first
-if ('dev' !== getenv('API_ENV') && apc_exists(APC_CONFIG_KEY)) {
+if ('dev' !== API_ENV && apc_exists(APC_CONFIG_KEY)) {
     $config = apc_fetch(APC_CONFIG_KEY);
 
 // build a new Configuration object using Doctrine Annotations
@@ -65,12 +76,13 @@ if ('dev' !== getenv('API_ENV') && apc_exists(APC_CONFIG_KEY)) {
         'Totsy\Resource\ProductResource',
         'Totsy\Resource\AuthResource',
         'Totsy\Resource\UserResource',
+        'Totsy\Resource\AddressResource',
     );
 
     $driver = new AnnotationDriver($resources, $annotationReader);
     $config = $driver->parseConfig();
 
-    if ('dev' !== getenv('API_ENV')) {
+    if ('dev' !== API_ENV) {
         apc_add(APC_CONFIG_KEY, $config);
     }
 }

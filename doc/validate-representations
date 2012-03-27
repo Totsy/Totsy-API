@@ -1,0 +1,58 @@
+#!/usr/bin/php
+<?php
+
+function usage() {
+    echo <<<EOH
+Usage:
+validate-representations <filename.wadl>
+
+EOH;
+    exit(1);
+}
+
+if ($argc < 2) {
+    usage();
+}
+
+$wadl = new SimpleXMLElement(file_get_contents($argv[1]));
+$wadl->registerXPathNamespace('wadl', 'http://research.sun.com/wadl/2006/10');
+
+$docblocks = $wadl->xpath("//wadl:representation[@mediaType='application/json']/wadl:doc");
+$valid     = 0;
+
+foreach($docblocks as $doc) {
+	$attrs  = $doc->attributes();
+	$repr   = (string) $doc->pre;
+	$result = json_decode($repr);
+
+	if (is_null($result)) {
+		echo "ERROR: Invalid JSON detected for representation titled '", $attrs['title'], "'.", PHP_EOL;
+	} else {
+        $valid++;
+    }
+}
+
+$successRate = round($valid / count($docblocks) * 100);
+echo "$successRate% of ", count($docblocks), " JSON representations in $argv[1] are valid.", PHP_EOL;
+echo "Memory: ", getPeakMemory(), PHP_EOL;
+
+if ($valid != count($docblocks)) {
+	exit(1);
+}
+
+function getPeakMemory($targetUnit = 'kB') {
+    $units = array('b', 'kB', 'MB');
+    $currentBytes = memory_get_peak_usage();
+    $currentUnit  = 'b';
+
+    for ($i = 0; $i < count($units); $i++) {
+        if ($units[$i] == $targetUnit) {
+            break;
+        }
+
+        $currentBytes /= 1024;
+        $currentUnit = $units[$i+1];
+    }
+
+    return number_format($currentBytes, 1) . ' ' . $currentUnit;
+}

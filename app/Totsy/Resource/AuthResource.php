@@ -59,7 +59,7 @@ class AuthResource extends AbstractResource
 
         $user = $this->_model->getCustomer();
         return json_encode(
-            $this->_formatItem($user->getData(), null, $this->_links)
+            $this->_formatItem($user, null, $this->_links)
         );
     }
 

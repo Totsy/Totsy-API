@@ -79,7 +79,7 @@ class AbstractResource
         $results = array();
         foreach ($hollowItems as $hollowItem) {
             $item = $this->_model->load($hollowItem->getId());
-            $results[] = $this->_formatItem($item->getData());
+            $results[] = $this->_formatItem($item);
         }
 
         return json_encode($results);
@@ -99,27 +99,28 @@ class AbstractResource
             return new Response(404);
         }
 
-        return json_encode($this->_formatItem($item->getData()));
+        return json_encode($this->_formatItem($item));
     }
 
     /**
-     * @param $item array
+     * @param $item Mage_Core_Model_Abstract
      * @param $fields array|null
      * @param $links array|null
      * @return array
      */
-    protected function _formatItem(array $item, $fields = NULL, $links = NULL)
+    protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
-        $itemData = array();
+        $sourceData    = $item->getData();
+        $formattedData = array();
 
         if (is_null($fields)) {
-            $fields = $this->_fields;
+            $fields = isset($this->_fields) ? $this->_fields : array();
         }
         if (is_null($links)) {
-            $links = $this->_links;
+            $links = isset($this->_links) ? $this->_links : array();
         }
 
-        // add selected data from the incoming $item to the output $itemData
+        // add selected data from the incoming $sourceData to the output $formattedData
         foreach ($fields as $outputFieldName => $dataFieldName) {
             if (is_int($outputFieldName)) {
                 $outputFieldName = $dataFieldName;
@@ -127,7 +128,7 @@ class AbstractResource
 
             // data field is an embedded object
             if (is_array($dataFieldName)) {
-                $itemData[$outputFieldName] = $this->_formatItem(
+                $formattedData[$outputFieldName] = $this->_formatItem(
                     $item,
                     $dataFieldName,
                     array()
@@ -135,15 +136,15 @@ class AbstractResource
 
             // data field is an alias of an existing field
             } else if (is_string($dataFieldName)) {
-                $itemData[$outputFieldName] = isset($item[$dataFieldName])
-                    ? $item[$dataFieldName]
+                $formattedData[$outputFieldName] = isset($sourceData[$dataFieldName])
+                    ? $sourceData[$dataFieldName]
                     : NULL;
             }
         }
 
         // populate hyperlinks if necessary
         if ($links && count($links)) {
-            $itemData['links'] = array();
+            $formattedData['links'] = array();
 
             foreach ($links as $link) {
                 $builder = $this->_uriInfo->getBaseUriBuilder();
@@ -159,12 +160,12 @@ class AbstractResource
                     unset($link['resource']);
                 }
 
-                $link['href'] = $builder->buildFromMap($item);
-                $itemData['links'][] = $link;
+                $link['href'] = $builder->buildFromMap($sourceData);
+                $formattedData['links'][] = $link;
             }
         }
 
-        return $itemData;
+        return $formattedData;
     }
 
     /**

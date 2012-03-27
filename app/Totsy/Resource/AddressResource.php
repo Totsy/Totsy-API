@@ -70,7 +70,7 @@ class AddressResource extends AbstractResource
         $addresses = $user->getAddressesCollection();
         $results = array();
         foreach ($addresses as $address) {
-            $results[] = $this->_formatItem($address->getData());
+            $results[] = $this->_formatItem($address);
         }
 
         return json_encode($results);
@@ -93,11 +93,7 @@ class AddressResource extends AbstractResource
         $address->setCustomerId($id);
         $this->_populateModelInstance($address);
 
-        $response = $this->_formatItem(
-            $address->getData(),
-            $this->_fields,
-            $this->_links
-        );
+        $response = $this->_formatItem($address);
         $responseBody = json_encode($response);
 
         return new Response(201,
@@ -125,13 +121,7 @@ class AddressResource extends AbstractResource
         // ensure that the request is authorized for the address owner
         UserResource::authorizeUser($address->getCustomerId());
 
-        return json_encode(
-            $this->_formatItem(
-                $address->getData(),
-                $this->_fields,
-                $this->_links
-            )
-        );
+        return json_encode($this->_formatItem($address));
     }
 
     /**
@@ -156,12 +146,6 @@ class AddressResource extends AbstractResource
 
         $this->_populateModelInstance($address);
 
-        return json_encode(
-            $this->_formatItem(
-                $address->getData(),
-                $this->_fields,
-                $this->_links
-            )
-        );
+        return json_encode($this->_formatItem($address));
     }
 }

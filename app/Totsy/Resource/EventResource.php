@@ -25,8 +25,8 @@ class EventResource extends AbstractResource
     protected $_fields = array(
         'name',
         'description',
+        'short_description',
         'department',
-        'tag',
         'age',
         'start'  => 'event_start_date',
         'end'    => 'event_end_date',
@@ -86,18 +86,6 @@ class EventResource extends AbstractResource
             }
         }
 
-        if ($tag = $this->_request->getQueryParam('tag')) {
-            $filters['tags'] = array('in' => explode(',', $tag));
-        }
-
-        if ($age = $this->_request->getQueryParam('age')) {
-            $filters['ages'] = array('in' => explode(',', $age));
-        }
-
-        if ($department = $this->_request->getQueryParam('department')) {
-            $filters['departments'] = array('in' => explode(',', $department));
-        }
-
         return $this->getCollection($filters);
     }
 
@@ -118,42 +106,66 @@ class EventResource extends AbstractResource
      * Add formatted fields to item data before deferring to the default
      * item formatting.
      *
-     * @param $item array
+     * @param $item array|Mage_Core_Model_Abstract
      * @param $fields null|array
      * @param $links null|array
      * @return array
      */
-    protected function _formatItem(array $item, $fields = NULL, $links = NULL)
+    protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
+        $sourceData    = $item->getData();
+        $formattedData = array();
+
         $imageBaseUrl = 'http://' . API_WEB_URL . '/media/catalog/category/';
 
-        $item['department'] = isset($item['departments'])
-            ? explode(',', $item['departments'])
-            : null;
-        $item['tag'] = isset($item['tags'])
-            ? explode(',', $item['tags'])
-            : null;
-        $item['age'] = isset($item['ages'])
-            ? explode(',', $item['ages'])
-            : null;
+        // scrape together department & age data from event products
+        $formattedData['department'] = array();
+        $formattedData['age'] = array();
 
-        if (isset($item['image'])) {
-            $item['default_image'] = $item['image'];
-        }
-        $item['image'] = array();
-        if (isset($item['default_image'])) {
-            $item['image']['default'] = $imageBaseUrl . $item['default_image'];
-        }
-        if (isset($item['small_image'])) {
-            $item['image']['small'] = $imageBaseUrl . $item['small_image'];
-        }
-        if (isset($item['thumbnail'])) {
-            $item['image']['thumbnail'] = $imageBaseUrl . $item['thumbnail'];
-        }
-        if (isset($item['logo'])) {
-            $item['image']['logo'] = $imageBaseUrl . $item['logo'];
+        $products = $item->getProductCollection();
+        foreach ($products as $product) {
+            $product->load($product->getId());
+
+            $departments = $product->getAttributeText('departments');
+            $ages = $product->getAttributeText('ages');
+
+            if (is_array($departments)) {
+                $formattedData['department'] = $formattedData['department']
+                    + $departments;
+            } else if (is_string($departments)) {
+                $formattedData['department'][] = $departments;
+            }
+
+            if (is_array($ages)) {
+                $formattedData['age'] = $formattedData['age']
+                    + $ages;
+            } else if (is_string($ages)) {
+                $formattedData['age'][] = $ages;
+            }
         }
 
+        $formattedData['department'] = array_unique($formattedData['department']);
+        $formattedData['age'] = array_unique($formattedData['age']);
+
+        // construct an object literal for event images
+        if (isset($sourceData['image'])) {
+            $formattedData['default_image'] = $sourceData['image'];
+        }
+        $formattedData['image'] = array();
+        if (isset($sourceData['default_image'])) {
+            $formattedData['image']['default'] = $imageBaseUrl . $sourceData['default_image'];
+        }
+        if (isset($sourceData['small_image'])) {
+            $formattedData['image']['small'] = $imageBaseUrl . $sourceData['small_image'];
+        }
+        if (isset($sourceData['thumbnail'])) {
+            $formattedData['image']['thumbnail'] = $imageBaseUrl . $sourceData['thumbnail'];
+        }
+        if (isset($sourceData['logo'])) {
+            $formattedData['image']['logo'] = $imageBaseUrl . $sourceData['logo'];
+        }
+
+        $item->addData($formattedData);
         return parent::_formatItem($item, $fields, $links);
     }
 }

@@ -36,9 +36,9 @@ class ProductResource extends AbstractResource
 
     protected $_fields = array(
         'name',
-        'description' => 'short_description',
+        'description',
+        'short_description',
         'department',
-        'category',
         'age',
         'vendor_style',
         'sku',
@@ -75,8 +75,8 @@ class ProductResource extends AbstractResource
     public function getProductEntity($id)
     {
         $product = $this->_model->load($id);
+        $event   = $product->getCategoryCollection()->getFirstItem();
 
-        $event = $product->getCategoryCollection()->getFirstItem();
         if ($event) {
             $this->_eventId = $event->getId();
         }
@@ -124,7 +124,7 @@ class ProductResource extends AbstractResource
         $results = array();
         foreach ($products as $product) {
             $item = $this->_model->load($product->getId());
-            $results[] = $this->_formatItem($item->getData());
+            $results[] = $this->_formatItem($item);
         }
 
         return json_encode($results);
@@ -134,35 +134,63 @@ class ProductResource extends AbstractResource
      * Add formatted fields to item data before deferring to the default
      * item formatting.
      *
-     * @param $item array
+     * @param $item array|Mage_Core_Model_Abstract
      * @param $fields null|array
      * @param $links null|array
      * @return array
      */
-    protected function _formatItem(array $item, $fields = NULL, $links = NULL)
+    protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
+        $sourceData    = $item->getData();
+        $formattedData = array();
+
         $imageBaseUrl = 'http://' . API_WEB_URL . '/media/catalog/product';
 
-        $item['event_id'] = $this->_eventId;
+        $formattedData['event_id'] = $this->_eventId;
 
-        $item['department'] = isset($item['departments'])
-            ? explode(',', $item['departments'])
-            : null;
-        $item['category'] = isset($item['categories'])
-            ? explode(',', $item['categories'])
-            : null;
-        $item['age'] = isset($item['ages'])
-            ? explode(',', $item['ages'])
-            : null;
+        // scrape together department & age data
+        $formattedData['department'] = array();
+        $formattedData['age'] = array();
 
-        $item['hot'] = isset($item['hot_list']) && $item['hot_list'];
-        $item['featured'] = isset($item['featured']) && $item['featured'];
+        $departments = $item->getAttributeText('departments');
+        $ages = $item->getAttributeText('ages');
 
-        $item['image'] = array();
-        foreach ($item['media_gallery']['images'] as $image) {
-            $item['image'][] = $imageBaseUrl . $image['file'];
+        if (is_array($departments)) {
+            $formattedData['department'] = $formattedData['department']
+                + $departments;
+        } else if (is_string($departments)) {
+            $formattedData['department'][] = $departments;
         }
 
+        if (is_array($ages)) {
+            $formattedData['age'] = $formattedData['age']
+                + $ages;
+        } else if (is_string($ages)) {
+            $formattedData['age'][] = $ages;
+        }
+
+        $formattedData['department'] = array_unique($formattedData['department']);
+        $formattedData['age'] = array_unique($formattedData['age']);
+
+        $formattedData['department'] = isset($item['departments'])
+            ? $item->getAttributeText('departments')
+            : array();
+        $formattedData['category'] = isset($item['categories'])
+            ? $item->getAttributeText('categories')
+            : array();
+        $formattedData['age'] = isset($item['ages'])
+            ? $item->getAttributeText('ages')
+            : array();
+
+        $formattedData['hot'] = isset($item['hot_list']) && $item['hot_list'];
+        $formattedData['featured'] = isset($item['featured']) && $item['featured'];
+
+        $formattedData['image'] = array();
+        foreach ($item['media_gallery']['images'] as $image) {
+            $formattedData['image'][] = $imageBaseUrl . $image['file'];
+        }
+
+        $item->addData($formattedData);
         return parent::_formatItem($item, $fields, $links);
     }
 }

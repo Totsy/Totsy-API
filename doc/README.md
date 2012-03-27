@@ -59,12 +59,6 @@ Users and their corresponding Orders are the primary use case for the Totsy API.
 ### Create a new Credit Card for a User ###
 `POST /user/123/creditcard` with a full representation of a Credit Card.
 
-### Retrieve Rewards stored for a User ###
-`GET /user/123/reward` responds with a collection of Rewards. Each entry in the collection contains a a full link [`rel=http://rel.totsy.com/entity/reward`] to the original Reward resource.
-
-### Create a new Reward for a User ###
-`POST /user/123/reward` with a partial representation of an Reward.
-
 ### Retrieve Orders stored for a User ###
 `GET /user/123/order` responds with a collection of Orders. Each entry in the collection contains a a full link [`rel=http://rel.totsy.com/entity/order`] to the original Order resource.
 
@@ -72,3 +66,7 @@ Users and their corresponding Orders are the primary use case for the Totsy API.
 1. `POST /user/123/order` with a partial representation of an Order, which includes a link [`rel=http://rel.totsy.com/entity/order`] to the full Order resource and the temporary Order expiry time. The server returns with a `202 Accepted` response, indicating that a temporary Order has been created. Initially, this temporary order will only contain order items (while the end user manipulates a client-side shopping cart).
 2. `PUT /order/765432` with a partial representation of an Order to update the existing temporary Order at any time, as often as needed. Each request will generate another `202 Accepted` response, with a full Order representation including an updated expiration time.
 3. `PUT /order/765432` a final time with a parital representation of an Order that contains address and payment information. The server returns with a `201 Created` response, indicating that a full and permanent Order has been created.
+
+Any order update (`PUT /order/765432`) could possibly respond with a `409 Conflict` status in the following scenarios:
+1. One or more of the items in the order are not available (out of stock).
+2. The amount of credit to apply to the order exceeds the amount of credit available to the user.

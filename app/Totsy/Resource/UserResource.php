@@ -73,11 +73,7 @@ class UserResource extends AbstractResource
         $user = Mage::getModel($this->_modelGroupName);
         $this->_populateModelInstance($user);
 
-        $response = $this->_formatItem(
-            $user->getData(),
-            $this->_fields,
-            $this->_links
-        );
+        $response = $this->_formatItem($user, $this->_fields, $this->_links);
         $responseBody = json_encode($response);
 
         return new Response(201,
@@ -98,9 +94,7 @@ class UserResource extends AbstractResource
     {
         $user = self::authorizeUser($id);
 
-        return json_encode(
-            $this->_formatItem($user->getData(), $this->_fields, $this->_links)
-        );
+        return json_encode($this->_formatItem($user));
     }
 
     /**
@@ -117,9 +111,7 @@ class UserResource extends AbstractResource
         $user = self::authorizeUser($id);
         $this->_populateModelInstance($user);
 
-        return json_encode(
-            $this->_formatItem($user->getData(), $this->_fields, $this->_links)
-        );
+        return json_encode($this->_formatItem($user));
     }
 
     /**
@@ -145,6 +137,8 @@ class UserResource extends AbstractResource
             );
             throw $e;
         }
+
+        return new Response(200);
     }
 
     /**

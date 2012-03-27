@@ -1,0 +1,23 @@
+#!/usr/bin/php
+<?php
+
+$db = new SQLite3(__DIR__ . '/../db/api.db');
+
+$create_client = <<<EOH
+    CREATE TABLE IF NOT EXISTS client (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        authorization TEXT
+    );
+EOH;
+
+if ($db->exec($create_client)) {
+    echo "New table 'client' created successfully.", PHP_EOL;
+} else {
+    echo sprintf(
+        "An error occurred while attempting to setup the database: %s (%s)%s",
+        $db->lastErrorMsg(),
+        $db->lastErrorCode(),
+        PHP_EOL
+    );
+}

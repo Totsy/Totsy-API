@@ -37,10 +37,17 @@ define('APC_CONFIG_KEY', 'api_config');
  */
 
 $authToken = $_SERVER['HTTP_AUTHORIZATION'];
-if (!$authToken || '08c59d86-ec9b-4cfd-b783-71a51e718b65' != $authToken) {
-    header('HTTP/1.0 401 Unauthorized');
-    header('WWW-Authenticate: Basic realm="Totsy API"');
-    exit;
+if ($authToken) {
+    $db = new SQLite3(__DIR__ . '/db/api.db');
+    $result = $db->querySingle(
+        "SELECT count(*) FROM client WHERE authorization = '$authToken'"
+    );
+
+    if (0 === $result) {
+        header('HTTP/1.0 401 Unauthorized');
+        header('WWW-Authenticate: Basic realm="Totsy API"');
+        exit;
+    }
 }
 
 /**

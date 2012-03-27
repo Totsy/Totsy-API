@@ -1,0 +1,24 @@
+#!/usr/bin/php
+<?php
+
+$db = new SQLite3(__DIR__ . '/../db/api.db');
+
+if ($argc < 2) {
+    die("Usage: addclient <client-name>");
+}
+
+$name = $argv[1];
+$key  = uniqid('', true);
+
+$create_client = "INSERT INTO client (name, authorization) VALUES ('$name', '$key')";
+
+if ($db->exec($create_client)) {
+    echo "New client created successfully with Authorization key: $key", PHP_EOL;
+} else {
+    echo sprintf(
+        "An error occurred while attempting create a new client: %s (%s)%s",
+        $db->lastErrorMsg(),
+        $db->lastErrorCode(),
+        PHP_EOL
+    );
+}

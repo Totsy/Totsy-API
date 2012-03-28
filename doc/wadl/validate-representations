@@ -26,9 +26,9 @@ foreach($docblocks as $doc) {
 	$result = json_decode($repr);
 
 	if (is_null($result)) {
-		echo "ERROR: Invalid JSON detected for representation titled '", $attrs['title'], "'.", PHP_EOL;
+	    echo "ERROR: Invalid JSON detected for representation titled '", $attrs['title'], "'.", PHP_EOL;
 	} else {
-        $valid++;
+	    $valid++;
     }
 }
 

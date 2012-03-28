@@ -597,6 +597,7 @@
           <response status="200">
             <representation mediaType="application/json">
               <doc title="Full User Entity">
+                <pre>
 {
     "email": "tbhuvanendran+hara@totsy.com",
     "firstname": "Tharsan",
@@ -621,6 +622,7 @@
         }
     ]
 }
+                </pre>
               </doc>
             </representation>
           </response>
@@ -708,7 +710,6 @@
               <representation mediaType="application/json">
                 <doc title="Partial Address Entity">
                   <pre>
-                  {
 {
     "firstname": "Maya",
     "lastname": "Troublestone",
@@ -771,140 +772,140 @@
               <representation mediaType="application/json">
                 <doc title="Order Collection">
                   <pre>
-                  [
+[
+    {
+        "status": "pending",
+        "created": "2012-03-28 21:21:39",
+        "updated": "2012-03-28 21:21:39",
+        "coupon_code": null,
+        "total_qty": "1.0000",
+        "total_weight": "1.0000",
+        "shipping": "0.0000",
+        "tax": "0.8000",
+        "discount": "0.0000",
+        "subtotal": "10.0000",
+        "total": "0.0000",
+        "products": [
+            {
+                "name": "Stripe Sling Stripe",
+                "price": "10.0000",
+                "qty": "1.0000",
+                "tax_pct": "8.0000",
+                "tax": "0.8000",
+                "weight": "1.0000",
+                "links": [
                     {
-                      "status": "...",
-                      "placed": "2011-12-13 14:42:22",
-                      "subtotal": 15.88,
-                      "shipping": 7.95,
-                      "taxes": 0,
-                      "payment": {
-                        "card_type": "VI",
-                        "card_number": 1111,
-                        "expire_month": 4,
-                        "expire_year": 2012,
-                        "card_holder_name": "..."
-                      },
-                      "addresses": [
-                        {
-                          "type": "shipping",
-                          "link": {
-                            "rel": "http://rel.totsy.com/address",
-                            "href": "https://api.totsy.com/address/293"
-                          }
-                        },
-                        {
-                          "type": "billing",
-                          "firstname": "...",
-                          "lastname": "...",
-                          "address": [
-                            "line1", "line2", "line3"
-                          ],
-                          "region": "...",
-                          "country": "...",
-                          "zip": "..."
-                        }
-                      ],
-                      "items": [
-                        {
-                          "quantity": 2,
-                          "size": "...",
-                          "color": "...",
-                          "style": "...",
-                          "link": {
-                            "rel": "http://rel.totsy.com/product",
-                            "href": "https://api.totsy.com/product/3820"
-                          }
-                        },
-                        {
-                          "quantity": 1,
-                          "size": "...",
-                          "color": "...",
-                          "style": "...",
-                          "link": {
-                            "rel": "http://rel.totsy.com/product",
-                            "href": "https://api.totsy.com/product/32532"
-                          }
-                        }
-                      ],
-                      "links": [
-                        {
-                          "rel": "http://rel.totsy.com/user",
-                          "href": "https://api.totsy.com/user/12492"
-                        },
-                        {
-                          "rel": "self",
-                          "href": "https://api.totsy.com/order/294882"
-                        }
-                      ]
-                    },
-                    {
-                      "status": "...",
-                      "placed": "2011-12-13 14:42:22",
-                      "subtotal": 15.88,
-                      "shipping": 7.95,
-                      "taxes": 0,
-                      "payment": {
-                        "card_type": "VI",
-                        "card_number": 1111,
-                        "expire_month": 4,
-                        "expire_year": 2012,
-                        "card_holder_name": "..."
-                      },
-                      "addresses": [
-                        {
-                          "type": "shipping",
-                          "link": {
-                            "rel": "http://rel.totsy.com/address",
-                            "href": "https://api.totsy.com/address/293"
-                          }
-                        },
-                        {
-                          "type": "billing",
-                          "firstname": "...",
-                          "lastname": "...",
-                          "address": [
-                            "line1", "line2", "line3"
-                          ],
-                          "region": "...",
-                          "country": "...",
-                          "zip": "..."
-                        }
-                      ],
-                      "items": [
-                        {
-                          "quantity": 2,
-                          "size": "...",
-                          "color": "...",
-                          "style": "...",
-                          "link": {
-                            "rel": "http://rel.totsy.com/product",
-                            "href": "https://api.totsy.com/product/3820"
-                          }
-                        },
-                        {
-                          "quantity": 1,
-                          "size": "...",
-                          "color": "...",
-                          "style": "...",
-                          "link": {
-                            "rel": "http://rel.totsy.com/product",
-                            "href": "https://api.totsy.com/product/32532"
-                          }
-                        }
-                      ],
-                      "links": [
-                        {
-                          "rel": "http://rel.totsy.com/user",
-                          "href": "https://api.totsy.com/user/12492"
-                        },
-                        {
-                          "rel": "self",
-                          "href": "https://api.totsy.com/order/294882"
-                        }
-                      ]
+                        "rel": "http://rel.totsy.com/entity/product",
+                        "href": "http://dev.api.tharsan.com:1180/product/392"
                     }
-                  ]
+                ]
+            }
+        ],
+        "payment": {
+            "reward_points_used": 11,
+            "creditcard_type": "VI",
+            "creditcard_last4": null,
+            "creditcard_exp_month": "1",
+            "creditcard_exp_year": "2015"
+        },
+        "addresses": [
+            {
+                "type": "billing",
+                "links": [
+                    {
+                        "rel": "http://rel.totsy.com/entity/address",
+                        "href": "http://dev.api.tharsan.com:1180/address/443"
+                    }
+                ]
+            },
+            {
+                "type": "shipping",
+                "links": [
+                    {
+                        "rel": "http://rel.totsy.com/entity/address",
+                        "href": "http://dev.api.tharsan.com:1180/address/444"
+                    }
+                ]
+            }
+        ],
+        "links": [
+            {
+                "rel": "self",
+                "href": "http://dev.api.tharsan.com:1180/order/222"
+            },
+            {
+                "rel": "http://rel.totsy.com/entity/user",
+                "href": "http://dev.api.tharsan.com:1180/user/1139"
+            }
+        ]
+    },
+    {
+        "status": "pending",
+        "created": "2012-03-27 16:07:25",
+        "updated": "2012-03-27 16:07:27",
+        "coupon_code": null,
+        "total_qty": "1.0000",
+        "total_weight": "2.0000",
+        "shipping": "0.0000",
+        "tax": "1.6000",
+        "discount": "0.0000",
+        "subtotal": "18.0000",
+        "total": "19.6000",
+        "products": [
+            {
+                "name": "Bullfinches Long Sleeve Ruched Neck Tee Light Blue",
+                "price": "18.0000",
+                "qty": "1.0000",
+                "tax_pct": "8.8750",
+                "tax": "1.6000",
+                "weight": "2.0000",
+                "links": [
+                    {
+                        "rel": "http://rel.totsy.com/entity/product",
+                        "href": "http://dev.api.tharsan.com:1180/product/383"
+                    }
+                ]
+            }
+        ],
+        "payment": {
+            "reward_points_used": 0,
+            "creditcard_type": "VI",
+            "creditcard_last4": "1111",
+            "creditcard_exp_month": "6",
+            "creditcard_exp_year": "2016"
+        },
+        "addresses": [
+            {
+                "type": "billing",
+                "links": [
+                    {
+                        "rel": "http://rel.totsy.com/entity/address",
+                        "href": "http://dev.api.tharsan.com:1180/address/429"
+                    }
+                ]
+            },
+            {
+                "type": "shipping",
+                "links": [
+                    {
+                        "rel": "http://rel.totsy.com/entity/address",
+                        "href": "http://dev.api.tharsan.com:1180/address/430"
+                    }
+                ]
+            }
+        ],
+        "links": [
+            {
+                "rel": "self",
+                "href": "http://dev.api.tharsan.com:1180/order/215"
+            },
+            {
+                "rel": "http://rel.totsy.com/entity/user",
+                "href": "http://dev.api.tharsan.com:1180/user/1139"
+            }
+        ]
+    }
+]
                   </pre>
                 </doc>
               </representation>
@@ -927,57 +928,47 @@
               <representation mediaType="application/json">
                 <doc title="Partial Order Entity">
                   <pre>
-                    {
-                      "payment": {
-                        "card_type": "VI",
-                        "card_number": 4111111111111111,
-                        "expire_month": 4,
-                        "expire_year": 2012,
-                        "card_holder_name": "..."
-                      },
-                      "addresses": [
-                        {
-                          "type": "shipping",
-                          "link": {
-                            "rel": "http://rel.totsy.com/address",
-                            "href": "https://api.totsy.com/address/293"
-                          }
-                        },
-                        {
-                          "type": "billing",
-                          "firstname": "...",
-                          "lastname": "...",
-                          "address": [
-                            "line1", "line2", "line3"
-                          ],
-                          "region": "...",
-                          "country": "...",
-                          "zip": "..."
-                        }
-                      ],
-                      "items": [
-                        {
-                          "quantity": 2,
-                          "size": "...",
-                          "color": "...",
-                          "style": "...",
-                          "link": {
-                            "rel": "http://rel.totsy.com/product",
-                            "href": "https://api.totsy.com/product/3820"
-                          }
-                        },
-                        {
-                          "quantity": 1,
-                          "size": "...",
-                          "color": "...",
-                          "style": "...",
-                          "link": {
-                            "rel": "http://rel.totsy.com/product",
-                            "href": "https://api.totsy.com/product/32532"
-                          }
-                        }
-                      ]
-                    }
+{
+    "coupon_code": null,
+    "products": [
+        {
+            "qty": "1.0000",
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/product",
+                    "href": "http://dev.api.tharsan.com:1180/product/392"
+                }
+            ]
+        }
+    ],
+    "payment": {
+        "reward_points_used": 5,
+        "creditcard_type": "VI",
+        "creditcard_number": "4111111111111111",
+        "creditcard_exp_month": "1",
+        "creditcard_exp_year": "2015"
+    },
+    "addresses": [
+        {
+            "type": "billing",
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/address",
+                    "href": "http://dev.api.tharsan.com:1180/address/443"
+                }
+            ]
+        },
+        {
+            "type": "shipping",
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/address",
+                    "href": "http://dev.api.tharsan.com:1180/address/444"
+                }
+            ]
+        }
+    ]
+}
                   </pre>
                 </doc>
               </representation>
@@ -985,75 +976,40 @@
             <response status="202">
               <doc>The order items have been accepted the order is pending.</doc>
               <representation mediaType="application/json">
-                <doc title="Full Order Entity">
+                <doc title="Full Order Entity (Pending)">
                   <pre>
-                  {
-                    "status": "...",
-                    "placed": "2011-12-13 14:42:22",
-                    "subtotal": 15.88,
-                    "shipping": 7.95,
-                    "taxes": 0,
-                    "payment": {
-                      "card_type": "VI",
-                      "card_number": 1111,
-                      "expire_month": 4,
-                      "expire_year": 2012,
-                      "card_holder_name": "..."
-                    },
-                    "addresses": [
-                      {
-                        "type": "shipping",
-                        "link": {
-                          "rel": "http://rel.totsy.com/address",
-                          "href": "https://api.totsy.com/address/293"
-                        }
-                      },
-                      {
-                        "type": "billing",
-                        "firstname": "...",
-                        "lastname": "...",
-                        "address": [
-                          "line1", "line2", "line3"
-                        ],
-                        "region": "...",
-                        "country": "...",
-                        "zip": "..."
-                      }
-                    ],
-                    "items": [
-                      {
-                        "quantity": 2,
-                        "size": "...",
-                        "color": "...",
-                        "style": "...",
-                        "link": {
-                          "rel": "http://rel.totsy.com/product",
-                          "href": "https://api.totsy.com/product/3820"
-                        }
-                      },
-                      {
-                        "quantity": 1,
-                        "size": "...",
-                        "color": "...",
-                        "style": "...",
-                        "link": {
-                          "rel": "http://rel.totsy.com/product",
-                          "href": "https://api.totsy.com/product/32532"
-                        }
-                      }
-                    ],
-                    "expires": "2012-03-05 10:00:01",
-                    "links": [
-                      {
-                        "rel": "http://rel.totsy.com/user",
-                        "href": "https://api.totsy.com/user/12492"
-                      },
-                      {
-                        "rel": "self",
-                        "href": "https://api.totsy.com/order/294882"
-                      }
-                    ]
-                  }
+{
+    "status": "pending",
+    "total_qty": "1.0000",
+    "total_weight": "2.0000",
+    "expires": "2012-03-27 16:07:25",
+    "products": [
+        {
+            "name": "Bullfinches Long Sleeve Ruched Neck Tee Light Blue",
+            "price": "18.0000",
+            "qty": "1.0000",
+            "tax_pct": "8.8750",
+            "tax": "1.6000",
+            "weight": "2.0000",
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/product",
+                    "href": "http://dev.api.tharsan.com:1180/product/383"
+                }
+            ]
+        }
+    ],
+    "links": [
+        {
+            "rel": "self",
+            "href": "http://dev.api.tharsan.com:1180/order/215"
+        },
+        {
+            "rel": "http://rel.totsy.com/entity/user",
+            "href": "http://dev.api.tharsan.com:1180/user/1139"
+        }
+    ]
+}
                   </pre>
                 </doc>
               </representation>
@@ -1061,74 +1017,75 @@
             <response status="201">
               <doc>The order is complete and will enter fulfillment.</doc>
               <representation mediaType="application/json">
-                <doc title="Full Order Entity">
+                <doc title="Full Order Entity (Placed)">
                   <pre>
-                  {
-                    "status": "...",
-                    "placed": "2011-12-13 14:42:22",
-                    "subtotal": 15.88,
-                    "shipping": 7.95,
-                    "taxes": 0,
-                    "payment": {
-                      "card_type": "VI",
-                      "card_number": 1111,
-                      "expire_month": 4,
-                      "expire_year": 2012,
-                      "card_holder_name": "..."
-                    },
-                    "addresses": [
-                      {
-                        "type": "shipping",
-                        "link": {
-                          "rel": "http://rel.totsy.com/address",
-                          "href": "https://api.totsy.com/address/293"
-                        }
-                      },
-                      {
-                        "type": "billing",
-                        "firstname": "...",
-                        "lastname": "...",
-                        "address": [
-                          "line1", "line2", "line3"
-                        ],
-                        "region": "...",
-                        "country": "...",
-                        "zip": "..."
-                      }
-                    ],
-                    "items": [
-                      {
-                        "quantity": 2,
-                        "size": "...",
-                        "color": "...",
-                        "style": "...",
-                        "link": {
-                          "rel": "http://rel.totsy.com/product",
-                          "href": "https://api.totsy.com/product/3820"
-                        }
-                      },
-                      {
-                        "quantity": 1,
-                        "size": "...",
-                        "color": "...",
-                        "style": "...",
-                        "link": {
-                          "rel": "http://rel.totsy.com/product",
-                          "href": "https://api.totsy.com/product/32532"
-                        }
-                      }
-                    ],
-                    "links": [
-                      {
-                        "rel": "http://rel.totsy.com/user",
-                        "href": "https://api.totsy.com/user/12492"
-                      },
-                      {
-                        "rel": "self",
-                        "href": "https://api.totsy.com/order/294882"
-                      }
-                    ]
-                  }
+
+{
+    "status": "pending",
+    "created": "2012-03-27 16:07:25",
+    "updated": "2012-03-27 16:07:27",
+    "coupon_code": null,
+    "total_qty": "1.0000",
+    "total_weight": "2.0000",
+    "shipping": "0.0000",
+    "tax": "1.6000",
+    "discount": "0.0000",
+    "subtotal": "18.0000",
+    "total": "19.6000",
+    "products": [
+        {
+            "name": "Bullfinches Long Sleeve Ruched Neck Tee Light Blue",
+            "price": "18.0000",
+            "qty": "1.0000",
+            "tax_pct": "8.8750",
+            "tax": "1.6000",
+            "weight": "2.0000",
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/product",
+                    "href": "http://dev.api.tharsan.com:1180/product/383"
+                }
+            ]
+        }
+    ],
+    "payment": {
+        "reward_points_used": 0,
+        "creditcard_type": "VI",
+        "creditcard_last4": "1111",
+        "creditcard_exp_month": "6",
+        "creditcard_exp_year": "2016"
+    },
+    "addresses": [
+        {
+            "type": "billing",
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/address",
+                    "href": "http://dev.api.tharsan.com:1180/address/429"
+                }
+            ]
+        },
+        {
+            "type": "shipping",
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/address",
+                    "href": "http://dev.api.tharsan.com:1180/address/430"
+                }
+            ]
+        }
+    ],
+    "links": [
+        {
+            "rel": "self",
+            "href": "http://dev.api.tharsan.com:1180/order/215"
+        },
+        {
+            "rel": "http://rel.totsy.com/entity/user",
+            "href": "http://dev.api.tharsan.com:1180/user/1131"
+        }
+    ]
+}
                   </pre>
                 </doc>
               </representation>
@@ -1356,8 +1313,7 @@
     <!-- Resource: Order -->
     <resource path="order">
       <doc title="Order">
-        An Order is a collection of Product entities and corresponding quantities
-        that a User purchases.
+        An Order is a collection of Product entities and their corresponding quantities that a User purchases.
       </doc>
 
       <param name="auth_token" type="xsd:string" style="query" required="true">
@@ -1376,7 +1332,7 @@
         <method name="DELETE">
           <doc title="Delete Order">Delete an existing Order.</doc>
           <request></request>
-          <response></response>
+          <response status="200"></response>
         </method>
 
         <method name="GET">
@@ -1387,72 +1343,72 @@
             <representation mediaType="application/json">
               <doc title="Full Order Entity">
                 <pre>
-                  {
-                    "status": "...",
-                    "placed": "2011-12-13 14:42:22",
-                    "subtotal": 15.88,
-                    "shipping": 7.95,
-                    "taxes": 0,
-                    "payment": {
-                      "card_type": "VI",
-                      "card_number": 1111,
-                      "expire_month": 4,
-                      "expire_year": 2012,
-                      "card_holder_name": "..."
-                    },
-                    "addresses": [
-                      {
-                        "type": "shipping",
-                        "link": {
-                          "rel": "http://rel.totsy.com/address",
-                          "href": "https://api.totsy.com/address/293"
-                        }
-                      },
-                      {
-                        "type": "billing",
-                        "firstname": "...",
-                        "lastname": "...",
-                        "address": [
-                          "line1", "line2", "line3"
-                        ],
-                        "region": "...",
-                        "country": "...",
-                        "zip": "..."
-                      }
-                    ],
-                    "items": [
-                      {
-                        "quantity": 2,
-                        "size": "...",
-                        "color": "...",
-                        "style": "...",
-                        "link": {
-                          "rel": "http://rel.totsy.com/product",
-                          "href": "https://api.totsy.com/product/3820"
-                        }
-                      },
-                      {
-                        "quantity": 1,
-                        "size": "...",
-                        "color": "...",
-                        "style": "...",
-                        "link": {
-                          "rel": "http://rel.totsy.com/product",
-                          "href": "https://api.totsy.com/product/32532"
-                        }
-                      }
-                    ],
-                    "links": [
-                      {
-                        "rel": "http://rel.totsy.com/user",
-                        "href": "https://api.totsy.com/user/12492"
-                      },
-                      {
-                        "rel": "self",
-                        "href": "https://api.totsy.com/order/294882"
-                      }
-                    ]
-                  }
+{
+    "status": "pending",
+    "created": "2012-03-27 16:07:25",
+    "updated": "2012-03-27 16:07:27",
+    "coupon_code": null,
+    "total_qty": "1.0000",
+    "total_weight": "2.0000",
+    "shipping": "0.0000",
+    "tax": "1.6000",
+    "discount": "0.0000",
+    "subtotal": "18.0000",
+    "total": "19.6000",
+    "products": [
+        {
+            "name": "Bullfinches Long Sleeve Ruched Neck Tee Light Blue",
+            "price": "18.0000",
+            "qty": "1.0000",
+            "tax_pct": "8.8750",
+            "tax": "1.6000",
+            "weight": "2.0000",
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/product",
+                    "href": "http://dev.api.tharsan.com:1180/product/383"
+                }
+            ]
+        }
+    ],
+    "payment": {
+        "reward_points_used": 0,
+        "creditcard_type": "VI",
+        "creditcard_last4": "1111",
+        "creditcard_exp_month": "6",
+        "creditcard_exp_year": "2016"
+    },
+    "addresses": [
+        {
+            "type": "billing",
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/address",
+                    "href": "http://dev.api.tharsan.com:1180/address/429"
+                }
+            ]
+        },
+        {
+            "type": "shipping",
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/address",
+                    "href": "http://dev.api.tharsan.com:1180/address/430"
+                }
+            ]
+        }
+    ],
+    "links": [
+        {
+            "rel": "self",
+            "href": "http://dev.api.tharsan.com:1180/order/215"
+        },
+        {
+            "rel": "http://rel.totsy.com/entity/user",
+            "href": "http://dev.api.tharsan.com:1180/user/1131"
+        }
+    ]
+}
                 </pre>
               </doc>
             </representation>
@@ -1464,58 +1420,47 @@
             <representation mediaType="application/json">
               <doc title="Partial Order Entity">
                 <pre>
-                  {
-                    "payment": {
-                      "card_type": "VI",
-                      "card_number": 4111111111111111,
-                      "expire_month": 4,
-                      "expire_year": 2012,
-                      "card_holder_name": "..."
-                    },
-                    "addresses": [
-                      {
-                        "type": "shipping",
-                        "link": {
-                          "rel": "http://rel.totsy.com/address",
-                          "href": "https://api.totsy.com/address/293"
-                        }
-                      },
-                      {
-                        "type": "billing",
-                        "firstname": "...",
-                        "lastname": "...",
-                        "address": [
-                          "line1", "line2", "line3"
-                        ],
-                        "region": "...",
-                        "country": "...",
-                        "zip": "..."
-                      }
-                    ],
-                    "items": [
-                      {
-                        "quantity": 2,
-                        "size": "...",
-                        "color": "...",
-                        "style": "...",
-                        "link": {
-                          "rel": "http://rel.totsy.com/product",
-                          "href": "https://api.totsy.com/product/3820"
-                        }
-                      },
-                      {
-                        "quantity": 1,
-                        "size": "...",
-                        "color": "...",
-                        "style": "...",
-                        "link": {
-                          "rel": "http://rel.totsy.com/product",
-                          "href": "https://api.totsy.com/product/32532"
-                        }
-                      }
-                    ],
-                    "expires": "2012-03-03 14:00:01"
-                  }
+{
+    "coupon_code": null,
+    "products": [
+        {
+            "qty": "1.0000",
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/product",
+                    "href": "http://dev.api.tharsan.com:1180/product/392"
+                }
+            ]
+        }
+    ],
+    "payment": {
+        "reward_points_used": 5,
+        "creditcard_type": "VI",
+        "creditcard_number": "4111111111111111",
+        "creditcard_exp_month": "1",
+        "creditcard_exp_year": "2015"
+    },
+    "addresses": [
+        {
+            "type": "billing",
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/address",
+                    "href": "http://dev.api.tharsan.com:1180/address/443"
+                }
+            ]
+        },
+        {
+            "type": "shipping",
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/address",
+                    "href": "http://dev.api.tharsan.com:1180/address/444"
+                }
+            ]
+        }
+    ]
+}
                 </pre>
               </doc>
             </representation>
@@ -1525,72 +1470,72 @@
             <representation mediaType="application/json">
               <doc title="Full Order Entity">
                 <pre>
-                  {
-                    "status": "...",
-                    "placed": "2011-12-13 14:42:22",
-                    "subtotal": 15.88,
-                    "shipping": 7.95,
-                    "taxes": 0,
-                    "payment": {
-                      "card_type": "VI",
-                      "card_number": 1111,
-                      "expire_month": 4,
-                      "expire_year": 2012,
-                      "card_holder_name": "..."
-                    },
-                    "addresses": [
-                      {
-                        "type": "shipping",
-                        "link": {
-                          "rel": "http://rel.totsy.com/address",
-                          "href": "https://api.totsy.com/address/293"
-                        }
-                      },
-                      {
-                        "type": "billing",
-                        "firstname": "...",
-                        "lastname": "...",
-                        "address": [
-                          "line1", "line2", "line3"
-                        ],
-                        "region": "...",
-                        "country": "...",
-                        "zip": "..."
-                      }
-                    ],
-                    "items": [
-                      {
-                        "quantity": 2,
-                        "size": "...",
-                        "color": "...",
-                        "style": "...",
-                        "link": {
-                          "rel": "http://rel.totsy.com/product",
-                          "href": "https://api.totsy.com/product/3820"
-                        }
-                      },
-                      {
-                        "quantity": 1,
-                        "size": "...",
-                        "color": "...",
-                        "style": "...",
-                        "link": {
-                          "rel": "http://rel.totsy.com/product",
-                          "href": "https://api.totsy.com/product/32532"
-                        }
-                      }
-                    ],
-                    "links": [
-                      {
-                        "rel": "http://rel.totsy.com/user",
-                        "href": "https://api.totsy.com/user/12492"
-                      },
-                      {
-                        "rel": "self",
-                        "href": "https://api.totsy.com/order/294882"
-                      }
-                    ]
-                  }
+{
+    "status": "pending",
+    "created": "2012-03-28 21:21:39",
+    "updated": "2012-03-28 21:21:39",
+    "coupon_code": null,
+    "total_qty": "1.0000",
+    "total_weight": "1.0000",
+    "shipping": "0.0000",
+    "tax": "0.8000",
+    "discount": "0.0000",
+    "subtotal": "10.0000",
+    "total": "0.0000",
+    "products": [
+        {
+            "name": "Stripe Sling Stripe",
+            "price": "10.0000",
+            "qty": "1.0000",
+            "tax_pct": "8.0000",
+            "tax": "0.8000",
+            "weight": "1.0000",
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/product",
+                    "href": "http://dev.api.tharsan.com:1180/product/392"
+                }
+            ]
+        }
+    ],
+    "payment": {
+        "reward_points_used": 11,
+        "creditcard_type": "VI",
+        "creditcard_last4": null,
+        "creditcard_exp_month": "1",
+        "creditcard_exp_year": "2015"
+    },
+    "addresses": [
+        {
+            "type": "billing",
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/address",
+                    "href": "http://dev.api.tharsan.com:1180/address/443"
+                }
+            ]
+        },
+        {
+            "type": "shipping",
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/address",
+                    "href": "http://dev.api.tharsan.com:1180/address/444"
+                }
+            ]
+        }
+    ],
+    "links": [
+        {
+            "rel": "self",
+            "href": "http://dev.api.tharsan.com:1180/order/222"
+        },
+        {
+            "rel": "http://rel.totsy.com/entity/user",
+            "href": "http://dev.api.tharsan.com:1180/user/1139"
+        }
+    ]
+}
                 </pre>
               </doc>
             </representation>

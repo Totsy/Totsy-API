@@ -87,6 +87,7 @@ if ('dev' !== API_ENV && apc_exists(APC_CONFIG_KEY)) {
         'Totsy\Resource\AuthResource',
         'Totsy\Resource\UserResource',
         'Totsy\Resource\AddressResource',
+        'Totsy\Resource\OrderResource',
     );
 
     $driver = new AnnotationDriver($resources, $annotationReader);

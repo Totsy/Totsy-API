@@ -13,14 +13,11 @@ The server uses a local SQLite3 database for storing client credentials.
 Dependencies
 ------------
 
-1. Magento
-This project belongs inside the `$MAGENTO_ROOT` directory.
+1. Magento: This project belongs inside the `$MAGENTO_ROOT` directory.
 
-2. Sonno
-A working copy of Sonno is expected in `$MAGENTO_ROOT/lib/sonno`.
+2. Sonno: A working copy of Sonno is expected in `$MAGENTO_ROOT/lib/sonno`.
 
-3. Doctrine-Common
-This library must be installed and available on the default PHP include path (installation via PEAR is the easiest method).
+3. Doctrine-Common: Must be installed and available on the default PHP include path (installation via PEAR is the easiest method).
 
 4. SQLite3 module (PHP)
 

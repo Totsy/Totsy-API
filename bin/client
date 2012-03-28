@@ -1,0 +1,44 @@
+#!/usr/bin/php
+<?php
+
+$usage = <<<EOH
+Usage: client add|list
+Create a new API client: client add <client-name> <auth-key>
+List all existing API clients: client list
+
+EOH;
+
+if ($argc < 2) {
+    die($usage);
+}
+
+$db = new SQLite3(__DIR__ . '/../db/api.db');
+
+if ('list' == $argv[1] && $result = $db->query('SELECT * FROM client')) {
+    while ($client = $result->fetchArray(SQLITE3_ASSOC)) {
+        print_r($client);
+    }
+} else if ('add' == $argv[1]) {
+    if (!isset($argv[2])) {
+        die($usage);
+    }
+
+    $name = $argv[2];
+    $key  = isset($argv[3]) ? $argv[3] : uniqid('', true);
+
+    $create_client = "INSERT INTO client (name, authorization) VALUES ('$name', '$key')";
+
+    if ($db->exec($create_client)) {
+        echo "New client created successfully with Authorization key: $key", PHP_EOL;
+    } else {
+        echo sprintf(
+            "An error occurred while attempting create a new client: %s (%s)%s",
+            $db->lastErrorMsg(),
+            $db->lastErrorCode(),
+            PHP_EOL
+        );
+    }
+
+} else {
+    die($usage);
+}

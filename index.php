@@ -40,13 +40,16 @@ $authToken = $_SERVER['HTTP_AUTHORIZATION'];
 if ($authToken) {
     $db = new SQLite3(__DIR__ . '/db/api.db');
     $result = $db->querySingle(
-        "SELECT count(*) FROM client WHERE authorization = '$authToken'"
+        "SELECT id FROM client WHERE authorization = '$authToken'"
     );
 
-    if (0 === $result) {
+    if (!$result) {
         header('HTTP/1.0 401 Unauthorized');
         header('WWW-Authenticate: Basic realm="Totsy API"');
         exit;
+    } else {
+        $now = date('Y-m-d H:i:s');
+        $db->exec("UPDATE client SET last_request='$now' WHERE id = $result");
     }
 }
 

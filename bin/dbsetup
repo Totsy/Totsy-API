@@ -1,13 +1,18 @@
 #!/usr/bin/php
 <?php
 
+if (!is_dir(__DIR__ . '/../db')) {
+    mkdir(__DIR__ . '/../db');
+}
+
 $db = new SQLite3(__DIR__ . '/../db/api.db');
 
 $create_client = <<<EOH
     CREATE TABLE IF NOT EXISTS client (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
-        authorization TEXT
+        authorization TEXT,
+        last_request TEXT
     );
 EOH;
 

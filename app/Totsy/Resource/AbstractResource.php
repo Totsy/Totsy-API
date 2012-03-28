@@ -110,7 +110,7 @@ class AbstractResource
      */
     protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
-        $sourceData    = $item->getData();
+        $sourceData    = ($item instanceof \Mage_Core_Model_Abstract) ? $item->getData() : array();
         $formattedData = array();
 
         if (is_null($fields)) {

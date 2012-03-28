@@ -7,9 +7,6 @@ The application expects two environment variables set in the environment (typica
 1. `API_ENV` is the application environment: dev | stg | prod
 2. `API_WEB_URL` is the base URL for static web assets.
 
-The application stores a copy of the full Configuration in a local APC cache (on all environments except for *dev*).
-The server uses a local SQLite3 database for storing client credentials.
-
 Dependencies
 ------------
 
@@ -19,7 +16,9 @@ Dependencies
 
 3. Doctrine-Common: Must be installed and available on the default PHP include path (installation via PEAR is the easiest method).
 
-4. SQLite3 module (PHP)
+4. SQLite3 module (PHP): A simple client database to store client authorization credentials.
+
+5. APC module (PHP): A full copy of the parsed Configuration data is stored in a local APC cache, on all environments except for *dev*.
 
 Documentation
 -------------

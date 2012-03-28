@@ -5,8 +5,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"> 
 
   <doc title="Totsy REST API Specification">
-    Version 0.7<br/>
-    Last Modified: <time datetime="2012-03-19">Mar 24, 2012</time><br/>
+    Last Modified: <time datetime="2012-03-19">Mar 28, 2012</time><br/>
     Author: <a href="mailto:tbhuvanendran@totsy.com">Tharsan Bhuvanendran &lt;tbhuvanendran@totsy.com&gt;</a>
   </doc>
 
@@ -54,9 +53,9 @@
         "start": "2012-02-29 02:28:00",
         "end": "2012-03-30 03:28:00",
         "image": {
-            "small": "http://dev.magento.tharsan.com/media/catalog/category/HP2.0Logo_2.png",
-            "thumbnail": "http://dev.magento.tharsan.com/media/catalog/category/HP2.0Logo_3.png",
-            "logo": "http://dev.magento.tharsan.com/media/catalog/category/HP2.0Logo_4.png"
+            "small": "http://www.totsy.com/media/catalog/category/HP2.0Logo_2.png",
+            "thumbnail": "http://www.totsy.com/media/catalog/category/HP2.0Logo_3.png",
+            "logo": "http://www.totsy.com/media/catalog/category/HP2.0Logo_4.png"
         },
         "links": [
             {
@@ -82,10 +81,10 @@
         "start": "2012-02-29 08:50:00",
         "end": "2012-03-30 19:50:00",
         "image": {
-            "default": "http://dev.magento.tharsan.com/media/catalog/category/HP2.0Logo_3_1.png",
-            "small": "http://dev.magento.tharsan.com/media/catalog/category/HP2.0Logo_2.png",
-            "thumbnail": "http://dev.magento.tharsan.com/media/catalog/category/HP2.0Logo.png",
-            "logo": "http://dev.magento.tharsan.com/media/catalog/category/HP2.0Logo_4.png"
+            "default": "http://www.totsy.com/media/catalog/category/HP2.0Logo_3_1.png",
+            "small": "http://www.totsy.com/media/catalog/category/HP2.0Logo_2.png",
+            "thumbnail": "http://www.totsy.com/media/catalog/category/HP2.0Logo.png",
+            "logo": "http://www.totsy.com/media/catalog/category/HP2.0Logo_4.png"
         },
         "links": [
             {
@@ -107,10 +106,10 @@
         "start": "2012-03-06 11:50:00",
         "end": "2012-03-31 11:36:00",
         "image": {
-            "default": "http://dev.magento.tharsan.com/media/catalog/category/HP2.0Logo_2.png",
-            "small": "http://dev.magento.tharsan.com/media/catalog/category/HP2.0Logo_2.png",
-            "thumbnail": "http://dev.magento.tharsan.com/media/catalog/category/Lotus_Nelumbo_Small.jpg",
-            "logo": "http://dev.magento.tharsan.com/media/catalog/category/HP2.0Logo_4.png"
+            "default": "http://www.totsy.com/media/catalog/category/HP2.0Logo_2.png",
+            "small": "http://www.totsy.com/media/catalog/category/HP2.0Logo_2.png",
+            "thumbnail": "http://www.totsy.com/media/catalog/category/Lotus_Nelumbo_Small.jpg",
+            "logo": "http://www.totsy.com/media/catalog/category/HP2.0Logo_4.png"
         },
         "links": [
             {
@@ -156,10 +155,10 @@
     "start": "2012-02-29 08:50:00",
     "end": "2012-03-30 19:50:00",
     "image": {
-        "default": "http://dev.magento.tharsan.com/media/catalog/category/HP2.0Logo_3_1.png",
-        "small": "http://dev.magento.tharsan.com/media/catalog/category/HP2.0Logo_2.png",
-        "thumbnail": "http://dev.magento.tharsan.com/media/catalog/category/HP2.0Logo.png",
-        "logo": "http://dev.magento.tharsan.com/media/catalog/category/HP2.0Logo_4.png"
+        "default": "http://www.totsy.com/media/catalog/category/HP2.0Logo_3_1.png",
+        "small": "http://www.totsy.com/media/catalog/category/HP2.0Logo_2.png",
+        "thumbnail": "http://www.totsy.com/media/catalog/category/HP2.0Logo.png",
+        "logo": "http://www.totsy.com/media/catalog/category/HP2.0Logo_4.png"
     },
     "links": [
         {
@@ -212,7 +211,7 @@
         "hot": false,
         "featured": false,
         "image": [
-            "http://dev.magento.tharsan.com/media/catalog/product/w/i/winter-stroller-cover-blue.jpg"
+            "http://www.totsy.com/media/catalog/product/w/i/winter-stroller-cover-blue.jpg"
         ],
         "links": [
             {
@@ -251,10 +250,10 @@
         "hot": false,
         "featured": false,
         "image": [
-            "http://dev.magento.tharsan.com/media/catalog/product/m/e/medium_1.gif",
-            "http://dev.magento.tharsan.com/media/catalog/product/t/h/thumbnail_1.gif",
-            "http://dev.magento.tharsan.com/media/catalog/product/s/m/small_1.gif",
-            "http://dev.magento.tharsan.com/media/catalog/product/l/a/large_1.gif"
+            "http://www.totsy.com/media/catalog/product/m/e/medium_1.gif",
+            "http://www.totsy.com/media/catalog/product/t/h/thumbnail_1.gif",
+            "http://www.totsy.com/media/catalog/product/s/m/small_1.gif",
+            "http://www.totsy.com/media/catalog/product/l/a/large_1.gif"
         ],
         "links": [
             {
@@ -290,7 +289,7 @@
         "hot": false,
         "featured": false,
         "image": [
-            "http://dev.magento.tharsan.com/media/catalog/product/o/p/open-ultra-fold-lady-umbrella-with-hard-case.jpg"
+            "http://www.totsy.com/media/catalog/product/o/p/open-ultra-fold-lady-umbrella-with-hard-case.jpg"
         ],
         "links": [
             {
@@ -358,10 +357,10 @@
     "hot": false,
     "featured": false,
     "image": [
-        "http://dev.magento.tharsan.com/media/catalog/product/m/e/medium_1.gif",
-        "http://dev.magento.tharsan.com/media/catalog/product/t/h/thumbnail_1.gif",
-        "http://dev.magento.tharsan.com/media/catalog/product/s/m/small_1.gif",
-        "http://dev.magento.tharsan.com/media/catalog/product/l/a/large_1.gif"
+        "http://www.totsy.com/media/catalog/product/m/e/medium_1.gif",
+        "http://www.totsy.com/media/catalog/product/t/h/thumbnail_1.gif",
+        "http://www.totsy.com/media/catalog/product/s/m/small_1.gif",
+        "http://www.totsy.com/media/catalog/product/l/a/large_1.gif"
     ],
     "links": [
         {
@@ -469,7 +468,10 @@
       </doc>
 
       <method name="POST">
-        <doc title="Create New User">Add a new User to the system.</doc>
+        <doc title="Create New User">
+            Add a new User to the system.
+            NOTE: The <code>points</code> property will be ignored when creating or updating users.
+        </doc>
 
         <request>
           <representation mediaType="application/json">
@@ -490,9 +492,10 @@
             <doc title="Full User Entity">
               <pre>
 {
-    "email": "tbhuvanendran@totsy.com",
+    "email": "tbhuvanendran+hara@totsy.com",
     "firstname": "Tharsan",
     "lastname": "Bhuvanendran",
+    "points": 0,
     "links": [
         {
             "rel": "self",
@@ -542,9 +545,10 @@
               <doc title="Full User Entity">
                 <pre>
 {
-    "email": "tbhuvanendran@totsy.com",
+    "email": "tbhuvanendran+hara@totsy.com",
     "firstname": "Tharsan",
     "lastname": "Bhuvanendran",
+    "points": 50,
     "links": [
         {
             "rel": "self",
@@ -573,6 +577,7 @@
         <method name="PUT">
           <doc title="Update User">
             Update the record of an existing system User.
+            NOTE: The <code>points</code> property will be ignored when creating or updating users.
           </doc>
 
           <request>
@@ -589,6 +594,36 @@
               </doc>
             </representation>
           </request>
+          <response status="200">
+            <representation mediaType="application/json">
+              <doc title="Full User Entity">
+{
+    "email": "tbhuvanendran+hara@totsy.com",
+    "firstname": "Tharsan",
+    "lastname": "Bhuvanendran",
+    "points": 0,
+    "links": [
+        {
+            "rel": "self",
+            "href": "https://api.totsy.com/user/1139"
+        },
+        {
+            "rel": "http://rel.totsy.com/collection/address",
+            "href": "https://api.totsy.com/user/1139/address"
+        },
+        {
+            "rel": "http://rel.totsy.com/collection/order",
+            "href": "https://api.totsy.com/user/1139/order"
+        },
+        {
+            "rel": "http://rel.totsy.com/collection/creditcard",
+            "href": "https://api.totsy.com/user/1139/creditcard"
+        }
+    ]
+}
+              </doc>
+            </representation>
+          </response>
         </method>
 
         <method name="DELETE">

@@ -35,6 +35,7 @@ class UserResource extends AbstractResource
         'email',
         'firstname',
         'lastname',
+        'points',
     );
 
     protected $_links = array(
@@ -49,10 +50,6 @@ class UserResource extends AbstractResource
         array(
             'rel' => 'http://rel.totsy.com/collection/order',
             'href' => '/user/{entity_id}/order'
-        ),
-        array(
-            'rel' => 'http://rel.totsy.com/collection/reward',
-            'href' => '/user/{entity_id}/reward'
         ),
         array(
             'rel' => 'http://rel.totsy.com/collection/creditcard',
@@ -140,6 +137,23 @@ class UserResource extends AbstractResource
 
         return new Response(200);
     }
+
+    /**
+     * @param $item Mage_Core_Model_Abstract
+     * @param $fields array|null
+     * @param $links array|null
+     * @return array
+     */
+    protected function _formatItem($item, $fields = NULL, $links = NULL)
+    {
+        $rewards = Mage::getSingleton('enterprise_reward/reward');
+        $rewards->setCustomer($item);
+        $rewards->loadByCustomer();
+
+        $item->addData(array('points' => intval($rewards->getPointsBalance())));
+        return parent::_formatItem($item, $fields, $links);
+    }
+
 
     /**
      * Verify that an incoming request is logged in for a specific user.

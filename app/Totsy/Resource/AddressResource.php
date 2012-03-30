@@ -29,6 +29,13 @@ use Sonno\Annotation\GET,
  */
 class AddressResource extends AbstractResource
 {
+    /**
+     * The user that an address belongs to.
+     *
+     * @var Mage_Customer_Model_Customer
+     */
+    protected $_user;
+
     protected $_modelGroupName = 'customer/address';
 
     protected $_fields = array(
@@ -42,6 +49,8 @@ class AddressResource extends AbstractResource
         'country' => 'country_id',
         'telephone',
         'fax',
+        'default_billing',
+        'default_shipping',
     );
 
     protected $_links = array(
@@ -65,9 +74,9 @@ class AddressResource extends AbstractResource
      */
     public function getUserAddresses($id)
     {
-        $user = UserResource::authorizeUser($id);
+        $this->_user = UserResource::authorizeUser($id);
 
-        $addresses = $user->getAddressesCollection();
+        $addresses = $this->_user->getAddressesCollection();
         $results = array();
         foreach ($addresses as $address) {
             $results[] = $this->_formatItem($address);
@@ -87,7 +96,7 @@ class AddressResource extends AbstractResource
      */
     public function createAddressEntity($id)
     {
-        $user = UserResource::authorizeUser($id);
+        $this->_user = UserResource::authorizeUser($id);
 
         $address = Mage::getModel($this->_modelGroupName);
         $address->setCustomerId($id);
@@ -119,7 +128,7 @@ class AddressResource extends AbstractResource
         }
 
         // ensure that the request is authorized for the address owner
-        UserResource::authorizeUser($address->getCustomerId());
+        $this->_user = UserResource::authorizeUser($address->getCustomerId());
 
         return json_encode($this->_formatItem($address));
     }
@@ -142,10 +151,72 @@ class AddressResource extends AbstractResource
         }
 
         // ensure that the request is authorized for the address owner
-        UserResource::authorizeUser($address->getCustomerId());
+        $this->_user = UserResource::authorizeUser($address->getCustomerId());
 
         $this->_populateModelInstance($address);
 
         return json_encode($this->_formatItem($address));
+    }
+
+    /**
+     * @param $item Mage_Core_Model_Abstract
+     * @param $fields array|null
+     * @param $links array|null
+     * @return array
+     */
+    protected function _formatItem($item, $fields = NULL, $links = NULL)
+    {
+        $userData = $this->_user->getData();
+
+        $item->setData(
+            'default_billing',
+            isset($userData['default_billing']) && $userData['default_billing'] == $item->getId()
+        );
+
+        $item->setData(
+            'default_shipping',
+            isset($userData['default_shipping']) && $userData['default_shipping'] == $item->getId()
+        );
+
+        return parent::_formatItem($item, $fields, $links);
+    }
+
+    /**
+     * Populate a Magento model object with an array of data, and persist the
+     * updated object.
+     *
+     * @param $obj Mage_Core_Model_Abstract
+     * @param $data array The data to populate, or NULL which will use the
+     *                    incoming request data.
+     * @return bool
+     * @throws Sonno\Application\WebApplicationException
+     */
+    protected function _populateModelInstance($obj, $data = NULL)
+    {
+        if (is_null($data)) {
+            $data = json_decode($this->_request->getRequestBody(), true);
+            if (is_null($data)) {
+                $error = 'Malformed entity representation in request body';
+                $e = new WebApplicationException(400);
+                $e->getResponse()->setHeaders(
+                    array('X-API-Error' => $error)
+                );
+                throw $e;
+            }
+        }
+
+        // save the address object
+        parent::_populateModelInstance($obj, $data);
+
+        // update the Customer object with default address settings
+        if (isset($data['default_billing'])) {
+            $this->_user->setData('default_billing', $data['default_billing'] ? $obj->getId() : null);
+        }
+
+        if (isset($data['default_shipping'])) {
+            $this->_user->setData('default_shipping', $data['default_shipping'] ? $obj->getId() : null);
+        }
+
+        $this->_user->save();
     }
 }

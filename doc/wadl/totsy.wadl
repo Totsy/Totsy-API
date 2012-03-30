@@ -651,46 +651,50 @@
                   <pre>
 [
     {
-        "firstname": "Stephen",
-        "lastname": "Hawking",
-        "company": "Fake Enterprise",
-        "street": "123 Fake Street\nApt. 108",
-        "city": "Springfield",
-        "state": "Ohio",
-        "zip": "12345",
+        "firstname": "Test First 2",
+        "lastname": "Test Last 2",
+        "company": null,
+        "street": "829 New Address Blvd",
+        "city": "Alison",
+        "state": "Arkansas",
+        "zip": "12224",
         "country": "US",
-        "telephone": "2121234539",
-        "fax": "2129973472",
+        "telephone": "2892232894",
+        "fax": null,
+        "default_billing": true,
+        "default_shipping": false,
         "links": [
             {
                 "rel": "self",
-                "href": "https://api.totsy.com/address/1243"
+                "href": "https://api.totsy.com/address/1262"
             },
             {
                 "rel": "http://rel.totsy.com/entity/user",
-                "href": "https://api.totsy.com/user/1153"
+                "href": "https://api.totsy.com/user/1139"
             }
         ]
     },
     {
-        "firstname": "Maya",
-        "lastname": "Troublestone",
+        "firstname": "Test First 2",
+        "lastname": "Test Last 2",
         "company": null,
-        "street": "482 5th Ave.",
-        "city": "New York",
-        "state": "New York",
-        "zip": "10078",
+        "street": "829 New Address Blvd",
+        "city": "Alison",
+        "state": "Arizona",
+        "zip": "12224",
         "country": "US",
-        "telephone": "2128482766",
+        "telephone": "2892232894",
         "fax": null,
+        "default_billing": false,
+        "default_shipping": true,
         "links": [
             {
                 "rel": "self",
-                "href": "https://api.totsy.com/address/1244"
+                "href": "https://api.totsy.com/address/1263"
             },
             {
                 "rel": "http://rel.totsy.com/entity/user",
-                "href": "https://api.totsy.com/user/1153"
+                "href": "https://api.totsy.com/user/1139"
             }
         ]
     }
@@ -720,7 +724,9 @@
     "zip": "10078",
     "country": "US",
     "telephone": "2128482766",
-    "fax": null
+    "fax": null,
+    "default_billing": false,
+    "default_billing": true
 }
                   </pre>
                 </doc>
@@ -741,6 +747,8 @@
     "country": "US",
     "telephone": "2128482766",
     "fax": null,
+    "default_billing": false,
+    "default_billing": true,
     "links": [
         {
             "rel": "self",
@@ -796,7 +804,7 @@
                 "links": [
                     {
                         "rel": "http://rel.totsy.com/entity/product",
-                        "href": "http://dev.api.tharsan.com:1180/product/392"
+                        "href": "https://api.totsy.com/product/392"
                     }
                 ]
             }
@@ -814,7 +822,7 @@
                 "links": [
                     {
                         "rel": "http://rel.totsy.com/entity/address",
-                        "href": "http://dev.api.tharsan.com:1180/address/443"
+                        "href": "https://api.totsy.com/address/443"
                     }
                 ]
             },
@@ -823,7 +831,7 @@
                 "links": [
                     {
                         "rel": "http://rel.totsy.com/entity/address",
-                        "href": "http://dev.api.tharsan.com:1180/address/444"
+                        "href": "https://api.totsy.com/address/444"
                     }
                 ]
             }
@@ -831,11 +839,11 @@
         "links": [
             {
                 "rel": "self",
-                "href": "http://dev.api.tharsan.com:1180/order/222"
+                "href": "https://api.totsy.com/order/222"
             },
             {
                 "rel": "http://rel.totsy.com/entity/user",
-                "href": "http://dev.api.tharsan.com:1180/user/1139"
+                "href": "https://api.totsy.com/user/1139"
             }
         ]
     },
@@ -862,7 +870,7 @@
                 "links": [
                     {
                         "rel": "http://rel.totsy.com/entity/product",
-                        "href": "http://dev.api.tharsan.com:1180/product/383"
+                        "href": "https://api.totsy.com/product/383"
                     }
                 ]
             }
@@ -880,7 +888,7 @@
                 "links": [
                     {
                         "rel": "http://rel.totsy.com/entity/address",
-                        "href": "http://dev.api.tharsan.com:1180/address/429"
+                        "href": "https://api.totsy.com/address/429"
                     }
                 ]
             },
@@ -889,7 +897,7 @@
                 "links": [
                     {
                         "rel": "http://rel.totsy.com/entity/address",
-                        "href": "http://dev.api.tharsan.com:1180/address/430"
+                        "href": "https://api.totsy.com/address/430"
                     }
                 ]
             }
@@ -897,11 +905,11 @@
         "links": [
             {
                 "rel": "self",
-                "href": "http://dev.api.tharsan.com:1180/order/215"
+                "href": "https://api.totsy.com/order/215"
             },
             {
                 "rel": "http://rel.totsy.com/entity/user",
-                "href": "http://dev.api.tharsan.com:1180/user/1139"
+                "href": "https://api.totsy.com/user/1139"
             }
         ]
     }
@@ -936,7 +944,7 @@
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/product",
-                    "href": "http://dev.api.tharsan.com:1180/product/392"
+                    "href": "https://api.totsy.com/product/392"
                 }
             ]
         }
@@ -954,7 +962,7 @@
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/address",
-                    "href": "http://dev.api.tharsan.com:1180/address/443"
+                    "href": "https://api.totsy.com/address/443"
                 }
             ]
         },
@@ -963,7 +971,7 @@
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/address",
-                    "href": "http://dev.api.tharsan.com:1180/address/444"
+                    "href": "https://api.totsy.com/address/444"
                 }
             ]
         }
@@ -994,7 +1002,7 @@
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/product",
-                    "href": "http://dev.api.tharsan.com:1180/product/383"
+                    "href": "https://api.totsy.com/product/383"
                 }
             ]
         }
@@ -1002,11 +1010,11 @@
     "links": [
         {
             "rel": "self",
-            "href": "http://dev.api.tharsan.com:1180/order/215"
+            "href": "https://api.totsy.com/order/215"
         },
         {
             "rel": "http://rel.totsy.com/entity/user",
-            "href": "http://dev.api.tharsan.com:1180/user/1139"
+            "href": "https://api.totsy.com/user/1139"
         }
     ]
 }
@@ -1043,7 +1051,7 @@
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/product",
-                    "href": "http://dev.api.tharsan.com:1180/product/383"
+                    "href": "https://api.totsy.com/product/383"
                 }
             ]
         }
@@ -1061,7 +1069,7 @@
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/address",
-                    "href": "http://dev.api.tharsan.com:1180/address/429"
+                    "href": "https://api.totsy.com/address/429"
                 }
             ]
         },
@@ -1070,7 +1078,7 @@
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/address",
-                    "href": "http://dev.api.tharsan.com:1180/address/430"
+                    "href": "https://api.totsy.com/address/430"
                 }
             ]
         }
@@ -1078,11 +1086,11 @@
     "links": [
         {
             "rel": "self",
-            "href": "http://dev.api.tharsan.com:1180/order/215"
+            "href": "https://api.totsy.com/order/215"
         },
         {
             "rel": "http://rel.totsy.com/entity/user",
-            "href": "http://dev.api.tharsan.com:1180/user/1131"
+            "href": "https://api.totsy.com/user/1131"
         }
     ]
 }
@@ -1237,6 +1245,8 @@
     "country": "US",
     "telephone": "2121234539",
     "fax": "2129973472",
+    "default_billing": false,
+    "default_billing": false,
     "links": [
         {
             "rel": "self",
@@ -1270,7 +1280,9 @@
     "zip": "12345",
     "country": "US",
     "telephone": "2121234539",
-    "fax": "2129973472"
+    "fax": "2129973472",
+    "default_billing": false,
+    "default_billing": false
 }
                 </pre>
               </doc>
@@ -1291,6 +1303,8 @@
     "country": "US",
     "telephone": "2121234539",
     "fax": "2129973472",
+    "default_billing": false,
+    "default_billing": false,
     "links": [
         {
             "rel": "self",
@@ -1366,7 +1380,7 @@
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/product",
-                    "href": "http://dev.api.tharsan.com:1180/product/383"
+                    "href": "https://api.totsy.com/product/383"
                 }
             ]
         }
@@ -1384,7 +1398,7 @@
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/address",
-                    "href": "http://dev.api.tharsan.com:1180/address/429"
+                    "href": "https://api.totsy.com/address/429"
                 }
             ]
         },
@@ -1393,7 +1407,7 @@
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/address",
-                    "href": "http://dev.api.tharsan.com:1180/address/430"
+                    "href": "https://api.totsy.com/address/430"
                 }
             ]
         }
@@ -1401,11 +1415,11 @@
     "links": [
         {
             "rel": "self",
-            "href": "http://dev.api.tharsan.com:1180/order/215"
+            "href": "https://api.totsy.com/order/215"
         },
         {
             "rel": "http://rel.totsy.com/entity/user",
-            "href": "http://dev.api.tharsan.com:1180/user/1131"
+            "href": "https://api.totsy.com/user/1131"
         }
     ]
 }
@@ -1428,7 +1442,7 @@
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/product",
-                    "href": "http://dev.api.tharsan.com:1180/product/392"
+                    "href": "https://api.totsy.com/product/392"
                 }
             ]
         }
@@ -1446,7 +1460,7 @@
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/address",
-                    "href": "http://dev.api.tharsan.com:1180/address/443"
+                    "href": "https://api.totsy.com/address/443"
                 }
             ]
         },
@@ -1455,7 +1469,7 @@
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/address",
-                    "href": "http://dev.api.tharsan.com:1180/address/444"
+                    "href": "https://api.totsy.com/address/444"
                 }
             ]
         }
@@ -1493,7 +1507,7 @@
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/product",
-                    "href": "http://dev.api.tharsan.com:1180/product/392"
+                    "href": "https://api.totsy.com/product/392"
                 }
             ]
         }
@@ -1511,7 +1525,7 @@
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/address",
-                    "href": "http://dev.api.tharsan.com:1180/address/443"
+                    "href": "https://api.totsy.com/address/443"
                 }
             ]
         },
@@ -1520,7 +1534,7 @@
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/address",
-                    "href": "http://dev.api.tharsan.com:1180/address/444"
+                    "href": "https://api.totsy.com/address/444"
                 }
             ]
         }
@@ -1528,11 +1542,11 @@
     "links": [
         {
             "rel": "self",
-            "href": "http://dev.api.tharsan.com:1180/order/222"
+            "href": "https://api.totsy.com/order/222"
         },
         {
             "rel": "http://rel.totsy.com/entity/user",
-            "href": "http://dev.api.tharsan.com:1180/user/1139"
+            "href": "https://api.totsy.com/user/1139"
         }
     ]
 }

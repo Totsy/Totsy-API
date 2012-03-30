@@ -28,7 +28,7 @@ use Sonno\Annotation\GET,
  */
 class OrderResource extends AbstractResource
 {
-    protected $_modelGroupName = 'sales/order';
+    protected $_modelGroupName = 'sales/quote';
 
     protected $_fields = array(
         'status',
@@ -155,15 +155,15 @@ class OrderResource extends AbstractResource
     protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
         $newData = array();
-
+/*
         // populate the "payment" property with credit card info and reward points redeemed
-        $payment = $item->getPayment()->getData();
+        $payment = $item->getPayment();
         $newData['payment'] = array(
             'reward_points_used' => ceil($item->getRewardCurrencyAmount()),
-            'creditcard_type' => $payment['cc_type'],
-            'creditcard_last4'   => $payment['cc_last4'],
-            'creditcard_exp_month' => $payment['cc_exp_month'],
-            'creditcard_exp_year' => $payment['cc_exp_year'],
+            'creditcard_type' => $payment->getCcType(),
+            'creditcard_last4'   => $payment->getCcLast4(),
+            'creditcard_exp_month' => $payment->getExpMonth(),
+            'creditcard_exp_year' => $payment->getExpYear(),
         );
 
         // populate the "addresses" property with billing & shipping addresses
@@ -200,7 +200,7 @@ class OrderResource extends AbstractResource
                 )
             );
         }
-
+*/
         // populate the "items" property with products that are part of this order
         // @todo get the product options also
         $builder = $this->_uriInfo->getBaseUriBuilder();
@@ -208,19 +208,18 @@ class OrderResource extends AbstractResource
 
         $products = $item->getItemsCollection();
         $newData['products'] = array();
-        foreach ($products as $product) {
+        foreach ($products as $productItem) {
+            $product = $productItem->getProduct();
             $productData = $product->getData();
             $newData['products'][] = array(
                 'name' => $productData['name'],
-                'price' => $productData['price'],
-                'qty' => $productData['qty_ordered'],
-                'tax_pct' => $product['tax_percent'],
-                'tax' => $productData['tax_amount'],
+                'price' => $productItem->getPrice(),
+                'qty' => $productItem->getQty(),
                 'weight' => $productData['weight'],
                 'links' => array(
                     array(
                         'rel' => 'http://rel.totsy.com/entity/product',
-                        'href' => $builder->build(array($productData['item_id']))
+                        'href' => $builder->build(array($product->getId()))
                     )
                 )
             );
@@ -228,5 +227,44 @@ class OrderResource extends AbstractResource
 
         $item->addData($newData);
         return parent::_formatItem($item, $this->_fields, $this->_links);
+    }
+
+    /**
+     * Populate a Magento model object with an array of data, and persist the
+     * updated object.
+     *
+     * @param $obj Mage_Core_Model_Abstract
+     * @param $data array The data to populate, or NULL which will use the
+     *                    incoming request data.
+     * @return bool
+     * @throws Sonno\Application\WebApplicationException
+     */
+    protected function _populateModelInstance($obj, $data = NULL)
+    {
+        if (is_null($data)) {
+            $data = json_decode($this->_request->getRequestBody(), true);
+            if (is_null($data)) {
+                $error = 'Malformed entity representation in request body';
+                $e = new WebApplicationException(400);
+                $e->getResponse()->setHeaders(
+                    array('X-API-Error' => $error)
+                );
+                throw $e;
+            }
+        }
+
+        if (isset($data['products']) && is_array($data['products'])) {
+            foreach ($data['products'] as $productData) {
+                // locate the Product ID in the Product URL
+                $productUrl = $productData['links'][0]['href'];
+                if ($offset = strrpos($productUrl, '/') !== FALSE) {
+                    $productId = substr($productUrl, $offset);
+                    $product = Mage::getModel('catalog/product')->load($productId);
+                    $obj->addProduct($product, $productData['qty']);
+                }
+            }
+        }
+
+        parent::_populateModelInstance($obj, $data);
     }
 }

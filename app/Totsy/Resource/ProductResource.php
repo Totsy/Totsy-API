@@ -149,26 +149,13 @@ class ProductResource extends AbstractResource
         $formattedData['event_id'] = $this->_eventId;
 
         // scrape together department & age data
-        $formattedData['department'] = array();
-        $formattedData['age'] = array();
-
         $departments = $item->getAttributeText('departments');
+        $formattedData['department'] = $departments ?
+            (array) $departments
+            : array();
+
         $ages = $item->getAttributeText('ages');
-
-        if (is_array($departments)) {
-            $formattedData['department'] = $departments;
-        } else if (is_string($departments)) {
-            $formattedData['department'] = array($departments);
-        }
-
-        if (is_array($ages)) {
-            $formattedData['age'] = $ages;
-        } else if (is_string($ages)) {
-            $formattedData['age'] = array($ages);
-        }
-
-        $formattedData['department'] = array_unique($formattedData['department']);
-        $formattedData['age'] = array_unique($formattedData['age']);
+        $formattedData['age'] = $ages ? (array) $ages : array();
 
         $formattedData['hot'] = isset($item['hot_list']) && $item['hot_list'];
         $formattedData['featured'] = isset($item['featured']) && $item['featured'];

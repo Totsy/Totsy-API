@@ -23,7 +23,7 @@ use Sonno\Annotation\GET,
 /**
  * The base class for all supported Totsy resource classes.
  */
-class AbstractResource
+abstract class AbstractResource
 {
     /**
      * The Magento model group name that this resource represents.
@@ -194,7 +194,7 @@ class AbstractResource
 
         // rewrite keys in the data array for any aliased keys
         foreach ($this->_fields as $outputFieldName => $dataFieldName) {
-            if (is_string($outputFieldName)) {
+            if (is_string($outputFieldName) && isset($data[$outputFieldName])) {
                 $data[$dataFieldName] = $data[$outputFieldName];
                 unset($data[$outputFieldName]);
             }

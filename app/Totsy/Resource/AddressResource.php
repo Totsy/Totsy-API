@@ -178,6 +178,8 @@ class AddressResource extends AbstractResource
             isset($userData['default_shipping']) && $userData['default_shipping'] == $item->getId()
         );
 
+        $item->setData('parent_id', $userData['entity_id']);
+
         return parent::_formatItem($item, $fields, $links);
     }
 
@@ -203,6 +205,25 @@ class AddressResource extends AbstractResource
                 );
                 throw $e;
             }
+        }
+
+        // locate the region identifier for the supplied region
+        $region = Mage::getModel('directory/region');
+        $region->loadByName($data['state'], $data['country']);
+        if ($region->isObjectNew()) {
+            $region->loadByCode($data['state'], $data['country']);
+        }
+        $obj->setRegionId($region->getId());
+
+        // the region value supplied could not be found
+        if ($region->isObjectNew()) {
+            $errorMessage = "Entity Validation Error: Invalid value in 'state'"
+                . " field.";
+            $e = new WebApplicationException(400);
+            $e->getResponse()->setHeaders(
+                array('X-API-Error' => $errorMessage)
+            );
+            throw $e;
         }
 
         // save the address object

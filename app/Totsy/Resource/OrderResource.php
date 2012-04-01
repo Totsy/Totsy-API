@@ -24,11 +24,12 @@ use Sonno\Annotation\GET,
     Mage;
 
 /**
- * An Order is a collection of Product entities and their corresponding quantities that a User purchases.
+ * An Order is a collection of Product entities and their corresponding
+ * quantities that a User purchases.
  */
 class OrderResource extends AbstractResource
 {
-    protected $_modelGroupName = 'sales/quote';
+    protected $_modelGroupName = 'sales/order';
 
     protected $_fields = array(
         'status',
@@ -77,6 +78,7 @@ class OrderResource extends AbstractResource
      * Add a new Order to the system.
      *
      * @POST
+     * @PUT
      * @Path("/user/{id}/order")
      * @Produces({"application/json"})
      * @Consumes({"application/json"})
@@ -84,19 +86,92 @@ class OrderResource extends AbstractResource
      */
     public function createOrderEntity($id)
     {
-        $user = UserResource::authorizeUser($id);
+        UserResource::authorizeUser($id);
 
-        $order = Mage::getModel($this->_modelGroupName);
-        $order->setCustomerId($id);
-        $this->_populateModelInstance($order);
+        $requestData = json_decode($this->_request->getRequestBody(), true);
+        if (is_null($requestData)) {
+            $error = 'Malformed entity representation in request body';
+            $e = new WebApplicationException(400);
+            $e->getResponse()->setHeaders(
+                array('X-API-Error' => $error)
+            );
+            throw $e;
+        }
 
-        $response = $this->_formatItem($order);
-        $responseBody = json_encode($response);
+        // retrieve the local session shopping cart
+        $cart  = Mage::getModel('checkout/session');
+        $quote = $cart->getQuote();
 
-        return new Response(201,
-            $responseBody,
-            array('Location' => $response['links'][0]['href'])
-        );
+        // add Product Items from request data to the shopping cart
+        if (isset($requestData['products'])
+            && is_array($requestData['products']))
+        {
+            foreach ($requestData['products'] as $requestProduct) {
+                // locate the Product ID in the Product URL
+                $productUrl = $requestProduct['links'][0]['href'];
+                if (($offset = strrpos($productUrl, '/')) !== FALSE) {
+                    $productId = substr($productUrl, $offset+1);
+                    $product = Mage::getModel('catalog/product');
+                    $product->load($productId);
+
+                    $quote->addProduct($product, $requestProduct['qty']);
+                }
+            }
+        }
+
+        // "checkout" the local session shopping cart once payment & address
+        // information is available in the request data
+        if (isset($requestData['payment'])
+            && isset($requestData['addresses'])
+        ) {
+            // setup the Billing & Shipping address for this order
+            foreach ($requestData['addresses'] as $type => $addressInfo) {
+                $address = Mage::getModel('customer/address');
+
+                if (isset($addressInfo['links'])) {
+                    // fetch existing address
+                    $addressUrl = $addressInfo['links'][0]['href'];
+                    if (($offset = strrpos($addressUrl, '/')) !== FALSE) {
+                        $addressId = substr($addressUrl, $offset+1);
+                        $address->load($addressId);
+                    }
+                } else {
+                    // create new address using address info
+                    $address->addData($addressInfo);
+                }
+
+                $quoteAddress = Mage::getModel('sales/quote_address');
+                $quoteAddress->importCustomerAddress($address);
+                if ('shipping' == $type) {
+                    $quote->setShippingAddress($quoteAddress);
+                } else if ('billing' == $type) {
+                    $quote->setBillingAddress($quoteAddress);
+                }
+            }
+
+            // setup the Payment for this order
+            $payment = Mage::getModel('sales/quote_payment');
+            $payment->addData($requestData['payment']);
+
+            $quote->addPayment($payment);
+            $quote->save();
+
+            // create the new order!
+            $quoteService = Mage::getModel('sales/service_quote', $quote);
+            $quoteService->submitAll();
+            $order = $quoteService->getOrder();
+
+            return new Response(
+                201,
+                json_encode($this->_formatOrderItem($order))
+            );
+        } else {
+            $quote->save();
+            return new Response(
+                202,
+                json_encode($this->_formatCartItem($cart))
+            );
+        }
     }
 
     /**
@@ -122,31 +197,6 @@ class OrderResource extends AbstractResource
     }
 
     /**
-     * Update the record of an existing Order.
-     *
-     * @PUT
-     * @Path("/order/{id}")
-     * @Produces({"application/json"})
-     * @Consumes({"application/json"})
-     * @PathParam("id")
-     */
-    public function updateOrderEntity($id)
-    {
-        $order = $this->_model->load($id);
-
-        if ($order->isObjectNew()) {
-            return new Response(404);
-        }
-
-        // ensure that the request is authorized for the address owner
-        UserResource::authorizeUser($order->getCustomerId());
-
-        $this->_populateModelInstance($order);
-
-        return json_encode($this->_formatItem($order));
-    }
-
-    /**
      * @param $item Mage_Core_Model_Abstract
      * @param $fields array|null
      * @param $links array|null
@@ -155,18 +205,19 @@ class OrderResource extends AbstractResource
     protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
         $newData = array();
-/*
-        // populate the "payment" property with credit card info and reward points redeemed
+
+        // construct a 'payment' object that includes credit card information
+        // used as well as any points redeemed
         $payment = $item->getPayment();
         $newData['payment'] = array(
             'reward_points_used' => ceil($item->getRewardCurrencyAmount()),
             'creditcard_type' => $payment->getCcType(),
             'creditcard_last4'   => $payment->getCcLast4(),
-            'creditcard_exp_month' => $payment->getExpMonth(),
-            'creditcard_exp_year' => $payment->getExpYear(),
+            'creditcard_exp_month' => $payment->getCcExpMonth(),
+            'creditcard_exp_year' => $payment->getCcExpYear(),
         );
 
-        // populate the "addresses" property with billing & shipping addresses
+        // construct a 'addresses' property with billing & shipping addresses
         $newData['addresses'] = array();
 
         $address = $item->getBillingAddress();
@@ -200,22 +251,27 @@ class OrderResource extends AbstractResource
                 )
             );
         }
-*/
-        // populate the "items" property with products that are part of this order
-        // @todo get the product options also
-        $builder = $this->_uriInfo->getBaseUriBuilder();
-        $builder->resourcePath('Totsy\Resource\ProductResource', 'getProductEntity');
 
-        $products = $item->getItemsCollection();
+        // construct a 'products' property with products that were line items
+        // in this order
+        $builder = $this->_uriInfo->getBaseUriBuilder();
+        $builder->resourcePath(
+            'Totsy\Resource\ProductResource',
+            'getProductEntity'
+        );
+
+        $products = $item->getAllVisibleItems();
         $newData['products'] = array();
         foreach ($products as $productItem) {
-            $product = $productItem->getProduct();
+            $product = Mage::getModel('catalog/product');
+            $product->load($productItem->getProductId());
             $productData = $product->getData();
+
             $newData['products'][] = array(
-                'name' => $productData['name'],
-                'price' => $productItem->getPrice(),
-                'qty' => $productItem->getQty(),
-                'weight' => $productData['weight'],
+                'name' => $product->getName(),
+                'price' => $product->getPrice(),
+                'qty' => $productItem->getQtyOrdered(),
+                'weight' => $product->getWeight(),
                 'links' => array(
                     array(
                         'rel' => 'http://rel.totsy.com/entity/product',
@@ -226,7 +282,65 @@ class OrderResource extends AbstractResource
         }
 
         $item->addData($newData);
+
         return parent::_formatItem($item, $this->_fields, $this->_links);
+    }
+
+    /**
+     * Format a shopping cart entity into an array for output.
+     *
+     * @param \Mage_Checkout_Model_Session $cart
+     * @return array
+     */
+    protected function _formatCartItem(\Mage_Checkout_Model_Session $cart)
+    {
+        $formattedData = array();
+
+        $quote = $cart->getQuote();
+
+        $cartShelfLife = $cart->getQuoteItemExpireTime();
+        $formattedData['expires'] = date(
+            'Y-m-d H:i:s',
+            strtotime("+$cartShelfLife seconds")
+        );
+
+        $quoteData = $quote->getData();
+        $formattedData['item_count'] = $quoteData['items_count'];
+        $formattedData['item_qty'] = $quoteData['items_qty'];
+        $formattedData['total'] = $quoteData['grand_total'];
+
+        $builder = $this->_uriInfo->getBaseUriBuilder();
+        $builder->resourcePath(
+            'Totsy\Resource\ProductResource',
+            'getProductEntity'
+        );
+
+        $formattedData['products'] = array();
+        $cartProducts = $quote->getItemsCollection();
+        foreach ($cartProducts as $quoteItem) {
+            $product = $quoteItem->getProduct();
+            $productData = $product->getData();
+
+            $formattedData['products'][] = array(
+                'name' => $productData['name'],
+                'price' => $productData['price'],
+                'qty' => $quoteItem->getQty(),
+                'links' => array(
+                    array(
+                        'rel' => 'http://rel.totsy.com/entity/product',
+                        'href' => $builder->build(array($product->getId()))
+                    )
+                )
+            );
+        }
+
+        $carriers = Mage::getSingleton('shipping/config')->getActiveCarriers();
+        $shippingMethods = array();
+        foreach ($carriers as $carrier) {
+            $carrier->collectRates();
+        }
+
+        return $formattedData;
     }
 
     /**
@@ -257,9 +371,10 @@ class OrderResource extends AbstractResource
             foreach ($data['products'] as $productData) {
                 // locate the Product ID in the Product URL
                 $productUrl = $productData['links'][0]['href'];
-                if ($offset = strrpos($productUrl, '/') !== FALSE) {
-                    $productId = substr($productUrl, $offset);
+                if (($offset = strrpos($productUrl, '/')) !== FALSE) {
+                    $productId = substr($productUrl, $offset+1);
                     $product = Mage::getModel('catalog/product')->load($productId);
+
                     $obj->addProduct($product, $productData['qty']);
                 }
             }

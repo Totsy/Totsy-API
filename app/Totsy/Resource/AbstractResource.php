@@ -42,7 +42,7 @@ abstract class AbstractResource
     /**
      * The incoming HTTP request.
      *
-     * @var Sonno\Http\Request\RequestInterface
+     * @var \Sonno\Http\Request\RequestInterface
      * @Context("Request")
      */
     protected $_request;
@@ -50,7 +50,7 @@ abstract class AbstractResource
     /**
      * Information about the incoming URI.
      *
-     * @var Sonno\Uri\UriInfo
+     * @var \Sonno\Uri\UriInfo
      * @Context("UriInfo")
      */
     protected $_uriInfo;
@@ -110,7 +110,9 @@ abstract class AbstractResource
      */
     protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
-        $sourceData    = ($item instanceof \Mage_Core_Model_Abstract) ? $item->getData() : array();
+        $sourceData    = ($item instanceof \Mage_Core_Model_Abstract)
+            ? $item->getData()
+            : array();
         $formattedData = array();
 
         if (is_null($fields)) {
@@ -120,7 +122,7 @@ abstract class AbstractResource
             $links = isset($this->_links) ? $this->_links : array();
         }
 
-        // add selected data from the incoming $sourceData to the output $formattedData
+        // add selected data from incoming $sourceData to output $formattedData
         foreach ($fields as $outputFieldName => $dataFieldName) {
             if (is_int($outputFieldName)) {
                 $outputFieldName = $dataFieldName;
@@ -201,6 +203,16 @@ abstract class AbstractResource
         }
 
         $obj->addData($data);
+
+        $validationErrors = $obj->validate();
+        if (is_array($validationErrors) && count($validationErrors)) {
+            $errorMessage = "Entity Validation Error: " . $validationErrors[0];
+            $e = new WebApplicationException(400);
+            $e->getResponse()->setHeaders(
+                array('X-API-Error' => $errorMessage)
+            );
+            throw $e;
+        }
 
         try {
             $obj->save();

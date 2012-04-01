@@ -51,7 +51,7 @@ Users and their corresponding Orders are the primary use case for the Totsy API.
 `GET /user/123/address` responds with a collection of Addresses. Each entry in the collection contains a a full link [`rel=http://rel.totsy.com/entity/address`] to the original Address resource.
 
 ### Create a new Address for a User ###
-`POST /user/123/address` with a partial representation of an Address.
+`POST /user/123/address` with a partial representation of an Address. The `state` field can be either the full name of the state, or the two-letter abbreviation.
 
 ### Retrieve Credit Cards stored for a User ###
 `GET /user/123/creditcard` responds with a collection of Credit Cards. Each entry in the collection contains a a full link [`rel=http://rel.totsy.com/entity/creditcard`] to the original Credit Card resource.
@@ -63,10 +63,10 @@ Users and their corresponding Orders are the primary use case for the Totsy API.
 `GET /user/123/order` responds with a collection of Orders. Each entry in the collection contains a a full link [`rel=http://rel.totsy.com/entity/order`] to the original Order resource.
 
 ### Create a new Order for a User ###
-1. `POST /user/123/order` with a partial representation of an Order, which includes a link [`rel=http://rel.totsy.com/entity/order`] to the full Order resource and the temporary Order expiry time. The server returns with a `202 Accepted` response, indicating that a temporary Order has been created. Initially, this temporary order will only contain order items (while the end user manipulates a client-side shopping cart).
-2. `PUT /order/765432` with a partial representation of an Order to update the existing temporary Order at any time, as often as needed. Each request will generate another `202 Accepted` response, with a full Order representation including an updated expiration time.
-3. `PUT /order/765432` a final time with a parital representation of an Order that contains address and payment information. The server returns with a `201 Created` response, indicating that a full and permanent Order has been created.
+A Totsy Order is defined by a set of products (and associated quantities), payment, and address information. In order for a new Order resource to be successfully created, it must contain all three of these critical pieces of information.
+However, product inventory can be reserved for a user using a `POST /user/345/order` request with a partial order representation containing only the "products" array. The server will respond with a `202 Accepted` response. An Order will not be created, but the requested products will be reserved in a server-side session shopping cart. This shopping cart does have a limited lifetime, indicated by the "expiry_time" property in the server's response representation. This cart can be updated an unlimited number of times using a `PUT /user/345/order` or a `POST /user/345/order` with an updated "products" property, which also updates the cart's "expiry_time" property.
+Once the final pieces of information are added (specifically the "payment" and "addresses" property), an Order resource will be created and the server will respond with a `201 Created` response, along with a Location header specifying the URL for the newly created resource.
 
-Any order update (`PUT /order/765432`) could possibly respond with a `409 Conflict` status in the following scenarios:
+Any order update (`PUT /user/345/order`) could possibly respond with a `409 Conflict` status in the following scenarios:
 1. One or more of the items in the order are not available (out of stock).
 2. The amount of credit to apply to the order exceeds the amount of credit available to the user.

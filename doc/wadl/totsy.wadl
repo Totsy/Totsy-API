@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/xsl" href="totsy_wadl_doc-2006-10.xsl" ?>
 <application xmlns="http://research.sun.com/wadl/2006/10" 
-  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"> 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
   <doc title="Totsy REST API Specification">
     Last Modified: <time datetime="2012-03-19">Mar 28, 2012</time><br/>
@@ -798,8 +797,6 @@
                 "name": "Stripe Sling Stripe",
                 "price": "10.0000",
                 "qty": "1.0000",
-                "tax_pct": "8.0000",
-                "tax": "0.8000",
                 "weight": "1.0000",
                 "links": [
                     {
@@ -812,7 +809,7 @@
         "payment": {
             "reward_points_used": 11,
             "creditcard_type": "VI",
-            "creditcard_last4": null,
+            "creditcard_last4": "1111",
             "creditcard_exp_month": "1",
             "creditcard_exp_year": "2015"
         },
@@ -864,8 +861,6 @@
                 "name": "Bullfinches Long Sleeve Ruched Neck Tee Light Blue",
                 "price": "18.0000",
                 "qty": "1.0000",
-                "tax_pct": "8.8750",
-                "tax": "1.6000",
                 "weight": "2.0000",
                 "links": [
                     {
@@ -937,41 +932,22 @@
                 <doc title="Partial Order Entity">
                   <pre>
 {
-    "coupon_code": null,
     "products": [
         {
-            "qty": "1.0000",
+            "qty": 5,
             "links": [
                 {
-                    "rel": "http://rel.totsy.com/entity/product",
-                    "href": "https://api.totsy.com/product/392"
-                }
-            ]
-        }
-    ],
-    "payment": {
-        "reward_points_used": 5,
-        "creditcard_type": "VI",
-        "creditcard_number": "4111111111111111",
-        "creditcard_exp_month": "1",
-        "creditcard_exp_year": "2015"
-    },
-    "addresses": [
-        {
-            "type": "billing",
-            "links": [
-                {
-                    "rel": "http://rel.totsy.com/entity/address",
-                    "href": "https://api.totsy.com/address/443"
+                    "href": "https://api.totsy.com/product/392",
+                    "rel": "http://rel.totsy.com/entity/product"
                 }
             ]
         },
         {
-            "type": "shipping",
+            "qty": 2,
             "links": [
                 {
-                    "rel": "http://rel.totsy.com/entity/address",
-                    "href": "https://api.totsy.com/address/444"
+                    "href": "https://api.totsy.com/product/1098",
+                    "rel": "http://rel.totsy.com/entity/product"
                 }
             ]
         }
@@ -987,34 +963,29 @@
                 <doc title="Full Order Entity (Pending)">
                   <pre>
 {
-    "status": "pending",
-    "total_qty": "1.0000",
-    "total_weight": "2.0000",
-    "expires": "2012-03-27 16:07:25",
+    "expires": "2012-03-30 21:49:09",
     "products": [
         {
-            "name": "Bullfinches Long Sleeve Ruched Neck Tee Light Blue",
-            "price": "18.0000",
-            "qty": "1.0000",
-            "tax_pct": "8.8750",
-            "tax": "1.6000",
-            "weight": "2.0000",
+            "name": "Giggle Giggle Quack",
+            "price": "10.5000",
+            "qty": 5,
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/product",
-                    "href": "https://api.totsy.com/product/383"
+                    "href": "https://api.totsy.com/product/392"
                 }
             ]
-        }
-    ],
-    "links": [
-        {
-            "rel": "self",
-            "href": "https://api.totsy.com/order/215"
         },
         {
-            "rel": "http://rel.totsy.com/entity/user",
-            "href": "https://api.totsy.com/user/1139"
+            "name": "Blue Umbrella Blowout",
+            "price": "10.0000",
+            "qty": 2,
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/product",
+                    "href": "https://api.totsy.com/product/1098"
+                }
+            ]
         }
     ]
 }
@@ -1045,8 +1016,6 @@
             "name": "Bullfinches Long Sleeve Ruched Neck Tee Light Blue",
             "price": "18.0000",
             "qty": "1.0000",
-            "tax_pct": "8.8750",
-            "tax": "1.6000",
             "weight": "2.0000",
             "links": [
                 {
@@ -1374,8 +1343,6 @@
             "name": "Bullfinches Long Sleeve Ruched Neck Tee Light Blue",
             "price": "18.0000",
             "qty": "1.0000",
-            "tax_pct": "8.8750",
-            "tax": "1.6000",
             "weight": "2.0000",
             "links": [
                 {
@@ -1420,133 +1387,6 @@
         {
             "rel": "http://rel.totsy.com/entity/user",
             "href": "https://api.totsy.com/user/1131"
-        }
-    ]
-}
-                </pre>
-              </doc>
-            </representation>
-          </response>
-        </method>
-
-        <method name="PUT">
-          <request>
-            <representation mediaType="application/json">
-              <doc title="Partial Order Entity">
-                <pre>
-{
-    "coupon_code": null,
-    "products": [
-        {
-            "qty": "1.0000",
-            "links": [
-                {
-                    "rel": "http://rel.totsy.com/entity/product",
-                    "href": "https://api.totsy.com/product/392"
-                }
-            ]
-        }
-    ],
-    "payment": {
-        "reward_points_used": 5,
-        "creditcard_type": "VI",
-        "creditcard_number": "4111111111111111",
-        "creditcard_exp_month": "1",
-        "creditcard_exp_year": "2015"
-    },
-    "addresses": [
-        {
-            "type": "billing",
-            "links": [
-                {
-                    "rel": "http://rel.totsy.com/entity/address",
-                    "href": "https://api.totsy.com/address/443"
-                }
-            ]
-        },
-        {
-            "type": "shipping",
-            "links": [
-                {
-                    "rel": "http://rel.totsy.com/entity/address",
-                    "href": "https://api.totsy.com/address/444"
-                }
-            ]
-        }
-    ]
-}
-                </pre>
-              </doc>
-            </representation>
-          </request>
-          <response status="200">
-
-            <representation mediaType="application/json">
-              <doc title="Full Order Entity">
-                <pre>
-{
-    "status": "pending",
-    "created": "2012-03-28 21:21:39",
-    "updated": "2012-03-28 21:21:39",
-    "coupon_code": null,
-    "total_qty": "1.0000",
-    "total_weight": "1.0000",
-    "shipping": "0.0000",
-    "tax": "0.8000",
-    "discount": "0.0000",
-    "subtotal": "10.0000",
-    "total": "0.0000",
-    "products": [
-        {
-            "name": "Stripe Sling Stripe",
-            "price": "10.0000",
-            "qty": "1.0000",
-            "tax_pct": "8.0000",
-            "tax": "0.8000",
-            "weight": "1.0000",
-            "links": [
-                {
-                    "rel": "http://rel.totsy.com/entity/product",
-                    "href": "https://api.totsy.com/product/392"
-                }
-            ]
-        }
-    ],
-    "payment": {
-        "reward_points_used": 11,
-        "creditcard_type": "VI",
-        "creditcard_last4": null,
-        "creditcard_exp_month": "1",
-        "creditcard_exp_year": "2015"
-    },
-    "addresses": [
-        {
-            "type": "billing",
-            "links": [
-                {
-                    "rel": "http://rel.totsy.com/entity/address",
-                    "href": "https://api.totsy.com/address/443"
-                }
-            ]
-        },
-        {
-            "type": "shipping",
-            "links": [
-                {
-                    "rel": "http://rel.totsy.com/entity/address",
-                    "href": "https://api.totsy.com/address/444"
-                }
-            ]
-        }
-    ],
-    "links": [
-        {
-            "rel": "self",
-            "href": "https://api.totsy.com/order/222"
-        },
-        {
-            "rel": "http://rel.totsy.com/entity/user",
-            "href": "https://api.totsy.com/user/1139"
         }
     ]
 }

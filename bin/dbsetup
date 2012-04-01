@@ -11,6 +11,7 @@ $create_client = <<<EOH
     CREATE TABLE IF NOT EXISTS client (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT,
+        contact TEXT,
         authorization TEXT,
         last_request TEXT
     );

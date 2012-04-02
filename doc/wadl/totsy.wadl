@@ -584,10 +584,11 @@
               <doc title="Partial User Entity">
                 <pre>
 {
-    "email": "...",
-    "firstname": "...",
-    "lastname": "...",
-    "password": "..."
+    "email": "tbhuvanendran@totsy.com",
+    "firstname": "Tharsan",
+    "lastname": "Bhuvanendran",
+    "password": "monkeywrench",
+    "confirmation": "monkeywrench"
 }
                 </pre>
               </doc>
@@ -598,7 +599,7 @@
               <doc title="Full User Entity">
                 <pre>
 {
-    "email": "tbhuvanendran+hara@totsy.com",
+    "email": "tbhuvanendran@totsy.com",
     "firstname": "Tharsan",
     "lastname": "Bhuvanendran",
     "points": 0,
@@ -963,7 +964,7 @@
                 <doc title="Full Order Entity (Pending)">
                   <pre>
 {
-    "expires": "2012-03-30 21:49:09",
+    "expires": "2012-04-02T00:26:54+00:00",
     "products": [
         {
             "name": "Giggle Giggle Quack",

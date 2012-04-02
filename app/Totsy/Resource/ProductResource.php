@@ -157,8 +157,10 @@ class ProductResource extends AbstractResource
         $ages = $item->getAttributeText('ages');
         $formattedData['age'] = $ages ? (array) $ages : array();
 
-        $formattedData['hot'] = isset($item['hot_list']) && $item['hot_list'];
-        $formattedData['featured'] = isset($item['featured']) && $item['featured'];
+        $formattedData['hot'] = isset($item['hot_list'])
+            && $item['hot_list'];
+        $formattedData['featured'] = isset($item['featured'])
+            && $item['featured'];
 
         $formattedData['image'] = array();
         foreach ($item['media_gallery']['images'] as $image) {

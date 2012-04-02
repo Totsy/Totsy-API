@@ -73,7 +73,8 @@ class UserResource extends AbstractResource
         $response = $this->_formatItem($user, $this->_fields, $this->_links);
         $responseBody = json_encode($response);
 
-        return new Response(201,
+        return new Response(
+            201,
             $responseBody,
             array('Location' => $response['links'][0]['href'])
         );
@@ -158,18 +159,18 @@ class UserResource extends AbstractResource
     /**
      * Verify that an incoming request is logged in for a specific user.
      *
-     * @param $user_id int The user ID that the request is made on behalf of.
+     * @param $userId int The user ID that the request is made on behalf of.
      * @return Mage_Customer_Model_Customer
      * @throws Sonno\Application\WebApplicationException
      */
-    public static function authorizeUser($user_id)
+    public static function authorizeUser($userId)
     {
         $session = Mage::getSingleton('customer/session');
 
         if ($session->isLoggedIn()) {
             // verify that the logged-in user is also the user requested
             $user = $session->getCustomer();
-            if ($user->getId() !== $user_id) {
+            if ($user->getId() !== $userId) {
                 throw new WebApplicationException(403);
             }
 

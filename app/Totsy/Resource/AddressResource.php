@@ -105,7 +105,8 @@ class AddressResource extends AbstractResource
         $response = $this->_formatItem($address);
         $responseBody = json_encode($response);
 
-        return new Response(201,
+        return new Response(
+            201,
             $responseBody,
             array('Location' => $response['links'][0]['href'])
         );
@@ -170,7 +171,7 @@ class AddressResource extends AbstractResource
 
         $item->setData(
             'default_billing',
-            isset($userData['default_billing']) && $userData['default_billing'] == $item->getId()
+            isset($userData['default_billing'])&& $userData['default_billing'] == $item->getId()
         );
 
         $item->setData(
@@ -231,11 +232,17 @@ class AddressResource extends AbstractResource
 
         // update the Customer object with default address settings
         if (isset($data['default_billing'])) {
-            $this->_user->setData('default_billing', $data['default_billing'] ? $obj->getId() : null);
+            $this->_user->setData(
+                'default_billing',
+                $data['default_billing'] ? $obj->getId() : null
+            );
         }
 
         if (isset($data['default_shipping'])) {
-            $this->_user->setData('default_shipping', $data['default_shipping'] ? $obj->getId() : null);
+            $this->_user->setData(
+                'default_shipping',
+                $data['default_shipping'] ? $obj->getId() : null
+            );
         }
 
         $this->_user->save();

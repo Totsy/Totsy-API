@@ -103,8 +103,8 @@ class OrderResource extends AbstractResource
         $quote = $cart->getQuote();
 
         // add Product Items from request data to the shopping cart
-        if (isset($requestData['products'])
-            && is_array($requestData['products']))
+        if (isset($requestData['products']) &&
+            is_array($requestData['products']))
         {
             foreach ($requestData['products'] as $requestProduct) {
                 // locate the Product ID in the Product URL
@@ -223,7 +223,10 @@ class OrderResource extends AbstractResource
         $address = $item->getBillingAddress();
         if ($address) {
             $builder = $this->_uriInfo->getBaseUriBuilder();
-            $builder->resourcePath('Totsy\Resource\AddressResource', 'getAddressEntity');
+            $builder->resourcePath(
+                'Totsy\Resource\AddressResource',
+                'getAddressEntity'
+            );
 
             $newData['addresses'][] = array(
                 'type' => 'billing',
@@ -239,7 +242,10 @@ class OrderResource extends AbstractResource
         $address = $item->getShippingAddress();
         if ($address) {
             $builder = $this->_uriInfo->getBaseUriBuilder();
-            $builder->resourcePath('Totsy\Resource\AddressResource', 'getAddressEntity');
+            $builder->resourcePath(
+                'Totsy\Resource\AddressResource',
+                'getAddressEntity'
+            );
 
             $newData['addresses'][] = array(
                 'type' => 'shipping',
@@ -300,13 +306,11 @@ class OrderResource extends AbstractResource
 
         $cartShelfLife = $cart->getQuoteItemExpireTime();
         $formattedData['expires'] = date(
-            'Y-m-d H:i:s',
-            strtotime("+$cartShelfLife seconds")
+            'c',
+            strtotime("+900 seconds")
         );
 
         $quoteData = $quote->getData();
-        $formattedData['item_count'] = $quoteData['items_count'];
-        $formattedData['item_qty'] = $quoteData['items_qty'];
         $formattedData['total'] = $quoteData['grand_total'];
 
         $builder = $this->_uriInfo->getBaseUriBuilder();
@@ -332,12 +336,6 @@ class OrderResource extends AbstractResource
                     )
                 )
             );
-        }
-
-        $carriers = Mage::getSingleton('shipping/config')->getActiveCarriers();
-        $shippingMethods = array();
-        foreach ($carriers as $carrier) {
-            $carrier->collectRates();
         }
 
         return $formattedData;

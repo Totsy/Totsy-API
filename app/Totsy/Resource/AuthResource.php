@@ -64,7 +64,8 @@ class AuthResource extends AbstractResource
     }
 
     /**
-     * Destroy an existing user session and log the system User out of the system.
+     * Destroy an existing user session and log the system User out of the
+     * system.
      *
      * @DELETE
      * @Produces({"*\/*"})

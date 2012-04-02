@@ -13,7 +13,8 @@ use Sonno\Annotation\GET,
     Sonno\Annotation\Path,
     Sonno\Annotation\Produces,
     Sonno\Annotation\Context,
-    Sonno\Annotation\PathParam;
+    Sonno\Annotation\PathParam,
+    Sonno\Application\WebApplicationException;
 
 /**
  * An Event is a time-limited sale of zero or more Product items.
@@ -83,6 +84,14 @@ class EventResource extends AbstractResource
                         'datetime' => true,
                     );
                     break;
+                default:
+                    $errorMessage = "Invalid value for the 'when' parameter: "
+                        . $when;
+                    $e = new WebApplicationException(400);
+                    $e->getResponse()->setHeaders(
+                        array('X-API-Error' => $errorMessage)
+                    );
+                    throw $e;
             }
         }
 
@@ -144,8 +153,12 @@ class EventResource extends AbstractResource
             }
         }
 
-        $formattedData['department'] = array_unique($formattedData['department']);
-        $formattedData['age'] = array_unique($formattedData['age']);
+        $formattedData['department'] = array_unique(
+            $formattedData['department']
+        );
+        $formattedData['age'] = array_unique(
+            $formattedData['age']
+        );
 
         // construct an object literal for event images
         if (isset($sourceData['image'])) {
@@ -153,16 +166,20 @@ class EventResource extends AbstractResource
         }
         $formattedData['image'] = array();
         if (isset($sourceData['default_image'])) {
-            $formattedData['image']['default'] = $imageBaseUrl . $sourceData['default_image'];
+            $formattedData['image']['default'] = $imageBaseUrl
+                . $sourceData['default_image'];
         }
         if (isset($sourceData['small_image'])) {
-            $formattedData['image']['small'] = $imageBaseUrl . $sourceData['small_image'];
+            $formattedData['image']['small'] = $imageBaseUrl
+                . $sourceData['small_image'];
         }
         if (isset($sourceData['thumbnail'])) {
-            $formattedData['image']['thumbnail'] = $imageBaseUrl . $sourceData['thumbnail'];
+            $formattedData['image']['thumbnail'] = $imageBaseUrl
+                . $sourceData['thumbnail'];
         }
         if (isset($sourceData['logo'])) {
-            $formattedData['image']['logo'] = $imageBaseUrl . $sourceData['logo'];
+            $formattedData['image']['logo'] = $imageBaseUrl
+                . $sourceData['logo'];
         }
 
         $item->addData($formattedData);

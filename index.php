@@ -32,12 +32,11 @@ define('APC_CONFIG_KEY', 'api_config');
 
 /**
  * Authorize the incoming request.
- *
- * @todo Store authorization identifiers in a persistence layer (sqlite)
  */
 
-$authToken = $_SERVER['HTTP_AUTHORIZATION'];
-if ($authToken) {
+if (isset($_SERVER['HTTP_AUTHORIZATION']) &&
+    $authToken = $_SERVER['HTTP_AUTHORIZATION']
+) {
     $db = new SQLite3(__DIR__ . '/db/api.db');
     $result = $db->querySingle(
         "SELECT id FROM client WHERE authorization = '$authToken'"
@@ -51,6 +50,10 @@ if ($authToken) {
         $now = date('Y-m-d H:i:s');
         $db->exec("UPDATE client SET last_request='$now' WHERE id = $result");
     }
+} else {
+    header('HTTP/1.0 401 Unauthorized');
+    header('WWW-Authenticate: Basic realm="Totsy API"');
+    exit;
 }
 
 /**

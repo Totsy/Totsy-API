@@ -1,0 +1,3 @@
+[submodule "lib/sonno"]
+	path = lib/sonno
+	url = git@github.com:thizzle/sonno.git

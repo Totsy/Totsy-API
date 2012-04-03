@@ -32,6 +32,13 @@ class ProductResource extends AbstractResource
      */
     protected $_eventId;
 
+    /**
+     * The base URL for static web assets.
+     *
+     * @var string
+     */
+    protected $_webBaseUrl;
+
     protected $_modelGroupName = 'catalog/product';
 
     protected $_fields = array(
@@ -63,6 +70,13 @@ class ProductResource extends AbstractResource
             'href' => '/event/{event_id}'
         ),
     );
+
+    public function __construct()
+    {
+        $this->_webBaseUrl = \Mage::getBaseUrl();
+
+        parent::__construct();
+    }
 
     /**
      * A single Product instance.
@@ -141,10 +155,9 @@ class ProductResource extends AbstractResource
      */
     protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
-        $sourceData    = $item->getData();
         $formattedData = array();
 
-        $imageBaseUrl = 'http://' . API_WEB_URL . '/media/catalog/product';
+        $imageBaseUrl = $this->_webBaseUrl . '/media/catalog/product';
 
         $formattedData['event_id'] = $this->_eventId;
 

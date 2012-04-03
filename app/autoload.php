@@ -18,7 +18,7 @@ unset($classLoader);
 
 $sonnoLoader = new ClassLoader(
     'Sonno',
-    __DIR__ . '/../../lib/sonno/src' // $MAGENTO_ROOT/lib/sonno/src
+    __DIR__ . '/../lib/sonno/src'
 );
 $sonnoLoader->register();
 unset($sonnoLoader);

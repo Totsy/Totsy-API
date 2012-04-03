@@ -23,10 +23,6 @@ define(
     'API_ENV',
     getenv('API_ENV') ? getenv('API_ENV') : 'dev'
 );
-define(
-    'API_WEB_URL',
-    getenv('API_WEB_URL') ? getenv('API_WEB_URL') : $_SERVER['SERVER_NAME']
-);
 
 define('APC_CONFIG_KEY', 'api_config');
 
@@ -60,8 +56,13 @@ if (isset($_SERVER['HTTP_AUTHORIZATION']) &&
  * Bootstrap the Magento environment.
  */
 
-require_once '../app/Mage.php';
-Mage::app('default');
+$mageRoot = '/' . trim(getenv('MAGENTO_ROOT'), '/');
+if (!is_dir($mageRoot)) {
+    throw new Exception("Invalid $mageRoot environment variable!");
+}
+
+require_once "$mageRoot/app/Mage.php";
+Mage::app();
 if ('dev' === API_ENV) {
     Mage::setIsDeveloperMode(true);
 }
@@ -79,7 +80,7 @@ if ('dev' !== API_ENV && apc_exists(APC_CONFIG_KEY)) {
     $doctrineReader = new AnnotationReader();
     AnnotationRegistry::registerAutoloadNamespace(
         'Sonno\Annotation',
-        BP . DS . 'lib' . DS . 'sonno' . DS . 'src'
+        __DIR__ . '/lib/sonno/src'
     );
 
     $annotationReader = new DoctrineReader($doctrineReader);

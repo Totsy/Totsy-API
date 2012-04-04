@@ -34,6 +34,7 @@ class EventResource extends AbstractResource
         'name',
         'description',
         'short_description',
+        'discount_pct',
         'department',
         'age',
         'start'  => 'event_start_date',
@@ -75,7 +76,7 @@ class EventResource extends AbstractResource
 
         // setup filters on event start & end dates using the 'when' parameter
         if ($when = $this->_request->getQueryParam('when')) {
-            switch($when) {
+            switch ($when) {
                 case 'past':
                     $filters['event_end_date'] = array(
                         'to' => date('Y-m-d H:m:s'),
@@ -133,6 +134,8 @@ class EventResource extends AbstractResource
      * @param $fields null|array
      * @param $links null|array
      * @return array
+     *
+     * @todo Populate a real value for the "discount_pct" field.
      */
     protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
@@ -195,6 +198,8 @@ class EventResource extends AbstractResource
             $formattedData['image']['logo'] = $imageBaseUrl
                 . $sourceData['logo'];
         }
+
+        $formattedData['discount_pct'] = 50;
 
         $item->addData($formattedData);
         return parent::_formatItem($item, $fields, $links);

@@ -26,3 +26,4 @@ Reference documentation can be found in `doc/README.md` and a Web Application De
 To-Do (Future)
 --------------
 * Add a domain model layer to decouple Magento models from the API server. Use Symfony DI to configure and instantiate classes.
+* Move API client configuration into a Magento admin module, instead of the current SQLite database.

@@ -27,32 +27,6 @@ define(
 define('APC_CONFIG_KEY', 'api_config');
 
 /**
- * Authorize the incoming request.
- */
-
-if (isset($_SERVER['HTTP_AUTHORIZATION']) &&
-    $authToken = $_SERVER['HTTP_AUTHORIZATION']
-) {
-    $db = new SQLite3(__DIR__ . '/db/api.db');
-    $result = $db->querySingle(
-        "SELECT id FROM client WHERE authorization = '$authToken'"
-    );
-
-    if (!$result) {
-        header('HTTP/1.0 401 Unauthorized');
-        header('WWW-Authenticate: Basic realm="Totsy API"');
-        exit;
-    } else {
-        $now = date('Y-m-d H:i:s');
-        $db->exec("UPDATE client SET last_request='$now' WHERE id = $result");
-    }
-} else {
-    header('HTTP/1.0 401 Unauthorized');
-    header('WWW-Authenticate: Basic realm="Totsy API"');
-    exit;
-}
-
-/**
  * Bootstrap the Magento environment.
  */
 
@@ -65,6 +39,28 @@ require_once "$mageRoot/app/Mage.php";
 Mage::app();
 if ('dev' === API_ENV) {
     Mage::setIsDeveloperMode(true);
+}
+
+/**
+ * Authorize the incoming request.
+ */
+
+if (isset($_SERVER['HTTP_AUTHORIZATION']) &&
+    $authToken = $_SERVER['HTTP_AUTHORIZATION']
+) {
+    $client = Mage::getModel('totsyapi/client')->getCollection();
+    $client->addFieldToFilter('authorization', $authToken);
+    $result = $client->getFirstItem();
+
+    if ($result->isObjectNew()) {
+        header('HTTP/1.0 401 Unauthorized');
+        header('WWW-Authenticate: Basic realm="Totsy API"');
+        exit;
+    }
+} else {
+    header('HTTP/1.0 401 Unauthorized');
+    header('WWW-Authenticate: Basic realm="Totsy API"');
+    exit;
 }
 
 /**

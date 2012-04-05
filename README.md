@@ -21,7 +21,7 @@ Dependencies
 Documentation
 -------------
 
-Reference documentation can be found in `doc/README.md` and a Web Application Description Language (WADL) specification is located in `doc/wadl/`.
+Reference documentation can be found at https://api.totsy.com/doc/ref/Usage.md and a Web Application Description Language (WADL) specification is located at https://api.totsy.com/doc/wadl/.
 
 To-Do (Future)
 --------------

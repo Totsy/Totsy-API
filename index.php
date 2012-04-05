@@ -52,7 +52,7 @@ if (isset($_SERVER['HTTP_AUTHORIZATION']) &&
     $client->addFieldToFilter('authorization', $authToken);
     $result = $client->getFirstItem();
 
-    if ($result->isObjectNew() || !$result->isActive()) {
+    if ($result->isObjectNew() || !$result->getActive()) {
         header('HTTP/1.0 401 Unauthorized');
         header('WWW-Authenticate: Basic realm="Totsy API"');
         exit;

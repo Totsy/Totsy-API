@@ -127,6 +127,34 @@ class EventResource extends AbstractResource
     }
 
     /**
+     * Construct a response (application/json) of a entity collection from the
+     * local model.
+     *
+     * @param $filters array The set of Magento ORM filters to apply.
+     * @return string json-encoded
+     */
+    public function getCollection($filters = array())
+    {
+        // hollow items are ID values only
+        $hollowItems = $this->_model->getCollection();
+
+        foreach ($filters as $filterName => $condition) {
+            $hollowItems->addAttributeToFilter($filterName, $condition);
+        }
+
+        $results = array();
+        foreach ($hollowItems as $hollowItem) {
+            $item = $this->_model->load($hollowItem->getId());
+            $productCount = count($item->getProductCollection());
+            if ($productCount && $formattedItem = $this->_formatItem($item)) {
+                $results[] = $formattedItem;
+            }
+        }
+
+        return json_encode($results);
+    }
+
+    /**
      * Add formatted fields to item data before deferring to the default
      * item formatting.
      *

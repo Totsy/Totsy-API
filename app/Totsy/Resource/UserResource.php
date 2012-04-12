@@ -151,7 +151,7 @@ class UserResource extends AbstractResource
         $rewards->setCustomer($item);
         $rewards->loadByCustomer();
 
-        $item->addData(array('points' => intval($rewards->getPointsBalance())));
+        $item->addData(array('credit' => intval($rewards->getPointsBalance())));
         return parent::_formatItem($item, $fields, $links);
     }
 

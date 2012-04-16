@@ -47,6 +47,7 @@ class ProductResource extends AbstractResource
         'short_description',
         'department',
         'age',
+        'attributes',
         'vendor_style',
         'sku',
         'weight',
@@ -178,6 +179,17 @@ class ProductResource extends AbstractResource
         $formattedData['image'] = array();
         foreach ($item['media_gallery']['images'] as $image) {
             $formattedData['image'][] = $imageBaseUrl . $image['file'];
+        }
+
+        $formattedData['attributes'] = array();
+        $configProduct = \Mage::getModel('catalog/product_type_configurable');
+        $configAttrs = $configProduct->getConfigurableAttributesAsArray($item);
+
+        foreach ($configAttrs as $attr) {
+            $formattedData['attributes'][$attr['label']] = array();
+            foreach ($attr['values'] as $attrVal) {
+                $formattedData['attributes'][$attr['label']][] = $attrVal['label'];
+            }
         }
 
         $item->addData($formattedData);

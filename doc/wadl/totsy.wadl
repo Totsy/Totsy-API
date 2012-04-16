@@ -203,6 +203,15 @@
             "3_4y",
             "5_up"
         ],
+        "attributes": {
+            "Size": [
+                "0-3M",
+                "0-6M"
+            ],
+            "Color": [
+                "Green"
+            ]
+        },
         "vendor_style": "dotcom",
         "sku": "SKU-33400-24",
         "weight": "1.0000",
@@ -242,6 +251,15 @@
             "3_4y",
             "5_up"
         ],
+        "attributes": {
+            "Size": [
+                "0-3M",
+                "0-6M"
+            ],
+            "Color": [
+                "Green"
+            ]
+        },
         "vendor_style": "dotcom",
         "sku": "SKU-334-2423501",
         "weight": "1.0000",
@@ -281,6 +299,15 @@
             "3_4y",
             "5_up"
         ],
+        "attributes": {
+            "Size": [
+                "0-3M",
+                "0-6M"
+            ],
+            "Color": [
+                "Green"
+            ]
+        },
         "vendor_style": null,
         "sku": "SKU-33544-4324",
         "weight": "1.0000",
@@ -349,6 +376,15 @@
         "3_4y",
         "5_up"
     ],
+    "attributes": {
+        "Size": [
+            "0-3M",
+            "0-6M"
+        ],
+        "Color": [
+            "Green"
+        ]
+    },
     "vendor_style": "dotcom",
     "sku": "SKU-334-2423501",
     "weight": "1.0000",

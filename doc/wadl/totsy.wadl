@@ -195,6 +195,7 @@
         "name": "Winter Stroller Cover Blue",
         "description": "The product short description",
         "short_description": "The product short description",
+        "shipping_returns": "...",
         "department": [],
         "age": [
             "0_6m",
@@ -240,6 +241,7 @@
         "name": "Blue Umbrella Blowout",
         "description": "The product long description",
         "short_description": "The product short description",
+        "shipping_returns": "...",
         "department": [
             "girls",
             "accessories"
@@ -291,6 +293,7 @@
         "name": "Open Ultra Fold",
         "description": "The product short description",
         "short_description": "The product short description",
+        "shipping_returns": "...",
         "department": [],
         "age": [
             "0_6m",
@@ -365,6 +368,7 @@
     "name": "Blue Umbrella Blowout",
     "description": "The product long description",
     "short_description": "The product short description",
+    "shipping_returns": "...",
     "department": [
         "girls",
         "accessories"

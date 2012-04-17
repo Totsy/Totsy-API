@@ -45,6 +45,7 @@ class ProductResource extends AbstractResource
         'name',
         'description',
         'short_description',
+        'shipping_returns',
         'department',
         'age',
         'attributes',
@@ -182,8 +183,8 @@ class ProductResource extends AbstractResource
         }
 
         $formattedData['attributes'] = array();
-        $configProduct = \Mage::getModel('catalog/product_type_configurable');
-        $configAttrs = $configProduct->getConfigurableAttributesAsArray($item);
+        $configAttrs = $item->getTypeInstance()
+            ->getConfigurableAttributesAsArray();
 
         foreach ($configAttrs as $attr) {
             $formattedData['attributes'][$attr['label']] = array();

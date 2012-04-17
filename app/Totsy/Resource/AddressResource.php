@@ -160,6 +160,40 @@ class AddressResource extends AbstractResource
     }
 
     /**
+     * Delete the record of an existing Address.
+     *
+     * @DELETE
+     * @Path("/address/{id}")
+     * @Produces({"*\/*"})
+     * @PathParam("id")
+     */
+    public function deleteAddressEntity($id)
+    {
+        $address = $this->_model->load($id);
+
+        if ($address->isObjectNew()) {
+            return new Response(404);
+        }
+
+        // ensure that the request is authorized for the address owner
+        $this->_user = UserResource::authorizeUser($address->getCustomerId());
+
+        try {
+            $address->delete();
+        } catch(\Exception $mageException) {
+            Mage::logException($mageException);
+
+            $e = new WebApplicationException(500);
+            $e->getResponse()->setHeaders(
+                array('X-API-Error' => $mageException->getMessage())
+            );
+            throw $e;
+        }
+
+        return new Response(200);
+    }
+
+    /**
      * @param $item Mage_Core_Model_Abstract
      * @param $fields array|null
      * @param $links array|null

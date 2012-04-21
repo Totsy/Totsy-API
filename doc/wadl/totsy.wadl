@@ -4,7 +4,7 @@
   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
   <doc title="Totsy REST API Specification">
-    Last Modified: <time datetime="2012-03-19">Apr 5, 2012</time><br/>
+    Last Modified: <time datetime="2012-04-21">Apr 21, 2012</time><br/>
     Author: <a href="mailto:tbhuvanendran@totsy.com">Tharsan Bhuvanendran &lt;tbhuvanendran@totsy.com&gt;</a>
   </doc>
 
@@ -536,7 +536,7 @@
             <doc title="Full User Entity">
               <pre>
 {
-    "email": "tbhuvanendran+hara@totsy.com",
+    "email": "tbhuvanendran@totsy.com",
     "firstname": "Tharsan",
     "lastname": "Bhuvanendran",
     "credit": 0,
@@ -981,6 +981,10 @@
     "products": [
         {
             "qty": 5,
+            "attributes": {
+                "Size": "0-3M",
+                "Color": "Green"
+            },
             "links": [
                 {
                     "href": "https://api.totsy.com/product/392",
@@ -990,6 +994,10 @@
         },
         {
             "qty": 2,
+            "attributes": {
+                "Size": "0-3M",
+                "Color": "Green"
+            },
             "links": [
                 {
                     "href": "https://api.totsy.com/product/1098",
@@ -1010,11 +1018,16 @@
                   <pre>
 {
     "expires": "2012-04-02T00:26:54+00:00",
+    "subtotal": 72.5,
     "products": [
         {
             "name": "Giggle Giggle Quack",
             "price": "10.5000",
             "qty": 5,
+            "attributes": {
+                "Size": "0-3M",
+                "Color": "Green"
+            },
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/product",
@@ -1026,6 +1039,10 @@
             "name": "Blue Umbrella Blowout",
             "price": "10.0000",
             "qty": 2,
+            "attributes": {
+                "Size": "0-3M",
+                "Color": "Green"
+            },
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/product",
@@ -1447,8 +1464,8 @@
     <!-- Resource: Credit Card -->
     <resource path="creditcard">
       <doc title="Credit Card">
-        A single Credit Card whose information is saved by the system for the user
-        for future purchases.
+        A Credit Card represents a payment method whose information is saved by
+        the system for the user for future purchases.
       </doc>
 
       <param name="auth_token" type="xsd:string" style="query" required="true">

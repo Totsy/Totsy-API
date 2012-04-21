@@ -163,6 +163,10 @@ class ProductResource extends AbstractResource
 
         $formattedData['event_id'] = $this->_eventId;
 
+        $formattedData['shipping_returns'] = trim(
+            strip_tags(html_entity_decode($item->getShippingReturns()))
+        );
+
         // scrape together department & age data
         $departments = $item->getAttributeText('departments');
         $formattedData['department'] = $departments ?

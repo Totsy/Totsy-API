@@ -25,66 +25,62 @@ use Sonno\Annotation\GET,
     Mage;
 
 /**
- * An Address represents a physical real-world location that is used to ship
- * products to, or as a billing address.
+ * A Credit Card represents a payment method whose information is saved by the
+ * system for the user for future purchases.
  */
-class AddressResource extends AbstractResource
+class CreditCardResource extends AbstractResource
 {
     /**
-     * The user that an address belongs to.
+     * The user that a credit card belongs to.
      *
      * @var Mage_Customer_Model_Customer
      */
     protected $_user;
 
-    protected $_modelGroupName = 'customer/address';
+    protected $_modelGroupName = 'paymentfactory/profile';
 
     protected $_fields = array(
-        'firstname',
-        'lastname',
-        'company',
-        'street',
-        'city',
-        'state' => 'region',
-        'zip' => 'postcode',
-        'country' => 'country_id',
-        'telephone',
-        'fax',
-        'default_billing',
-        'default_shipping',
+        'testdata',
     );
 
     protected $_links = array(
         array(
             'rel' => 'self',
-            'href' => '/address/{entity_id}'
+            'href' => '/creditcard/{entity_id}'
         ),
         array(
-            'rel' => 'http://rel.totsy.com/entity/user',
+            'rel' => 'http://rel.totsy.com/entity/creditcard',
             'href' => '/user/{parent_id}'
         ),
     );
 
     /**
-     * Retrieve the set of addresses stored for a specific User.
+     * Retrieve the set of credit cards stored for a specific User.
      *
      * @GET
-     * @Path("/user/{id}/address")
+     * @Path("/user/{id}/creditcard")
      * @Produces({"application/json"})
      * @PathParam("id")
      */
-    public function getUserAddresses($id)
+    public function getUserCreditCards($id)
     {
         $this->_user = UserResource::authorizeUser($id);
 
-        return $this->getCollection(array('parent_id' => $id));
+        $creditCards = $this->_model->loadByCustomerId($id);
+        $results = array();
+        foreach ($creditCards as $card) {
+            print_r($card->getData());
+            //$results[] = $this->_formatItem($card);
+        }
+exit;
+        return json_encode($results);
     }
 
     /**
-     * Add a new Address to the system.
+     * Add a new Credit Card to the system.
      *
      * @POST
-     * @Path("/user/{id}/address")
+     * @Path("/user/{id}/creditcard")
      * @Produces({"application/json"})
      * @Consumes({"application/json"})
      * @PathParam("id")
@@ -93,11 +89,11 @@ class AddressResource extends AbstractResource
     {
         $this->_user = UserResource::authorizeUser($id);
 
-        $address = Mage::getModel($this->_modelGroupName);
-        $address->setCustomerId($id);
-        $this->_populateModelInstance($address);
+        $card = Mage::getModel($this->_modelGroupName);
+        $card->setCustomerId($id);
+        $this->_populateModelInstance($card);
 
-        $response = $this->_formatItem($address);
+        $response = $this->_formatItem($card);
 
         return new Response(
             201,
@@ -107,76 +103,76 @@ class AddressResource extends AbstractResource
     }
 
     /**
-     * A single Address instance.
+     * A single Credit Card instance.
      *
      * @GET
-     * @Path("/address/{id}")
+     * @Path("/creditcard/{id}")
      * @Produces({"application/json"})
      * @PathParam("id")
      */
     public function getEntity($id)
     {
-        $address = $this->_model->load($id);
+        $card = $this->_model->load($id);
 
-        if ($address->isObjectNew()) {
+        if ($card->isObjectNew()) {
             return new Response(404);
         }
 
         // ensure that the request is authorized for the address owner
-        $this->_user = UserResource::authorizeUser($address->getCustomerId());
+        $this->_user = UserResource::authorizeUser($card->getCustomerId());
 
-        return json_encode($this->_formatItem($address));
+        return json_encode($this->_formatItem($card));
     }
 
     /**
-     * Update the record of an existing Address.
+     * Update the record of an existing Credit Card.
      *
      * @PUT
-     * @Path("/address/{id}")
+     * @Path("/creditcard/{id}")
      * @Produces({"application/json"})
      * @Consumes({"application/json"})
      * @PathParam("id")
      */
     public function updateEntity($id)
     {
-        $address = $this->_model->load($id);
+        $card = $this->_model->load($id);
 
-        if ($address->isObjectNew()) {
+        if ($card->isObjectNew()) {
             return new Response(404);
         }
 
         // ensure that the request is authorized for the address owner
-        $this->_user = UserResource::authorizeUser($address->getCustomerId());
+        $this->_user = UserResource::authorizeUser($card->getCustomerId());
 
-        $this->_populateModelInstance($address);
+        $this->_populateModelInstance($card);
 
-        return json_encode($this->_formatItem($address));
+        return json_encode($this->_formatItem($card));
     }
 
     /**
-     * Delete the record of an existing Address.
+     * Delete the record of an existing Credit Card.
      *
      * @DELETE
-     * @Path("/address/{id}")
+     * @Path("/creditcard/{id}")
      * @Produces({"*\/*"})
      * @PathParam("id")
      */
     public function deleteEntity($id)
     {
-        $address = $this->_model->load($id);
+        $card = $this->_model->load($id);
 
-        if ($address->isObjectNew()) {
+        if ($card->isObjectNew()) {
             return new Response(404);
         }
 
         // ensure that the request is authorized for the address owner
-        $this->_user = UserResource::authorizeUser($address->getCustomerId());
+        $this->_user = UserResource::authorizeUser($card->getCustomerId());
 
         try {
-            $address->delete();
+            $card->delete();
         } catch(\Exception $e) {
             Mage::logException($e);
-            throw new WebApplicationException(500, $e);
+            throw new WebApplicationException(500, $e->getMessage());
         }
 
         return new Response(200);
@@ -239,10 +235,13 @@ class AddressResource extends AbstractResource
 
         // the region value supplied could not be found
         if ($region->isObjectNew()) {
-            throw new WebApplicationException(
-                400,
-                "Validation Error: Invalid value in 'state' field."
+            $errorMessage = "Entity Validation Error: Invalid value in 'state'"
+                . " field.";
+            $e = new WebApplicationException(400);
+            $e->getResponse()->setHeaders(
+                array('X-API-Error' => $errorMessage)
             );
+            throw $e;
         }
 
         // save the address object

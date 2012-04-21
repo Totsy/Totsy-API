@@ -73,5 +73,7 @@ class AuthResource extends AbstractResource
     public function logout()
     {
         $this->_model->logout();
+
+        return '';
     }
 }

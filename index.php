@@ -19,11 +19,7 @@ use Sonno\Configuration\Driver\AnnotationDriver,
  */
 require_once 'app/autoload.php';
 
-define(
-    'API_ENV',
-    getenv('API_ENV') ? getenv('API_ENV') : 'dev'
-);
-
+define('API_ENV', getenv('API_ENV') ? getenv('API_ENV') : 'dev');
 define('APC_CONFIG_KEY', 'api_config');
 
 /**
@@ -32,7 +28,7 @@ define('APC_CONFIG_KEY', 'api_config');
 
 $mageRoot = '/' . trim(getenv('MAGENTO_ROOT'), '/');
 if (!is_dir($mageRoot)) {
-    throw new Exception("Invalid $mageRoot environment variable!");
+    throw new Exception("Could not find Magento installation at $mageRoot.");
 }
 
 require_once "$mageRoot/app/Mage.php";
@@ -87,6 +83,7 @@ if ('dev' !== API_ENV && apc_exists(APC_CONFIG_KEY)) {
         'Totsy\Resource\AuthResource',
         'Totsy\Resource\UserResource',
         'Totsy\Resource\AddressResource',
+        'Totsy\Resource\CreditCardResource',
         'Totsy\Resource\OrderResource',
     );
 

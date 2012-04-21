@@ -16,7 +16,8 @@ use Sonno\Annotation\GET,
     Sonno\Annotation\PathParam,
     Sonno\Annotation\QueryParam,
     Sonno\Http\Response\Response,
-    Sonno\Application\WebApplicationException,
+
+    Totsy\Exception\WebApplicationException,
 
     Mage;
 
@@ -185,12 +186,10 @@ abstract class AbstractResource
         if (is_null($data)) {
             $data = json_decode($this->_request->getRequestBody(), true);
             if (is_null($data)) {
-                $error = 'Malformed entity representation in request body';
-                $e = new WebApplicationException(400);
-                $e->getResponse()->setHeaders(
-                    array('X-API-Error' => $error)
+                throw new WebApplicationException(
+                    400,
+                    'Malformed entity representation in request body'
                 );
-                throw $e;
             }
         }
 
@@ -206,32 +205,20 @@ abstract class AbstractResource
 
         $validationErrors = $obj->validate();
         if (is_array($validationErrors) && count($validationErrors)) {
-            $errorMessage = "Entity Validation Error: " . $validationErrors[0];
-            $e = new WebApplicationException(400);
-            $e->getResponse()->setHeaders(
-                array('X-API-Error' => $errorMessage)
+            throw new WebApplicationException(
+                400,
+                "Entity Validation Error: " . $validationErrors[0]
             );
-            throw $e;
         }
 
         try {
             $obj->save();
         } catch(\Mage_Core_Exception $mageException) {
             Mage::logException($mageException);
-
-            $e = new WebApplicationException(400);
-            $e->getResponse()->setHeaders(
-                array('X-API-Error' => $mageException->getMessage())
-            );
-            throw $e;
-        } catch(\Exception $mageException) {
-            Mage::logException($mageException);
-
-            $e = new WebApplicationException(500);
-            $e->getResponse()->setHeaders(
-                array('X-API-Error' => $mageException->getMessage())
-            );
-            throw $e;
+            throw new WebApplicationException(400, $mageException->getMessage());
+        } catch(\Exception $e) {
+            Mage::logException($e);
+            throw new WebApplicationException(500, $e);
         }
 
         return true;

@@ -35,7 +35,7 @@ class UserResource extends AbstractResource
         'email',
         'firstname',
         'lastname',
-        'points',
+        'credit',
     );
 
     protected $_links = array(

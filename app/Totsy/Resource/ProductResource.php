@@ -32,13 +32,6 @@ class ProductResource extends AbstractResource
      */
     protected $_eventId;
 
-    /**
-     * The base URL for static web assets.
-     *
-     * @var string
-     */
-    protected $_webBaseUrl;
-
     protected $_modelGroupName = 'catalog/product';
 
     protected $_fields = array(
@@ -60,6 +53,7 @@ class ProductResource extends AbstractResource
         'hot',
         'featured',
         'image',
+        'web_url',
     );
 
     protected $_links = array(
@@ -72,13 +66,6 @@ class ProductResource extends AbstractResource
             'href' => '/event/{event_id}'
         ),
     );
-
-    public function __construct()
-    {
-        $this->_webBaseUrl = \Mage::getBaseUrl();
-
-        parent::__construct();
-    }
 
     /**
      * A single Product instance.
@@ -159,7 +146,7 @@ class ProductResource extends AbstractResource
     {
         $formattedData = array();
 
-        $imageBaseUrl = $this->_webBaseUrl . '/media/catalog/product';
+        $imageBaseUrl = \Mage::getBaseUrl() . '/media/catalog/product';
 
         $formattedData['event_id'] = $this->_eventId;
 
@@ -186,14 +173,16 @@ class ProductResource extends AbstractResource
             $formattedData['image'][] = $imageBaseUrl . $image['file'];
         }
 
-        $formattedData['attributes'] = array();
-        $configAttrs = $item->getTypeInstance()
-            ->getConfigurableAttributesAsArray();
+        if ('configurable' == $item->getTypeId()) {
+            $formattedData['attributes'] = array();
+            $productAttrs = $item->getTypeInstance()
+                ->getConfigurableAttributesAsArray();
 
-        foreach ($configAttrs as $attr) {
-            $formattedData['attributes'][$attr['label']] = array();
-            foreach ($attr['values'] as $attrVal) {
-                $formattedData['attributes'][$attr['label']][] = $attrVal['label'];
+            foreach ($productAttrs as $attr) {
+                $formattedData['attributes'][$attr['label']] = array();
+                foreach ($attr['values'] as $attrVal) {
+                    $formattedData['attributes'][$attr['label']][] = $attrVal['label'];
+                }
             }
         }
 

@@ -23,13 +23,6 @@ class EventResource extends AbstractResource
 {
     protected $_modelGroupName = 'catalog/category';
 
-    /**
-     * The base URL for static web assets.
-     *
-     * @var string
-     */
-    protected $_webBaseUrl;
-
     protected $_fields = array(
         'name',
         'description',
@@ -40,6 +33,7 @@ class EventResource extends AbstractResource
         'start'  => 'event_start_date',
         'end'    => 'event_end_date',
         'image',
+        'web_url',
     );
 
     protected $_links = array(
@@ -52,13 +46,6 @@ class EventResource extends AbstractResource
             'href' => '/event/{entity_id}/product'
         ),
     );
-
-    public function __construct()
-    {
-        $this->_webBaseUrl = \Mage::getBaseUrl();
-
-        parent::__construct();
-    }
 
     /**
      * Retrieve a collection of all active/current Event instances.
@@ -170,7 +157,7 @@ class EventResource extends AbstractResource
         $sourceData    = $item->getData();
         $formattedData = array();
 
-        $imageBaseUrl = $this->_webBaseUrl . '/media/catalog/category/';
+        $imageBaseUrl = \Mage::getBaseUrl() . '/media/catalog/category/';
 
         // scrape together department & age data from event products
         $formattedData['department'] = array();

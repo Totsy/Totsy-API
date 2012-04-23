@@ -9,22 +9,14 @@
 use Doctrine\Common\ClassLoader;
 require 'Doctrine/Common/ClassLoader.php';
 
-$classLoader = new ClassLoader(
-    'Totsy',
-    __DIR__
-);
+$classLoader = new ClassLoader('Totsy', __DIR__);
 $classLoader->register();
 unset($classLoader);
 
-$sonnoLoader = new ClassLoader(
-    'Sonno',
-    __DIR__ . '/../lib/sonno/src'
-);
+$sonnoLoader = new ClassLoader('Sonno', __DIR__ . '/../lib/vendor/sonno/src');
 $sonnoLoader->register();
 unset($sonnoLoader);
 
-$commonLoader = new ClassLoader(
-    'Doctrine\Common'
-);
+$commonLoader = new ClassLoader('Doctrine\Common');
 $commonLoader->register();
 unset($commonLoader);

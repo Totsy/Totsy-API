@@ -1,0 +1,3 @@
+[submodule "lib/vendor/sonno"]
+	path = lib/vendor/sonno
+	url = git@github.com:360i/sonno.git

@@ -72,7 +72,7 @@ if ('dev' !== API_ENV && apc_exists(APC_CONFIG_KEY)) {
     $doctrineReader = new AnnotationReader();
     AnnotationRegistry::registerAutoloadNamespace(
         'Sonno\Annotation',
-        __DIR__ . '/lib/sonno/src'
+        __DIR__ . '/lib/vendor/sonno/src'
     );
 
     $annotationReader = new DoctrineReader($doctrineReader);

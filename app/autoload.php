@@ -6,8 +6,8 @@
  * @copyright  Copyright (c) 2012 Totsy LLC
  */
 
+require 'lib/vendor/doctrine-common/lib/Doctrine/Common/ClassLoader.php';
 use Doctrine\Common\ClassLoader;
-require 'Doctrine/Common/ClassLoader.php';
 
 $classLoader = new ClassLoader('Totsy', __DIR__);
 $classLoader->register();

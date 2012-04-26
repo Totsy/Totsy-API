@@ -70,7 +70,7 @@ class OrderResource extends AbstractResource
      */
     public function getUserOrders($id)
     {
-        $user = UserResource::authorizeUser($id);
+        $user = UserResource::authorizeUser($this->_request, $id);
 
         return $this->getCollection(array('customer_id' => array('eq' => $id)));
     }
@@ -89,7 +89,7 @@ class OrderResource extends AbstractResource
      */
     public function createOrderEntity($id)
     {
-        UserResource::authorizeUser($id);
+        UserResource::authorizeUser($this->_request, $id);
 
         $requestData = json_decode($this->_request->getRequestBody(), true);
         if (is_null($requestData)) {
@@ -133,7 +133,7 @@ class OrderResource extends AbstractResource
         }
 
         // ensure that the request is authorized for the address owner
-        UserResource::authorizeUser($order->getCustomerId());
+        UserResource::authorizeUser($this->_request, $order->getCustomerId());
 
         return json_encode($this->_formatItem($order));
     }
@@ -249,7 +249,7 @@ class OrderResource extends AbstractResource
             strtotime('+' . $cartShelfLife . ' seconds')
         );
 
-        $quoteData = $quote->getData();
+        $quoteData = $cart->getQuote()->getData();
         $formattedData['subtotal'] = $quoteData['grand_total'];
 
         $builder = $this->_uriInfo->getBaseUriBuilder();
@@ -259,7 +259,7 @@ class OrderResource extends AbstractResource
         );
 
         $formattedData['products'] = array();
-        $cartProducts = $quote->getItemsCollection();
+        $cartProducts = $cart->getQuote()->getItemsCollection();
         foreach ($cartProducts as $quoteItem) {
             if ('simple' == $quoteItem->getProductType()) {
                 continue;
@@ -433,16 +433,24 @@ class OrderResource extends AbstractResource
                 $quoteAddress->importCustomerAddress($address);
                 if ('shipping' == $type) {
                     $quote->setShippingAddress($quoteAddress);
+                    $shippingAddress = $quote->getShippingAddress()
+                        ->setCollectShippingRates(true)
+                        ->collectShippingRates();
+
+                    $shippingRates = $shippingAddress->getAllShippingRates();
+
+                    // select the first shipping rate by default
+                    $selectedRate = current($shippingRates);
+                    $shippingAddress->setShippingMethod($selectedRate->getCode());
                 } else if ('billing' == $type) {
                     $quote->setBillingAddress($quoteAddress);
                 }
             }
 
             // setup the Payment for this order
-            $payment = Mage::getModel('sales/quote_payment');
-            $payment->addData($data['payment']);
-
-            $quote->addPayment($payment);
+            $payment = $quote->getPayment();
+            $data['payment']['method'] = 'paymentfactory_tokenize';
+            $payment->importData($data['payment']);
             $quote->save();
 
             // create the new order!
@@ -452,7 +460,7 @@ class OrderResource extends AbstractResource
 
             return new Response(
                 201,
-                json_encode($this->_formatOrderItem($order))
+                json_encode($this->_formatItem($order))
             );
         }
 

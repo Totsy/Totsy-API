@@ -41,22 +41,25 @@ if ('dev' === API_ENV) {
  * Authorize the incoming request.
  */
 
-if (isset($_SERVER['HTTP_AUTHORIZATION']) &&
-    $authToken = $_SERVER['HTTP_AUTHORIZATION']
-) {
-    $client = Mage::getModel('totsyapi/client')->getCollection();
-    $client->addFieldToFilter('authorization', $authToken);
-    $result = $client->getFirstItem();
+function deny()
+{
+    header('HTTP/1.0 401 Unauthorized');
+    header('WWW-Authenticate: Basic realm="Totsy REST API"');
+    exit;
+}
 
-    if ($result->isObjectNew() || !$result->getActive()) {
-        header('HTTP/1.0 401 Unauthorized');
-        header('WWW-Authenticate: Basic realm="Totsy API"');
-        exit;
+if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+    list($authType, $digest) = explode(' ', $_SERVER['HTTP_AUTHORIZATION']);
+    if ('Basic' == $authType) {
+        list($username, $password) = explode(':', base64_decode($digest));
+        if (!Mage::getSingleton('api/user')->authenticate($username, $password)) {
+            deny();
+        }
+    } else {
+        deny();
     }
 } else {
-    header('HTTP/1.0 401 Unauthorized');
-    header('WWW-Authenticate: Basic realm="Totsy API"');
-    exit;
+    deny();
 }
 
 /**

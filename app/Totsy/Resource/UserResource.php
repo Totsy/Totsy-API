@@ -18,8 +18,9 @@ use Sonno\Annotation\GET,
     Sonno\Annotation\Produces,
     Sonno\Annotation\Context,
     Sonno\Annotation\PathParam,
-    Sonno\Application\WebApplicationException,
     Sonno\Http\Response\Response,
+
+    Totsy\Exception\WebApplicationException,
 
     Mage;
 
@@ -90,7 +91,7 @@ class UserResource extends AbstractResource
      */
     public function getUserEntity($id)
     {
-        $user = self::authorizeUser($id);
+        $user = self::authorizeUser($this->_request, $id);
 
         return json_encode($this->_formatItem($user));
     }
@@ -106,7 +107,7 @@ class UserResource extends AbstractResource
      */
     public function updateUserEntity($id)
     {
-        $user = self::authorizeUser($id);
+        $user = self::authorizeUser($this->_request, $id);
         $this->_populateModelInstance($user);
 
         return json_encode($this->_formatItem($user));
@@ -122,18 +123,14 @@ class UserResource extends AbstractResource
      */
     public function deleteUserEntity($id)
     {
-        $user = self::authorizeUser($id);
+        $user = self::authorizeUser($this->_request, $id);
 
         try {
             $user->delete();
-        } catch(\Mage_Core_Exception $mageException) {
-            Mage::logException($mageException);
+        } catch(\Mage_Core_Exception $e) {
+            Mage::logException($e);
 
-            $e = new WebApplicationException(500);
-            $e->getResponse()->setHeaders(
-                array('X-API-Error' => $mageException->getMessage())
-            );
-            throw $e;
+            throw new WebApplicationException(500, $e->getMessage());
         }
 
         return new Response(200);
@@ -155,16 +152,29 @@ class UserResource extends AbstractResource
         return parent::_formatItem($item, $fields, $links);
     }
 
-
     /**
      * Verify that an incoming request is logged in for a specific user.
      *
+     * @param $request \Sonno\Http\Request\RequestInterface
      * @param $userId int The user ID that the request is made on behalf of.
+     *
      * @return Mage_Customer_Model_Customer
-     * @throws Sonno\Application\WebApplicationException
+     * @throws \Totsy\Exception\WebApplicationException
+     *
+     * @todo Update all calls to this method to include the incoming HTTP request.
      */
-    public static function authorizeUser($userId)
+    public static function authorizeUser($request, $userId)
     {
+        $headers = $request->getHeaders();
+        $cookie = $headers['cookie'];
+        if (!$cookie) {
+            throw new WebApplicationException(403);
+        }
+
+        $cookieParams = explode(';', $cookie);
+        list($cookieName, $cookieValue) = explode('=', $cookieParams[0]);
+
+        Mage::getSingleton('core/session', array('name' => $cookieName));
         $session = Mage::getSingleton('customer/session');
 
         if ($session->isLoggedIn()) {

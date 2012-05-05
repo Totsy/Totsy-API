@@ -75,7 +75,7 @@ class AddressResource extends AbstractResource
      */
     public function getUserAddresses($id)
     {
-        $this->_user = UserResource::authorizeUser($this->_request, $id);
+        $this->_user = UserResource::authorizeUser($id);
 
         return $this->getCollection(array('parent_id' => $id));
     }
@@ -91,7 +91,7 @@ class AddressResource extends AbstractResource
      */
     public function createEntity($id)
     {
-        $this->_user = UserResource::authorizeUser($this->_request, $id);
+        $this->_user = UserResource::authorizeUser($id);
 
         $address = Mage::getModel($this->_modelGroupName);
         $address->setCustomerId($id);
@@ -123,7 +123,7 @@ class AddressResource extends AbstractResource
         }
 
         // ensure that the request is authorized for the address owner
-        $this->_user = UserResource::authorizeUser($this->_request, $address->getCustomerId());
+        $this->_user = UserResource::authorizeUser($address->getCustomerId());
 
         return json_encode($this->_formatItem($address));
     }
@@ -146,7 +146,7 @@ class AddressResource extends AbstractResource
         }
 
         // ensure that the request is authorized for the address owner
-        $this->_user = UserResource::authorizeUser($this->_request, $address->getCustomerId());
+        $this->_user = UserResource::authorizeUser($address->getCustomerId());
 
         $this->_populateModelInstance($address);
 
@@ -170,7 +170,7 @@ class AddressResource extends AbstractResource
         }
 
         // ensure that the request is authorized for the address owner
-        $this->_user = UserResource::authorizeUser($this->_request, $address->getCustomerId());
+        $this->_user = UserResource::authorizeUser($address->getCustomerId());
 
         try {
             $address->delete();
@@ -194,7 +194,7 @@ class AddressResource extends AbstractResource
 
         $item->setData(
             'default_billing',
-            isset($userData['default_billing'])&& $userData['default_billing'] == $item->getId()
+            isset($userData['default_billing']) && $userData['default_billing'] == $item->getId()
         );
 
         $item->setData(

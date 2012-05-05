@@ -70,7 +70,7 @@ class OrderResource extends AbstractResource
      */
     public function getUserOrders($id)
     {
-        $user = UserResource::authorizeUser($this->_request, $id);
+        $user = UserResource::authorizeUser($id);
 
         return $this->getCollection(array('customer_id' => array('eq' => $id)));
     }
@@ -89,7 +89,7 @@ class OrderResource extends AbstractResource
      */
     public function createOrderEntity($id)
     {
-        UserResource::authorizeUser($this->_request, $id);
+        UserResource::authorizeUser($id);
 
         $requestData = json_decode($this->_request->getRequestBody(), true);
         if (is_null($requestData)) {
@@ -133,7 +133,7 @@ class OrderResource extends AbstractResource
         }
 
         // ensure that the request is authorized for the address owner
-        UserResource::authorizeUser($this->_request, $order->getCustomerId());
+        UserResource::authorizeUser($order->getCustomerId());
 
         return json_encode($this->_formatItem($order));
     }

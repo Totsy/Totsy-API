@@ -91,7 +91,7 @@ class UserResource extends AbstractResource
      */
     public function getUserEntity($id)
     {
-        $user = self::authorizeUser($this->_request, $id);
+        $user = self::authorizeUser($id);
 
         return json_encode($this->_formatItem($user));
     }
@@ -107,7 +107,7 @@ class UserResource extends AbstractResource
      */
     public function updateUserEntity($id)
     {
-        $user = self::authorizeUser($this->_request, $id);
+        $user = self::authorizeUser($id);
         $this->_populateModelInstance($user);
 
         return json_encode($this->_formatItem($user));
@@ -123,7 +123,7 @@ class UserResource extends AbstractResource
      */
     public function deleteUserEntity($id)
     {
-        $user = self::authorizeUser($this->_request, $id);
+        $user = self::authorizeUser($id);
 
         try {
             $user->delete();
@@ -160,21 +160,9 @@ class UserResource extends AbstractResource
      *
      * @return Mage_Customer_Model_Customer
      * @throws \Totsy\Exception\WebApplicationException
-     *
-     * @todo Update all calls to this method to include the incoming HTTP request.
      */
-    public static function authorizeUser($request, $userId)
+    public static function authorizeUser($userId)
     {
-        $headers = $request->getHeaders();
-        $cookie = $headers['cookie'];
-        if (!$cookie) {
-            throw new WebApplicationException(403);
-        }
-
-        $cookieParams = explode(';', $cookie);
-        list($cookieName, $cookieValue) = explode('=', $cookieParams[0]);
-
-        Mage::getSingleton('core/session', array('name' => $cookieName));
         $session = Mage::getSingleton('customer/session');
 
         if ($session->isLoggedIn()) {

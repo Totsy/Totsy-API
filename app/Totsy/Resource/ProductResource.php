@@ -144,6 +144,7 @@ class ProductResource extends AbstractResource
      */
     protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
+        $sourceData    = $item->getData();
         $formattedData = array();
 
         $imageBaseUrl = \Mage::getBaseUrl() . '/media/catalog/product';
@@ -185,6 +186,16 @@ class ProductResource extends AbstractResource
                 }
             }
         }
+
+        if (empty($links)) {
+            $links = $this->_links;
+        }
+
+        $productUrl = \Mage::getBaseUrl() . $sourceData['url_key'] . '.html';
+        $links[] = array(
+            'rel' => 'alternate',
+            'href' => $productUrl
+        );
 
         $item->addData($formattedData);
         return parent::_formatItem($item, $fields, $links);

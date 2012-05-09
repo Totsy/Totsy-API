@@ -43,19 +43,21 @@ if ('dev' === API_ENV) {
 
 function deny()
 {
-    header('HTTP/1.0 401 Unauthorized');
+    header('HTTP/1.1 401 Unauthorized');
     header('WWW-Authenticate: Basic realm="Totsy REST API"');
     exit;
 }
 
 if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
-    list($authType, $digest) = explode(' ', $_SERVER['HTTP_AUTHORIZATION']);
-    if ('Basic' == $authType) {
-        list($username, $password) = explode(':', base64_decode($digest));
-        if (!Mage::getSingleton('api/user')->authenticate($username, $password)) {
-            deny();
-        }
-    } else {
+    $authorization = explode(' ', $_SERVER['HTTP_AUTHORIZATION']);
+    if (count($authorization) != 2 || 'Basic' != $authorization[0]) {
+        deny();
+    }
+
+    $credentials = explode(':', base64_decode($authorization[1]));
+    if (count($credentials) != 2 ||
+        !Mage::getSingleton('api/user')->authenticate($credentials[0], $credentials[1])
+    ) {
         deny();
     }
 } else {

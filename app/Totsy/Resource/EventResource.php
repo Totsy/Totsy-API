@@ -216,6 +216,17 @@ class EventResource extends AbstractResource
 
         $formattedData['discount_pct'] = 50;
 
+        if (empty($links)) {
+            $links = $this->_links;
+        }
+
+        $eventUrl = \Mage::getBaseUrl() .
+            'sales/' . $sourceData['url_key'] . '.html';
+        $links[] = array(
+            'rel' => 'alternate',
+            'href' => $eventUrl
+        );
+
         $item->addData($formattedData);
         return parent::_formatItem($item, $fields, $links);
     }

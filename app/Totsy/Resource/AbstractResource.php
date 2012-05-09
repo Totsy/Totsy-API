@@ -151,19 +151,24 @@ abstract class AbstractResource
 
             foreach ($links as $link) {
                 $builder = $this->_uriInfo->getBaseUriBuilder();
-                $builder->replaceQuery(null);
 
+                // the link's "href" was provided explicitly
                 if (isset($link['href'])) {
-                    $builder->path($link['href']);
+                    // as a relative URI
+                    if (strpos($link['href'], '://') === false) {
+                        $link['href'] = $builder->replaceQuery(null)
+                            ->path($link['href'])
+                            ->buildFromMap($sourceData);
+                    }
                 } else if (isset($link['resource'])) {
-                    $builder->resourcePath(
+                    $link['href'] = $builder->replaceQuery(null)
+                        ->resourcePath(
                         $link['resource']['class'],
                         $link['resource']['method']
-                    );
+                    )->build();
                     unset($link['resource']);
                 }
 
-                $link['href'] = $builder->buildFromMap($sourceData);
                 $formattedData['links'][] = $link;
             }
         }

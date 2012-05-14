@@ -33,7 +33,6 @@ class EventResource extends AbstractResource
         'start'  => 'event_start_date',
         'end'    => 'event_end_date',
         'image',
-        'web_url',
     );
 
     protected $_links = array(
@@ -56,48 +55,24 @@ class EventResource extends AbstractResource
      */
     public function getEventCollection()
     {
-        $filters = array(
-            'level' => array('gt' => 0),
-            'event_start_date' => array('notnull' => true)
-        );
+        $sortEntry = \Mage::getModel('categoryevent/sortentry')
+            ->getCollection()
+            ->addFilter('date', date('Y-m-d'))
+            ->addFilter('store_id', 1)
+            ->getFirstItem();
 
         // setup filters on event start & end dates using the 'when' parameter
-        if ($when = $this->_request->getQueryParam('when')) {
-            switch ($when) {
-                case 'past':
-                    $filters['event_end_date'] = array(
-                        'to' => date('Y-m-d H:m:s'),
-                        'datetime' => true,
-                    );
-                    break;
-                case 'current':
-                    $filters['event_start_date'] = array(
-                        'to' => date('Y-m-d H:m:s'),
-                        'datetime' => true,
-                    );
-                    $filters['event_end_date'] = array(
-                        'from' => date('Y-m-d H:m:s'),
-                        'datetime' => true,
-                    );
-                    break;
-                case 'upcoming':
-                    $filters['event_start_date'] = array(
-                        'from' => date('Y-m-d H:m:s'),
-                        'datetime' => true,
-                    );
-                    break;
-                default:
-                    $errorMessage = "Invalid value for the 'when' parameter: "
-                        . $when;
-                    $e = new WebApplicationException(400);
-                    $e->getResponse()->setHeaders(
-                        array('X-API-Error' => $errorMessage)
-                    );
-                    throw $e;
-            }
+        $queue = json_decode($sortEntry->getLiveQueue(), true);
+        if ('upcoming' == $this->_request->getQueryParam('when')) {
+            $queue = json_decode($sortEntry->getUpcomingQueue(), true);
         }
 
-        return $this->getCollection($filters);
+        $eventIds = array();
+        foreach ($queue as $categoryInfo) {
+            $eventIds[] = $categoryInfo['entity_id'];
+        }
+
+        return $this->getCollection(array('entity_id' => $eventIds));
     }
 
     /**
@@ -111,34 +86,6 @@ class EventResource extends AbstractResource
     public function getEventEntity($id)
     {
         return $this->getItem($id);
-    }
-
-    /**
-     * Construct a response (application/json) of a entity collection from the
-     * local model.
-     *
-     * @param $filters array The set of Magento ORM filters to apply.
-     * @return string json-encoded
-     */
-    public function getCollection($filters = array())
-    {
-        // hollow items are ID values only
-        $hollowItems = $this->_model->getCollection();
-
-        foreach ($filters as $filterName => $condition) {
-            $hollowItems->addAttributeToFilter($filterName, $condition);
-        }
-
-        $results = array();
-        foreach ($hollowItems as $hollowItem) {
-            $item = $this->_model->load($hollowItem->getId());
-            $productCount = count($item->getProductCollection());
-            if ($productCount && $formattedItem = $this->_formatItem($item)) {
-                $results[] = $formattedItem;
-            }
-        }
-
-        return json_encode($results);
     }
 
     /**
@@ -157,7 +104,7 @@ class EventResource extends AbstractResource
         $sourceData    = $item->getData();
         $formattedData = array();
 
-        $imageBaseUrl = \Mage::getBaseUrl() . '/media/catalog/category/';
+        $imageBaseUrl = \Mage::getBaseUrl() . 'media/catalog/category/';
 
         // scrape together department & age data from event products
         $formattedData['department'] = array();
@@ -185,11 +132,11 @@ class EventResource extends AbstractResource
             }
         }
 
-        $formattedData['department'] = array_unique(
-            $formattedData['department']
+        $formattedData['department'] = array_values(
+            array_unique($formattedData['department'])
         );
-        $formattedData['age'] = array_unique(
-            $formattedData['age']
+        $formattedData['age'] = array_values(
+            array_unique($formattedData['age'])
         );
 
         // construct an object literal for event images

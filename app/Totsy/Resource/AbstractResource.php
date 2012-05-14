@@ -73,8 +73,14 @@ abstract class AbstractResource
         // hollow items are ID values only
         $hollowItems = $this->_model->getCollection();
 
-        foreach ($filters as $filterName => $condition) {
-            $hollowItems->addAttributeToFilter($filterName, $condition);
+        if ($hollowItems instanceof \Mage_Eav_Model_Entity_Collection_Abstract) {
+            foreach ($filters as $filterName => $condition) {
+                $hollowItems->addAttributeToFilter($filterName, $condition);
+            }
+        } else {
+            foreach ($filters as $filterName => $condition) {
+                $hollowItems->addFilter($filterName, $condition);
+            }
         }
 
         $results = array();

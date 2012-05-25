@@ -41,6 +41,25 @@ abstract class AbstractResource
     protected $_model;
 
     /**
+     * A prefix for the cache key for cache entries.
+     * When populated, response bodies will be cached using this prefix,
+     * followed by a hash of the incoming request, as the cache key.
+     * When empty, response bodies will never be cached.
+     *
+     * @var string
+     */
+    protected $_cachePrefix = '';
+
+    /**
+     * The frequency with which to update cached response bodies.
+     * This is the number of requests to serve cached content to until it
+     * is considered stale and is refreshed.
+     *
+     * @var int
+     */
+    protected $_cacheRefreshFrequency = 0;
+
+    /**
      * The incoming HTTP request.
      *
      * @var \Sonno\Http\Request\RequestInterface
@@ -89,7 +108,14 @@ abstract class AbstractResource
             $results[] = $this->_formatItem($item);
         }
 
-        return json_encode($results);
+        $response = json_encode($results);
+
+        if (isset($this->_cachePrefix)) {
+            $cacheKey = $this->_cachePrefix . md5($this->_request->getRequestUri());
+            apc_add($cacheKey, $response);
+        }
+
+        return $response;
     }
 
     /**
@@ -233,5 +259,29 @@ abstract class AbstractResource
         }
 
         return true;
+    }
+
+    /**
+     * Check the local cache for a copy of a response body that can fulfill the
+     * current request.
+     *
+     * @return bool|mixed
+     */
+    protected function _inspectCache()
+    {
+        // ignore cache
+        if ('dev' == API_ENV || // in a development environment
+            $this->_cachePrefix || // without a prefix declared
+            (isset($this->_cacheRefreshFrequency) &&
+                rand(1, $this->_cacheRefreshFrequency) == 1
+            )
+        ) {
+            return false;
+        }
+
+        $cacheKey = $this->_cachePrefix . md5($this->_request->getRequestUri());
+        if (apc_exists($cacheKey)) {
+            return apc_fetch($cacheKey);
+        }
     }
 }

@@ -37,6 +37,8 @@ class UserResource extends AbstractResource
         'firstname',
         'lastname',
         'credit',
+        'invitation_url',
+        'facebook_uid',
     );
 
     protected $_links = array(
@@ -148,7 +150,16 @@ class UserResource extends AbstractResource
         $rewards->setCustomer($item);
         $rewards->loadByCustomer();
 
-        $item->addData(array('credit' => intval($rewards->getPointsBalance())));
+        $invitationUrl = Mage::helper('enterprise_invitation')
+            ->getGenericInvitationLink();
+
+        $item->addData(
+            array(
+                'credit'         => intval($rewards->getPointsBalance()),
+                'invitation_url' => $invitationUrl
+            )
+        );
+
         return parent::_formatItem($item, $fields, $links);
     }
 

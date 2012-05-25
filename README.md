@@ -12,7 +12,7 @@ Dependencies
 
 1. Magento: The path to a local Magento installation must be supplied in a `$MAGENTO_ROOT` environment variable.
 
-2. Sonno: Configured as a Git submodule in lib/vendor-sonno.
+2. Sonno: Configured as a Git submodule in lib/vendor/sonno.
 
 3. Doctrine-Common: Configured as a Git submodule in lib/vendor/doctrine-common.
 
@@ -26,4 +26,4 @@ Reference documentation can be found at https://api.totsy.com/doc/ref/Usage.md a
 To-Do (Future)
 --------------
 * Add a domain model layer to decouple Magento models from the API server. Use Symfony DI to configure and instantiate classes.
-
+* Cache responses on Event & Product resources for performance reasons. On APC for now, potentially move to Memcached in the future.

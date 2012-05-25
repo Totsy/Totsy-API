@@ -32,6 +32,10 @@ class ProductResource extends AbstractResource
      */
     protected $_eventId;
 
+    protected $_cachePrefix = 'REST_API_PRODUCT_';
+
+    protected $_cacheRefreshFrequency = 10;
+
     protected $_modelGroupName = 'catalog/product';
 
     protected $_fields = array(
@@ -65,6 +69,10 @@ class ProductResource extends AbstractResource
             'rel' => 'http://rel.totsy.com/entity/event',
             'href' => '/event/{event_id}'
         ),
+        array(
+            'rel' => 'alternate',
+            'href' => '{$web_base_url}/{$url_key}.html'
+        )
     );
 
     /**
@@ -127,7 +135,7 @@ class ProductResource extends AbstractResource
         $results = array();
         foreach ($products as $product) {
             $item = $this->_model->load($product->getId());
-            $results[] = $this->_formatItem($item);
+            $results[] = $this->_formatItem($item, $this->_fields, $this->_links);
         }
 
         return json_encode($results);
@@ -187,15 +195,14 @@ class ProductResource extends AbstractResource
             }
         }
 
-        if (empty($links)) {
-            $links = $this->_links;
-        }
-
         $productUrl = \Mage::getBaseUrl() . $sourceData['url_key'] . '.html';
-        $links[] = array(
-            'rel' => 'alternate',
-            'href' => $productUrl
-        );
+        if (is_array($links)) {
+            foreach ($links as &$link) {
+                if ('alternate' == $link['rel']) {
+                    $link['href'] = $productUrl;
+                }
+            }
+        }
 
         $item->addData($formattedData);
         return parent::_formatItem($item, $fields, $links);

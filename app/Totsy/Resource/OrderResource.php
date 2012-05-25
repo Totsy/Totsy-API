@@ -106,14 +106,47 @@ class OrderResource extends AbstractResource
             $this->_getCurrentTime()
         );
 
-        // retrieve the local session shopping cart
-        $cart = Mage::getSingleton('checkout/cart');
+        $cart = Mage::getModel('checkout/cart');
+        $quote = $cart->getQuote();
 
         $this->_populateModelInstance($cart);
 
-        Mage::getSingleton('checkout/session')->setCartWasUpdated(true)->getData();
+        if (count($quote->getAllVisibleItems()) &&
+            isset($requestData['payment'])
+        ) {
+            // create the new order!
+            try {
+                // setup the Payment for this order
+                $payment = $quote->getPayment();
+                $requestData['payment']['method'] = 'paymentfactory_tokenize';
+                $payment->importData($requestData['payment']);
 
-        return new Response(202, json_encode($this->_formatCartItem($cart)));
+                $quoteService = Mage::getModel('sales/service_quote', $quote);
+                $quoteService->submitAll();
+                $order = $quoteService->getOrder();
+
+                $response = $this->_formatItem($order);
+
+                return new Response(
+                    201,
+                    json_encode($response),
+                    array('Location' => $response['links'][0]['href'])
+                );
+            } catch (\Mage_Core_Exception $mageException) {
+                Mage::logException($mageException);
+                throw new WebApplicationException(
+                    400,
+                    $mageException->getMessage()
+                );
+            }
+        } else {
+            Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
+
+            return new Response(
+                202,
+                json_encode($this->_formatCartItem($quote))
+            );
+        }
     }
 
     /**
@@ -152,11 +185,11 @@ class OrderResource extends AbstractResource
         // used as well as any points redeemed
         $payment = $item->getPayment();
         $newData['payment'] = array(
-            'reward_points_used' => ceil($item->getRewardCurrencyAmount()),
-            'creditcard_type' => $payment->getCcType(),
-            'creditcard_last4'   => $payment->getCcLast4(),
+            'reward_points_used'   => ceil($item->getRewardCurrencyAmount()),
+            'creditcard_type'      => $payment->getCcType(),
+            'creditcard_last4'     => $payment->getCcLast4(),
             'creditcard_exp_month' => $payment->getCcExpMonth(),
-            'creditcard_exp_year' => $payment->getCcExpYear(),
+            'creditcard_exp_year'  => $payment->getCcExpYear(),
         );
 
         // construct a 'addresses' property with billing & shipping addresses
@@ -236,20 +269,22 @@ class OrderResource extends AbstractResource
     /**
      * Format a shopping cart entity into an array for output.
      *
-     * @param \Mage_Checkout_Model_Cart $cart
+     * @param \Mage_Sales_Model_Quote $quote
      * @return array
      */
-    protected function _formatCartItem(\Mage_Checkout_Model_Cart $cart)
+    protected function _formatCartItem(\Mage_Sales_Model_Quote $quote)
     {
         $formattedData = array();
 
-        $cartShelfLife = $cart->getQuoteItemExpireTime();
+        $cartShelfLife = Mage::getConfig()->getStoresConfigByPath(
+            'config/rushcheckout_timer/limit_timer'
+        );
         $formattedData['expires'] = date(
             'c',
-            strtotime('+' . $cartShelfLife . ' seconds')
+            strtotime("+$cartShelfLife[0] seconds")
         );
 
-        $quoteData = $cart->getQuote()->getData();
+        $quoteData = $quote->getData();
         $formattedData['subtotal'] = $quoteData['grand_total'];
 
         $builder = $this->_uriInfo->getBaseUriBuilder();
@@ -259,25 +294,19 @@ class OrderResource extends AbstractResource
         );
 
         $formattedData['products'] = array();
-        $cartProducts = $cart->getQuote()->getItemsCollection();
+        $cartProducts = $quote->getItemsCollection();
         foreach ($cartProducts as $quoteItem) {
-            if ('simple' == $quoteItem->getProductType()) {
+            // ignore this quote item if it's a simple product with a parent
+            if ('simple' == $quoteItem->getProductType() &&
+                $quoteItem->getParentItemId()
+            ) {
                 continue;
             }
 
-            // compile the map of attributes on this product
-            $product = $quoteItem->getProduct()->getTypeInstance();
-            $attributes = $product->getSelectedAttributesInfo();
-            $productAttributes = array();
-            foreach ($attributes as $attr) {
-                $productAttributes[$attr['label']] = $attr['value'];
-            }
-
-            $formattedData['products'][] = array(
+            $cartItemData = array(
                 'name' => $quoteItem->getName(),
                 'price' => $quoteItem->getPrice(),
                 'qty' => $quoteItem->getQty(),
-                'attributes' => $productAttributes,
                 'links' => array(
                     array(
                         'rel' => 'http://rel.totsy.com/entity/product',
@@ -285,6 +314,20 @@ class OrderResource extends AbstractResource
                     )
                 )
             );
+
+            if ('configurable' == $quoteItem->getProductType()) {
+                // compile the map of attributes on this product
+                $product = $quoteItem->getProduct()->getTypeInstance();
+                $attributes = $product->getSelectedAttributesInfo();
+                $productAttributes = array();
+                foreach ($attributes as $attr) {
+                    $productAttributes[$attr['label']] = $attr['value'];
+                }
+
+                $cartItemData['attributes'] = $productAttributes;
+            }
+
+            $formattedData['products'][] = $cartItemData;
         }
 
         return $formattedData;
@@ -324,12 +367,10 @@ class OrderResource extends AbstractResource
 
                 // referenced product not found
                 if ($productIdOffset === false) {
-                    if ($product->isObjectNew()) {
-                        throw new WebApplicationException(
-                            400,
-                            "There is no Product Resource at URL $productUrl"
-                        );
-                    }
+                    throw new WebApplicationException(
+                        400,
+                        "There is no Product Resource at URL $productUrl"
+                    );
                 }
 
                 // fetch the Mage_Catalog_Model_Product instance for the
@@ -337,6 +378,14 @@ class OrderResource extends AbstractResource
                 $productId = substr($productUrl, $productIdOffset+1);
                 $product = Mage::getModel('catalog/product');
                 $product->load($productId);
+
+                // referenced product not found
+                if ($product->isObjectNew()) {
+                    throw new WebApplicationException(
+                        400,
+                        "There is no Product Resource at URL $productUrl"
+                    );
+                }
 
                 // setup cart parameters for this product
                 $productParams = array('qty' => $requestProduct['qty']);
@@ -371,16 +420,20 @@ class OrderResource extends AbstractResource
                 }
 
                 $cartContainsProduct = false;
-                if ($obj->getQuote()->hasProductId($product->getId())) {
+                if ($obj->hasProductId($product->getId())) {
                     // find the quote item for this product
-                    $quoteItems = $obj->getQuote()->getItemsCollection();
-                    foreach ($quoteItems as $quoteItemId => $quoteItem) {
-                        if ($quoteItemAttrOption = $quoteItem->getOptionByCode('attributes')) {
-                            $quoteItemAttrOption = unserialize($quoteItemAttrOption->getValue());
-                            if ($quoteItemAttrOption == $productParams['super_attribute']) {
-                                // add quantity updates for existing cart items
-                                $cartUpdates[$quoteItemId] = array('qty' => $requestProduct['qty']);
-                                $cartContainsProduct = true;
+                    if ('simple' == $product->getTypeId()) {
+                        $cartContainsProduct = true;
+                    } else {
+                        $quoteItems = $obj->getItemsCollection();
+                        foreach ($quoteItems as $quoteItemId => $quoteItem) {
+                            if ($quoteItemAttrOption = $quoteItem->getOptionByCode('attributes')) {
+                                $quoteItemAttrOption = unserialize($quoteItemAttrOption->getValue());
+                                if ($quoteItemAttrOption == $productParams['super_attribute']) {
+                                    // add quantity updates for existing cart items
+                                    $cartUpdates[$quoteItemId] = array('qty' => $requestProduct['qty']);
+                                    $cartContainsProduct = true;
+                                }
                             }
                         }
                     }
@@ -388,7 +441,15 @@ class OrderResource extends AbstractResource
 
                 // add this product to the cart
                 if (!$cartContainsProduct) {
-                    $item = $obj->addProduct($product, $productParams);
+                    try {
+                        $item = $obj->addProduct($product, $productParams);
+                    } catch (\Mage_Core_Exception $e) {
+                        throw new WebApplicationException(
+                            400,
+                            "Could not add Product $productUrl -- " .
+                                $e->getMessage()
+                        );
+                    }
 
                     if (is_string($item)) {
                         throw new WebApplicationException(
@@ -406,11 +467,9 @@ class OrderResource extends AbstractResource
             }
         }
 
-        // "checkout" the local session shopping cart once payment & address
+        // "checkout" the local session shopping cart once payment
         // information is available in the request data
-        if (isset($data['payment'])
-            && isset($data['addresses'])
-        ) {
+        if (isset($data['addresses'])) {
             $quote = $obj->getQuote();
 
             // setup the Billing & Shipping address for this order
@@ -442,26 +501,18 @@ class OrderResource extends AbstractResource
                     // select the first shipping rate by default
                     $selectedRate = current($shippingRates);
                     $shippingAddress->setShippingMethod($selectedRate->getCode());
+
+                    if ($quote->isVirtual()) {
+                        $shippingAddress->setPaymentMethod('paymentfactory_tokenize');
+                    }
                 } else if ('billing' == $type) {
                     $quote->setBillingAddress($quoteAddress);
+
+                    if (!$quote->isVirtual()) {
+                        $quote->getBillingAddress()->setPaymentMethod('paymentfactory_tokenize');
+                    }
                 }
             }
-
-            // setup the Payment for this order
-            $payment = $quote->getPayment();
-            $data['payment']['method'] = 'paymentfactory_tokenize';
-            $payment->importData($data['payment']);
-            $quote->save();
-
-            // create the new order!
-            $quoteService = Mage::getModel('sales/service_quote', $quote);
-            $quoteService->submitAll();
-            $order = $quoteService->getOrder();
-
-            return new Response(
-                201,
-                json_encode($this->_formatItem($order))
-            );
         }
 
         try {

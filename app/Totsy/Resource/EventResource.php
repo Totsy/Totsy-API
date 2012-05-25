@@ -21,6 +21,10 @@ use Sonno\Annotation\GET,
  */
 class EventResource extends AbstractResource
 {
+    protected $_cachePrefix = 'REST_API_EVENT_';
+
+    protected $_cacheRefreshFrequency = 100;
+
     protected $_modelGroupName = 'catalog/category';
 
     protected $_fields = array(
@@ -55,6 +59,10 @@ class EventResource extends AbstractResource
      */
     public function getEventCollection()
     {
+        if ($response = $this->_inspectCache()) {
+            return $response;
+        }
+
         $sortEntry = \Mage::getModel('categoryevent/sortentry')
             ->getCollection()
             ->addFilter('date', date('Y-m-d'))
@@ -70,6 +78,10 @@ class EventResource extends AbstractResource
         $eventIds = array();
         foreach ($queue as $categoryInfo) {
             $eventIds[] = $categoryInfo['entity_id'];
+        }
+
+        if (!count($eventIds)) {
+            return json_encode(array());
         }
 
         return $this->getCollection(array('entity_id' => $eventIds));

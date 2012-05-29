@@ -57,7 +57,6 @@ class ProductResource extends AbstractResource
         'hot',
         'featured',
         'image',
-        'web_url',
     );
 
     protected $_links = array(

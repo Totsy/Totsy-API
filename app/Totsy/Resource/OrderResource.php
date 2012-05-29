@@ -200,7 +200,7 @@ class OrderResource extends AbstractResource
             $builder = $this->_uriInfo->getBaseUriBuilder();
             $builder->resourcePath(
                 'Totsy\Resource\AddressResource',
-                'getAddressEntity'
+                'getEntity'
             );
 
             $newData['addresses'][] = array(
@@ -219,7 +219,7 @@ class OrderResource extends AbstractResource
             $builder = $this->_uriInfo->getBaseUriBuilder();
             $builder->resourcePath(
                 'Totsy\Resource\AddressResource',
-                'getAddressEntity'
+                'getEntity'
             );
 
             $newData['addresses'][] = array(
@@ -285,7 +285,8 @@ class OrderResource extends AbstractResource
         );
 
         $quoteData = $quote->getData();
-        $formattedData['subtotal'] = $quoteData['grand_total'];
+        $formattedData['grand_total'] = $quoteData['grand_total'];
+        $formattedData['subtotal'] = $quoteData['subtotal'];
 
         $builder = $this->_uriInfo->getBaseUriBuilder();
         $builder->resourcePath(
@@ -294,7 +295,7 @@ class OrderResource extends AbstractResource
         );
 
         $formattedData['products'] = array();
-        $cartProducts = $quote->getItemsCollection();
+        $cartProducts = $quote->getAllVisibleItems();
         foreach ($cartProducts as $quoteItem) {
             // ignore this quote item if it's a simple product with a parent
             if ('simple' == $quoteItem->getProductType() &&
@@ -419,20 +420,20 @@ class OrderResource extends AbstractResource
                     }
                 }
 
-                $cartContainsProduct = false;
-                if ($obj->hasProductId($product->getId())) {
+                $productQuoteItemId = false;
+                if ($obj->getQuote()->hasProductId($product->getId())) {
                     // find the quote item for this product
                     if ('simple' == $product->getTypeId()) {
                         $cartContainsProduct = true;
                     } else {
-                        $quoteItems = $obj->getItemsCollection();
+                        $quoteItems = $obj->getQuote()->getItemsCollection();
                         foreach ($quoteItems as $quoteItemId => $quoteItem) {
                             if ($quoteItemAttrOption = $quoteItem->getOptionByCode('attributes')) {
                                 $quoteItemAttrOption = unserialize($quoteItemAttrOption->getValue());
                                 if ($quoteItemAttrOption == $productParams['super_attribute']) {
                                     // add quantity updates for existing cart items
                                     $cartUpdates[$quoteItemId] = array('qty' => $requestProduct['qty']);
-                                    $cartContainsProduct = true;
+                                    $productQuoteItemId = $quoteItemId;
                                 }
                             }
                         }
@@ -440,7 +441,7 @@ class OrderResource extends AbstractResource
                 }
 
                 // add this product to the cart
-                if (!$cartContainsProduct) {
+                if (false === $productQuoteItemId) {
                     try {
                         $item = $obj->addProduct($product, $productParams);
                     } catch (\Mage_Core_Exception $e) {

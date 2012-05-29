@@ -283,5 +283,7 @@ abstract class AbstractResource
         if (apc_exists($cacheKey)) {
             return apc_fetch($cacheKey);
         }
+
+        return false;
     }
 }

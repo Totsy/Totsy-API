@@ -74,6 +74,9 @@ class EventResource extends AbstractResource
         if ('upcoming' == $this->_request->getQueryParam('when')) {
             $queue = json_decode($sortEntry->getUpcomingQueue(), true);
         }
+        if (null == $queue) {
+            $queue = array();
+        }
 
         $eventIds = array();
         foreach ($queue as $categoryInfo) {
@@ -108,8 +111,6 @@ class EventResource extends AbstractResource
      * @param $fields null|array
      * @param $links null|array
      * @return array
-     *
-     * @todo Populate a real value for the "discount_pct" field.
      */
     protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
@@ -121,6 +122,7 @@ class EventResource extends AbstractResource
         // scrape together department & age data from event products
         $formattedData['department'] = array();
         $formattedData['age'] = array();
+        $formattedData['discount_pct'] = 0;
 
         $products = $item->getProductCollection();
         foreach ($products as $product) {
@@ -142,6 +144,13 @@ class EventResource extends AbstractResource
             } else if (is_string($ages)) {
                 $formattedData['age'][] = $ages;
             }
+
+            // calculate discount percentage for the event
+            $productDiscount = round(($product->getPrice() - $product->getSpecialPrice()) / $product->getPrice() * 100);
+            $formattedData['discount_pct'] = max(
+                $formattedData['discount_pct'],
+                $productDiscount
+            );
         }
 
         $formattedData['department'] = array_values(
@@ -172,8 +181,6 @@ class EventResource extends AbstractResource
             $formattedData['image']['logo'] = $imageBaseUrl
                 . $sourceData['logo'];
         }
-
-        $formattedData['discount_pct'] = 50;
 
         if (empty($links)) {
             $links = $this->_links;

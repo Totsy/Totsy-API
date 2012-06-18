@@ -63,31 +63,52 @@ class EventResource extends AbstractResource
             return $response;
         }
 
-        $sortEntry = \Mage::getModel('categoryevent/sortentry')
-            ->getCollection()
-            ->addFilter('date', date('Y-m-d'))
-            ->addFilter('store_id', 1)
-            ->getFirstItem();
+        // look for a category event sort entry
+        // this is a cached version of all events, indexed by date
+        if ($events = $this->_getEventsFromSortEntry()) {
+            return $events;
+        } else {
+            $filters = array('level' => 3);
 
-        // setup filters on event start & end dates using the 'when' parameter
-        $queue = json_decode($sortEntry->getLiveQueue(), true);
-        if ('upcoming' == $this->_request->getQueryParam('when')) {
-            $queue = json_decode($sortEntry->getUpcomingQueue(), true);
-        }
-        if (null == $queue) {
-            $queue = array();
-        }
+            // setup filters on event start & end dates using the 'when'
+            // request parameter
+            if ($when = $this->_request->getQueryParam('when')) {
+                switch ($when) {
+                    case 'past':
+                        $filters['event_end_date'] = array(
+                            'to' => date('Y-m-d H:m:s'),
+                            'datetime' => true,
+                        );
+                        break;
+                    case 'current':
+                        $filters['event_start_date'] = array(
+                            'to' => date('Y-m-d H:m:s'),
+                            'datetime' => true,
+                        );
+                        $filters['event_end_date'] = array(
+                            'from' => date('Y-m-d H:m:s'),
+                            'datetime' => true,
+                        );
+                        break;
+                    case 'upcoming':
+                        $filters['event_start_date'] = array(
+                            'from' => date('Y-m-d H:m:s'),
+                            'datetime' => true,
+                        );
+                        break;
+                    default:
+                        $errorMessage = "Invalid value for 'when' parameter: "
+                            . $when;
+                        $e = new WebApplicationException(400);
+                        $e->getResponse()->setHeaders(
+                            array('X-API-Error' => $errorMessage)
+                        );
+                        throw $e;
+                }
+            }
 
-        $eventIds = array();
-        foreach ($queue as $categoryInfo) {
-            $eventIds[] = $categoryInfo['entity_id'];
+            return $this->getCollection($filters);
         }
-
-        if (!count($eventIds)) {
-            return json_encode(array());
-        }
-
-        return $this->getCollection(array('entity_id' => $eventIds));
     }
 
     /**
@@ -103,6 +124,46 @@ class EventResource extends AbstractResource
         return $this->getItem($id);
     }
 
+    /**
+     * Get the event collection to fulfill the current request from the local
+     * event cache (category sort entry).
+     *
+     * @return bool|string The JSON response for the current request, or false
+     *                     if there is no available sort entry.
+     */
+    protected function _getEventsFromSortEntry()
+    {
+        $sortEntry = \Mage::getModel('categoryevent/sortentry')
+            ->getCollection()
+            ->addFilter('date', date('Y-m-d'))
+            ->addFilter('store_id', 1)
+            ->getFirstItem();
+
+        if(is_null($sortEntry)) {
+            return false;
+        }
+
+        // setup filters on event start & end dates using the 'when' parameter
+        $queue = json_decode($sortEntry->getLiveQueue(), true);
+        if ('upcoming' == $this->_request->getQueryParam('when')) {
+            $queue = json_decode($sortEntry->getUpcomingQueue(), true);
+        }
+
+        if (empty($queue)) {
+            return false;
+        }
+
+        $eventIds = array();
+        foreach ($queue as $categoryInfo) {
+            $eventIds[] = $categoryInfo['entity_id'];
+        }
+
+        if (!count($eventIds)) {
+            return json_encode(array());
+        }
+
+        return $this->getCollection(array('entity_id' => $eventIds));
+    }
     /**
      * Add formatted fields to item data before deferring to the default
      * item formatting.
@@ -146,10 +207,11 @@ class EventResource extends AbstractResource
             }
 
             // calculate discount percentage for the event
-            $productDiscount = round(($product->getPrice() - $product->getSpecialPrice()) / $product->getPrice() * 100);
+            $priceDiff = $product->getPrice() - $product->getSpecialPrice();
+            $discount = round($priceDiff / $product->getPrice() * 100);
             $formattedData['discount_pct'] = max(
                 $formattedData['discount_pct'],
-                $productDiscount
+                $discount
             );
         }
 

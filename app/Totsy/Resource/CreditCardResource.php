@@ -40,7 +40,10 @@ class CreditCardResource extends AbstractResource
     protected $_modelGroupName = 'paymentfactory/profile';
 
     protected $_fields = array(
-        'testdata',
+        'type'         => 'card_type',
+        'last4'        => 'last4no',
+        'expiry_year'  => 'expire_year',
+        'expiry_month' => 'expire_month',
     );
 
     protected $_links = array(
@@ -49,8 +52,8 @@ class CreditCardResource extends AbstractResource
             'href' => '/creditcard/{entity_id}'
         ),
         array(
-            'rel' => 'http://rel.totsy.com/entity/creditcard',
-            'href' => '/user/{parent_id}'
+            'rel' => 'http://rel.totsy.com/entity/user',
+            'href' => '/user/{customer_id}'
         ),
     );
 
@@ -69,10 +72,9 @@ class CreditCardResource extends AbstractResource
         $creditCards = $this->_model->loadByCustomerId($id);
         $results = array();
         foreach ($creditCards as $card) {
-            print_r($card->getData());
-            //$results[] = $this->_formatItem($card);
+            $results[] = $this->_formatItem($card);
         }
-exit;
+
         return json_encode($results);
     }
 
@@ -89,9 +91,65 @@ exit;
     {
         $this->_user = UserResource::authorizeUser($id);
 
-        $card = Mage::getModel($this->_modelGroupName);
-        $card->setCustomerId($id);
-        $this->_populateModelInstance($card);
+        $data = json_decode($this->_request->getRequestBody(), true);
+        if (is_null($data)) {
+            throw new WebApplicationException(
+                400,
+                'Malformed entity representation in request body'
+            );
+        }
+
+        // setup some default data for creating a payment profile
+        $data['saved_by_customer'] = 1;
+        $data['email'] = $this->_user->getEmail();
+        $data['cc_type'] = $data['type'];
+        unset($data['type']);
+
+        if (isset($data['links'])) {
+            // fetch the billing address by URL
+            $addressId = $this->_getEntityIdFromUrl($data['links'][0]['href']);
+            $customerAddress = Mage::getModel('customer/address')->load($addressId);
+            $address = $customerAddress->getData();
+
+        } else if (isset($data['address'])) {
+            // create a new billing address
+            $address = $data['address'];
+            $address['region'] = $address['state'];
+            $address['postcode'] = $address['zip'];
+            $address['country_id'] = $address['country'];
+
+            // locate the region identifier for the supplied region
+            $region = Mage::getModel('directory/region');
+            $region->loadByName($address['state'], $address['country']);
+            if ($region->isObjectNew()) {
+                $region->loadByCode($address['state'], $address['country']);
+            }
+            $address['region_id'] = $region->getId();
+
+            $customerAddress = Mage::getModel('customer/address')->addData($address)
+                ->setCustomerId($id)
+                ->save();
+        }
+
+        $address['street'] = array($address['street'], '');
+
+        try {
+            Mage::getModel('paymentfactory/tokenize')->createProfile(
+                new \Varien_Object($data),
+                new \Varien_Object($address),
+                $id,
+                $customerAddress->getId()
+            );
+        } catch (\Mage_Core_Exception $mageException) {
+            Mage::logException($mageException);
+            throw new WebApplicationException(500, $mageException->getMessage());
+        } catch (\Exception $e) {
+            throw new WebApplicationException(500, $e->getMessage());
+        }
+
+        $card = Mage::getModel($this->_modelGroupName)->loadByCcNumberWithId(
+            $data['cc_number'] . $id . $data['cc_exp_year'] . $data['cc_exp_month']
+        );
 
         $response = $this->_formatItem($card);
 
@@ -118,33 +176,8 @@ exit;
             return new Response(404);
         }
 
-        // ensure that the request is authorized for the address owner
+        // ensure that the request is authorized for the card owner
         $this->_user = UserResource::authorizeUser($card->getCustomerId());
-
-        return json_encode($this->_formatItem($card));
-    }
-
-    /**
-     * Update the record of an existing Credit Card.
-     *
-     * @PUT
-     * @Path("/creditcard/{id}")
-     * @Produces({"application/json"})
-     * @Consumes({"application/json"})
-     * @PathParam("id")
-     */
-    public function updateEntity($id)
-    {
-        $card = $this->_model->load($id);
-
-        if ($card->isObjectNew()) {
-            return new Response(404);
-        }
-
-        // ensure that the request is authorized for the address owner
-        $this->_user = UserResource::authorizeUser($card->getCustomerId());
-
-        $this->_populateModelInstance($card);
 
         return json_encode($this->_formatItem($card));
     }
@@ -176,92 +209,5 @@ exit;
         }
 
         return new Response(200);
-    }
-
-    /**
-     * @param $item Mage_Core_Model_Abstract
-     * @param $fields array|null
-     * @param $links array|null
-     * @return array
-     */
-    protected function _formatItem($item, $fields = NULL, $links = NULL)
-    {
-        $userData = $this->_user->getData();
-
-        $item->setData(
-            'default_billing',
-            isset($userData['default_billing'])&& $userData['default_billing'] == $item->getId()
-        );
-
-        $item->setData(
-            'default_shipping',
-            isset($userData['default_shipping']) && $userData['default_shipping'] == $item->getId()
-        );
-
-        $item->setData('parent_id', $userData['entity_id']);
-
-        return parent::_formatItem($item, $fields, $links);
-    }
-
-    /**
-     * Populate a Magento model object with an array of data, and persist the
-     * updated object.
-     *
-     * @param $obj Mage_Core_Model_Abstract
-     * @param $data array The data to populate, or NULL which will use the
-     *                    incoming request data.
-     * @return bool
-     * @throws Totsy\Exception\WebApplicationException
-     */
-    protected function _populateModelInstance($obj, $data = NULL)
-    {
-        if (is_null($data)) {
-            $data = json_decode($this->_request->getRequestBody(), true);
-            if (is_null($data)) {
-                throw new WebApplicationException(
-                    400,
-                    'Malformed entity representation in request body'
-                );
-            }
-        }
-
-        // locate the region identifier for the supplied region
-        $region = Mage::getModel('directory/region');
-        $region->loadByName($data['state'], $data['country']);
-        if ($region->isObjectNew()) {
-            $region->loadByCode($data['state'], $data['country']);
-        }
-        $obj->setRegionId($region->getId());
-
-        // the region value supplied could not be found
-        if ($region->isObjectNew()) {
-            $errorMessage = "Entity Validation Error: Invalid value in 'state'"
-                . " field.";
-            $e = new WebApplicationException(400);
-            $e->getResponse()->setHeaders(
-                array('X-API-Error' => $errorMessage)
-            );
-            throw $e;
-        }
-
-        // save the address object
-        parent::_populateModelInstance($obj, $data);
-
-        // update the Customer object with default address settings
-        if (isset($data['default_billing'])) {
-            $this->_user->setData(
-                'default_billing',
-                $data['default_billing'] ? $obj->getId() : null
-            );
-        }
-
-        if (isset($data['default_shipping'])) {
-            $this->_user->setData(
-                'default_shipping',
-                $data['default_shipping'] ? $obj->getId() : null
-            );
-        }
-
-        $this->_user->save();
     }
 }

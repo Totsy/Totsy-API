@@ -1154,34 +1154,40 @@
               <representation mediaType="application/json">
                 <doc title="Credit Card Collection">
                   <pre>
-                  [
-                    {
-                      "type": "VI",
-                      "last_four": 4929,
-                      "expiry_year": 2014,
-                      "expiry_month": 4,
-                      "cardholder_name": "...",
-                      "links": [
-                        {
-                          "rel": "http://rel.totsy.com/user",
-                          "href": "https://api.totsy.com/user/29480"
-                        }
-                      ]
-                    },
-                    {
-                      "type": "MC",
-                      "last_four": 2444,
-                      "expiry_year": 2014,
-                      "expiry_month": 5,
-                      "cardholder_name": "...",
-                      "links": [
-                        {
-                          "rel": "http://rel.totsy.com/user",
-                          "href": "https://api.totsy.com/user/29480"
-                        }
-                      ]
-                    }
-                  ]
+[
+    {
+        "type": "VI",
+        "last4": "1111",
+        "expiry_year": "2014",
+        "expiry_month": "5",
+        "links": [
+            {
+                "rel": "self",
+                "href": "https://api.totsy.com/creditcard/23514543"
+            },
+            {
+                "rel": "http://rel.totsy.com/entity/user",
+                "href": "https://api.totsy.com/user/4944189"
+            }
+        ]
+    },
+    {
+        "type": "MC",
+        "last4": "4444",
+        "expiry_year": "2015",
+        "expiry_month": "1",
+        "links": [
+            {
+                "rel": "self",
+                "href": "https://api.totsy.com/creditcard/232352"
+            },
+            {
+                "rel": "http://rel.totsy.com/entity/user",
+                "href": "https://api.totsy.com/user/4944189"
+            }
+        ]
+    }
+]
                   </pre>
                 </doc>
               </representation>
@@ -1196,13 +1202,18 @@
               <representation mediaType="application/json">
                 <doc title="Partial Credit Card Entity">
                   <pre>
-                  {
-                    "type": "VI",
-                    "number": 1234567812345678,
-                    "expiry_year": 2014,
-                    "expiry_month": 4,
-                    "cardholder_name": "First Last"
-                  }
+{
+    "type": "VI",
+    "cc_number": "4111111111111111",
+    "cc_exp_month": 5,
+    "cc_exp_year": 2014,
+    "links": [
+        {
+            "rel": "http://api.totsy.com/rel/address",
+            "href": "http://api-tharsan.totsy.com/address/364674"
+        }
+    ]
+}
                   </pre>
                 </doc>
               </representation>
@@ -1211,19 +1222,22 @@
               <representation mediaType="application/json">
                 <doc title="Full Credit Card Entity">
                   <pre>
-                  {
-                    "type": "VI",
-                    "last_four": 5678,
-                    "expiry_year": 2014,
-                    "expiry_month": 4,
-                    "cardholder_name": "First Last",
-                    "links": [
-                      {
-                        "rel": "http://rel.totsy.com/user",
-                        "href": "https://api.totsy.com/user/29480"
-                      }
-                    ]
-                  }
+{
+    "type": "MC",
+    "last4": "4444",
+    "expiry_year": "2015",
+    "expiry_month": "1",
+    "links": [
+        {
+            "rel": "self",
+            "href": "https://api.totsy.com/creditcard/23445"
+        },
+        {
+            "rel": "http://rel.totsy.com/entity/user",
+            "href": "https://api.totsy.com/user/4944189"
+        }
+    ]
+}
                   </pre>
                 </doc>
               </representation>
@@ -1498,19 +1512,22 @@
             <representation mediaType="application/json">
               <doc title="Full Credit Card Entity">
                 <pre>
-                {
-                  "type": "VI",
-                  "last_four": 4929,
-                  "expiry_year": 2014,
-                  "expiry_month": 4,
-                  "cardholder_name": "First Last",
-                  "links": [
-                    {
-                      "rel": "http://rel.totsy.com/user",
-                      "href": "https://api.totsy.com/user/29480"
-                    }
-                  ]
-                }
+{
+    "type": "MC",
+    "last4": "4444",
+    "expiry_year": "2015",
+    "expiry_month": "1",
+    "links": [
+        {
+            "rel": "self",
+            "href": "https://api.totsy.com/creditcard/257794"
+        },
+        {
+            "rel": "http://rel.totsy.com/entity/user",
+            "href": "https://api.totsy.com/user/4944189"
+        }
+    ]
+}
                 </pre>
               </doc>
             </representation>

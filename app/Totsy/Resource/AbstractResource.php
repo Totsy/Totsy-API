@@ -240,12 +240,14 @@ abstract class AbstractResource
 
         $obj->addData($data);
 
-        $validationErrors = $obj->validate();
-        if (is_array($validationErrors) && count($validationErrors)) {
-            throw new WebApplicationException(
-                400,
-                "Entity Validation Error: " . $validationErrors[0]
-            );
+        if (method_exists($obj, 'validate')) {
+            $validationErrors = $obj->validate();
+            if (is_array($validationErrors) && count($validationErrors)) {
+                throw new WebApplicationException(
+                    400,
+                    "Entity Validation Error: " . $validationErrors[0]
+                );
+            }
         }
 
         try {
@@ -285,5 +287,26 @@ abstract class AbstractResource
         }
 
         return false;
+    }
+
+    /**
+     * Parse the integer entity ID value from a resource URL.
+     *
+     * @param $url string The resource URL.
+     *
+     * @return int
+     * @throws \Totsy\Exception\WebApplicationException
+     */
+    protected function _getEntityIdFromUrl($url)
+    {
+        $offset = strrpos($url, '/');
+        if ($offset === false) {
+            throw new WebApplicationException(
+                400,
+                "Invalid Resource URL $link[href]"
+            );
+        }
+
+        return intval(substr($url, $offset+1));
     }
 }

@@ -70,3 +70,5 @@ Once the final pieces of information are added (specifically the "payment" and "
 Any order update (`PUT /user/345/order`) could possibly respond with a `409 Conflict` status in the following scenarios:
 1. One or more of the items in the order are not available (out of stock).
 2. The amount of credit to apply to the order exceeds the amount of credit available to the user.
+3. The coupon code specified is invalid.
+

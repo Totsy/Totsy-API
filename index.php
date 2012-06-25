@@ -100,6 +100,9 @@ if ('dev' !== API_ENV && apc_exists(APC_CONFIG_KEY)) {
     }
 }
 
+header("X-API-Environment: " . API_ENV);
+header("X-API-Version: " . substr(exec('git rev-parse --verify HEAD'), 0, 8));
+
 /**
  * Run a Sonno application!
  */

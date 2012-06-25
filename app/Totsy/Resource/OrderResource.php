@@ -424,7 +424,12 @@ class OrderResource extends AbstractResource
                 if ($obj->getQuote()->hasProductId($product->getId())) {
                     // find the quote item for this product
                     if ('simple' == $product->getTypeId()) {
-                        $cartContainsProduct = true;
+                        $productQuoteItemId = $obj->getQuote()
+                            ->getItemByProduct($product)
+                            ->getId();
+                        $cartUpdates[$productQuoteItemId] = array(
+                            'qty' => $requestProduct['qty']
+                        );
                     } else {
                         $quoteItems = $obj->getQuote()->getItemsCollection();
                         foreach ($quoteItems as $quoteItemId => $quoteItem) {
@@ -463,8 +468,8 @@ class OrderResource extends AbstractResource
 
             // process any cart updates
             if (count($cartUpdates)) {
-                $obj->suggestItemsQty($cartUpdates);
-                $obj->updateItems($cartUpdates);
+                $cartUpdates = $obj->suggestItemsQty($cartUpdates);
+                $obj->updateItems($cartUpdates)->save();
             }
         }
 

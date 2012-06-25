@@ -287,6 +287,7 @@ class OrderResource extends AbstractResource
         $quoteData = $quote->getData();
         $formattedData['grand_total'] = $quoteData['grand_total'];
         $formattedData['subtotal'] = $quoteData['subtotal'];
+        $formattedData['coupon_code'] = $quoteData['coupon_code'];
 
         $builder = $this->_uriInfo->getBaseUriBuilder();
         $builder->resourcePath(
@@ -356,10 +357,89 @@ class OrderResource extends AbstractResource
             }
         }
 
-        // add Product Items from request data to the shopping cart
-        if (isset($data['products']) &&
-            is_array($data['products']))
-        {
+        $this->_updateProducts($obj, $data);
+        $this->_updateAddress($obj, $data);
+        $this->_updateCoupon($obj, $data);
+
+        try {
+            $obj->save();
+        } catch(\Mage_Core_Exception $mageException) {
+            Mage::logException($mageException);
+            throw new WebApplicationException(400, $mageException->getMessage());
+        } catch(\Exception $e) {
+            Mage::logException($e);
+            throw new WebApplicationException(500, $e);
+        }
+    }
+
+    /**
+     * Update an existing cart object with address information.
+     *
+     * @param Mage_Checkout_Model_Cart $obj
+     * @param $data Request data containing address information.
+     *
+     * @return void
+     */
+    protected function _updateAddress($obj, $data)
+    {
+        if (isset($data['addresses']) && is_array($data['addresses'])) {
+            $quote = $obj->getQuote();
+
+            // setup the Billing & Shipping address for this order
+            foreach ($data['addresses'] as $type => $addressInfo) {
+                $address = Mage::getModel('customer/address');
+
+                if (isset($addressInfo['links'])) {
+                    // fetch existing address
+                    $addressUrl = $addressInfo['links'][0]['href'];
+                    if (($offset = strrpos($addressUrl, '/')) !== FALSE) {
+                        $addressId = substr($addressUrl, $offset + 1);
+                        $address->load($addressId);
+                    }
+                } else {
+                    // create new address using address info
+                    $address->addData($addressInfo);
+                }
+
+                $quoteAddress = Mage::getModel('sales/quote_address');
+                $quoteAddress->importCustomerAddress($address);
+                if ('shipping' == $type) {
+                    $quote->setShippingAddress($quoteAddress);
+                    $shippingAddress = $quote->getShippingAddress()
+                        ->setCollectShippingRates(true)
+                        ->collectShippingRates();
+
+                    $shippingRates = $shippingAddress->getAllShippingRates();
+
+                    // select the first shipping rate by default
+                    $selectedRate = current($shippingRates);
+                    $shippingAddress->setShippingMethod($selectedRate->getCode());
+
+                    if ($quote->isVirtual()) {
+                        $shippingAddress->setPaymentMethod('paymentfactory_tokenize');
+                    }
+                } else if ('billing' == $type) {
+                    $quote->setBillingAddress($quoteAddress);
+
+                    if (!$quote->isVirtual()) {
+                        $quote->getBillingAddress()->setPaymentMethod('paymentfactory_tokenize');
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Update an existing cart object with products.
+     *
+     * @param Mage_Checkout_Model_Cart $obj
+     * @param $data Request data containing products.
+     *
+     * @return void
+     */
+    protected function _updateProducts($obj, $data)
+    {
+        if (isset($data['products']) && is_array($data['products'])) {
             $cartUpdates = array();
             foreach ($data['products'] as $requestProduct) {
                 // locate the Product ID in the Product URL
@@ -376,7 +456,7 @@ class OrderResource extends AbstractResource
 
                 // fetch the Mage_Catalog_Model_Product instance for the
                 // referenced product
-                $productId = substr($productUrl, $productIdOffset+1);
+                $productId = substr($productUrl, $productIdOffset + 1);
                 $product = Mage::getModel('catalog/product');
                 $product->load($productId);
 
@@ -472,63 +552,31 @@ class OrderResource extends AbstractResource
                 $obj->updateItems($cartUpdates)->save();
             }
         }
+    }
 
-        // "checkout" the local session shopping cart once payment
-        // information is available in the request data
-        if (isset($data['addresses'])) {
+    /**
+     * Update an existing cart object with a discount coupon or promo code.
+     *
+     * @param Mage_Checkout_Model_Cart $obj
+     * @param $data Request data containing coupon information.
+     *
+     * @return void
+     */
+    protected function _updateCoupon($obj, $data)
+    {
+        if (isset($data['coupon_code'])) {
             $quote = $obj->getQuote();
+            $quote->getShippingAddress()->setCollectShippingRates(true);
+            $quote->setCouponCode($data['coupon_code'])
+                ->collectTotals()
+                ->save();
 
-            // setup the Billing & Shipping address for this order
-            foreach ($data['addresses'] as $type => $addressInfo) {
-                $address = Mage::getModel('customer/address');
-
-                if (isset($addressInfo['links'])) {
-                    // fetch existing address
-                    $addressUrl = $addressInfo['links'][0]['href'];
-                    if (($offset = strrpos($addressUrl, '/')) !== FALSE) {
-                        $addressId = substr($addressUrl, $offset+1);
-                        $address->load($addressId);
-                    }
-                } else {
-                    // create new address using address info
-                    $address->addData($addressInfo);
-                }
-
-                $quoteAddress = Mage::getModel('sales/quote_address');
-                $quoteAddress->importCustomerAddress($address);
-                if ('shipping' == $type) {
-                    $quote->setShippingAddress($quoteAddress);
-                    $shippingAddress = $quote->getShippingAddress()
-                        ->setCollectShippingRates(true)
-                        ->collectShippingRates();
-
-                    $shippingRates = $shippingAddress->getAllShippingRates();
-
-                    // select the first shipping rate by default
-                    $selectedRate = current($shippingRates);
-                    $shippingAddress->setShippingMethod($selectedRate->getCode());
-
-                    if ($quote->isVirtual()) {
-                        $shippingAddress->setPaymentMethod('paymentfactory_tokenize');
-                    }
-                } else if ('billing' == $type) {
-                    $quote->setBillingAddress($quoteAddress);
-
-                    if (!$quote->isVirtual()) {
-                        $quote->getBillingAddress()->setPaymentMethod('paymentfactory_tokenize');
-                    }
-                }
+            if ($data['coupon_code'] != $quote->getCouponCode()) {
+                throw new WebApplicationException(
+                    409,
+                    "Coupon code '$data[coupon_code]' was rejected."
+                );
             }
-        }
-
-        try {
-            $obj->save();
-        } catch(\Mage_Core_Exception $mageException) {
-            Mage::logException($mageException);
-            throw new WebApplicationException(400, $mageException->getMessage());
-        } catch(\Exception $e) {
-            Mage::logException($e);
-            throw new WebApplicationException(500, $e);
         }
     }
 

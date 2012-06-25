@@ -4,7 +4,7 @@
   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
   <doc title="Totsy REST API Specification">
-    Last Modified: <time datetime="2012-04-21">Apr 21, 2012</time><br/>
+    Last Modified: <time datetime="2012-06-25">Jun 25, 2012</time><br/>
     Author: <a href="mailto:tbhuvanendran@totsy.com">Tharsan Bhuvanendran &lt;tbhuvanendran@totsy.com&gt;</a>
   </doc>
 
@@ -978,6 +978,7 @@
                 <doc title="Partial Order Entity">
                   <pre>
 {
+    "coupon_code": "DISCOUNT",
     "products": [
         {
             "qty": 5,
@@ -1019,6 +1020,7 @@
 {
     "expires": "2012-04-02T00:26:54+00:00",
     "subtotal": 72.5,
+    "coupon_code": "DISCOUNT",
     "products": [
         {
             "name": "Giggle Giggle Quack",
@@ -1209,8 +1211,8 @@
     "cc_exp_year": 2014,
     "links": [
         {
-            "rel": "http://api.totsy.com/rel/address",
-            "href": "http://api-tharsan.totsy.com/address/364674"
+            "rel": "http://rel.totsy.com/rel/address",
+            "href": "https://api.totsy.com/address/364674"
         }
     ]
 }

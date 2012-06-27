@@ -41,9 +41,9 @@ class CreditCardResource extends AbstractResource
 
     protected $_fields = array(
         'type'         => 'card_type',
-        'last4'        => 'last4no',
-        'expiry_year'  => 'expire_year',
-        'expiry_month' => 'expire_month',
+        'cc_last4'     => 'last4no',
+        'cc_exp_year'  => 'expire_year',
+        'cc_exp_month' => 'expire_month',
     );
 
     protected $_links = array(

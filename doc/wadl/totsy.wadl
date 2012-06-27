@@ -1159,9 +1159,9 @@
 [
     {
         "type": "VI",
-        "last4": "1111",
-        "expiry_year": "2014",
-        "expiry_month": "5",
+        "cc_last4": "1111",
+        "cc_exp_year": "2014",
+        "cc_exp_month": "5",
         "links": [
             {
                 "rel": "self",
@@ -1175,9 +1175,9 @@
     },
     {
         "type": "MC",
-        "last4": "4444",
-        "expiry_year": "2015",
-        "expiry_month": "1",
+        "cc_last4": "4444",
+        "cc_exp_year": "2015",
+        "cc_exp_month": "1",
         "links": [
             {
                 "rel": "self",
@@ -1209,6 +1209,18 @@
     "cc_number": "4111111111111111",
     "cc_exp_month": 5,
     "cc_exp_year": 2014,
+    "address": {
+        "firstname": "Rich",
+        "lastname": "Minns",
+        "company": "Totsy",
+        "street": "10 W 18th St.",
+        "city": "New York",
+        "state": "New York",
+        "zip": "10010",
+        "country": "US",
+        "telephone": "2128482766",
+        "fax": null
+    },
     "links": [
         {
             "rel": "http://rel.totsy.com/rel/address",
@@ -1226,9 +1238,9 @@
                   <pre>
 {
     "type": "MC",
-    "last4": "4444",
-    "expiry_year": "2015",
-    "expiry_month": "1",
+    "cc_last4": "4444",
+    "cc_exp_year": "2015",
+    "cc_exp_month": "1",
     "links": [
         {
             "rel": "self",
@@ -1516,9 +1528,9 @@
                 <pre>
 {
     "type": "MC",
-    "last4": "4444",
-    "expiry_year": "2015",
-    "expiry_month": "1",
+    "cc_last4": "4444",
+    "cc_exp_year": "2015",
+    "cc_exp_month": "1",
     "links": [
         {
             "rel": "self",

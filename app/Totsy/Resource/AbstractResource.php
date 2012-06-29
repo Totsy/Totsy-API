@@ -109,11 +109,7 @@ abstract class AbstractResource
         }
 
         $response = json_encode($results);
-
-        if (isset($this->_cachePrefix)) {
-            $cacheKey = $this->_cachePrefix . md5($this->_request->getRequestUri());
-            apc_add($cacheKey, $response);
-        }
+        $this->_addCache($response);
 
         return $response;
     }
@@ -273,7 +269,7 @@ abstract class AbstractResource
     {
         // ignore cache
         if ('dev' == API_ENV || // in a development environment
-            $this->_cachePrefix || // without a prefix declared
+            empty($this->_cachePrefix) || // without a prefix declared
             (isset($this->_cacheRefreshFrequency) &&
                 rand(1, $this->_cacheRefreshFrequency) == 1
             )
@@ -287,6 +283,14 @@ abstract class AbstractResource
         }
 
         return false;
+    }
+
+    protected function _addCache($value)
+    {
+        if (isset($this->_cachePrefix)) {
+            $cacheKey = $this->_cachePrefix . md5($this->_request->getRequestUri());
+            apc_add($cacheKey, $value);
+        }
     }
 
     /**

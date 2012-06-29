@@ -23,7 +23,7 @@ class EventResource extends AbstractResource
 {
     protected $_cachePrefix = 'REST_API_EVENT_';
 
-    protected $_cacheRefreshFrequency = 100;
+    protected $_cacheRefreshFrequency = 25;
 
     protected $_modelGroupName = 'catalog/category';
 
@@ -66,6 +66,7 @@ class EventResource extends AbstractResource
         // look for a category event sort entry
         // this is a cached version of all events, indexed by date
         if ($events = $this->_getEventsFromSortEntry()) {
+            $this->_addCache($events);
             return $events;
         } else {
             $filters = array('level' => 3);
@@ -208,11 +209,13 @@ class EventResource extends AbstractResource
 
             // calculate discount percentage for the event
             $priceDiff = $product->getPrice() - $product->getSpecialPrice();
-            $discount = round($priceDiff / $product->getPrice() * 100);
-            $formattedData['discount_pct'] = max(
-                $formattedData['discount_pct'],
-                $discount
-            );
+            if ($product->getPrice()) {
+                $discount = round($priceDiff / $product->getPrice() * 100);
+                $formattedData['discount_pct'] = max(
+                    $formattedData['discount_pct'],
+                    $discount
+                );
+            }
         }
 
         $formattedData['department'] = array_values(

@@ -183,7 +183,11 @@ class ProductResource extends AbstractResource
 
         if ('configurable' == $item->getTypeId()) {
             $formattedData['attributes'] = array();
-            $productAttrs = $item->getTypeInstance()
+
+            // unsure why the item needs to be reloaded, but strange attribute
+            // values appear from $item
+            $product = Mage::getModel('catalog/product')->load($item->getId());
+            $productAttrs = $product->getTypeInstance()
                 ->getConfigurableAttributesAsArray();
 
             foreach ($productAttrs as $attr) {

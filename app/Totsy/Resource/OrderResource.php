@@ -276,13 +276,16 @@ class OrderResource extends AbstractResource
     {
         $formattedData = array();
 
-        $cartShelfLife = Mage::getConfig()->getStoresConfigByPath(
-            'config/rushcheckout_timer/limit_timer'
-        );
-        $formattedData['expires'] = date(
-            'c',
-            strtotime("+$cartShelfLife[0] seconds")
-        );
+        $cartProducts = $quote->getAllVisibleItems();
+        if (!empty($cartProducts)) {
+            $cartShelfLife = Mage::getConfig()->getStoresConfigByPath(
+                'config/rushcheckout_timer/limit_timer'
+            );
+            $formattedData['expires'] = date(
+                'c',
+                strtotime("+$cartShelfLife[0] seconds")
+            );
+        }
 
         $quoteData = $quote->getData();
         $formattedData['grand_total'] = $quoteData['grand_total'];
@@ -296,7 +299,6 @@ class OrderResource extends AbstractResource
         );
 
         $formattedData['products'] = array();
-        $cartProducts = $quote->getAllVisibleItems();
         foreach ($cartProducts as $quoteItem) {
             // ignore this quote item if it's a simple product with a parent
             if ('simple' == $quoteItem->getProductType() &&
@@ -489,11 +491,18 @@ class OrderResource extends AbstractResource
                         }
 
                         $reqAttrVal = $requestProduct['attributes'][$attr['label']];
-                        $attrId = 0;
+                        $attrId = false;
                         foreach ($attr['values'] as $attrVal) {
                             if ($reqAttrVal == $attrVal['label']) {
                                 $attrId = $attrVal['value_index'];
                             }
+                        }
+
+                        if (false === $attrId) {
+                            throw new WebApplicationException(
+                                400,
+                                "Could not add Product $productUrl -- Attribute value '$reqAttrVal' is invalid for attribute '$attr[label]''"
+                            );
                         }
 
                         $productParams['super_attribute'][$attr['attribute_id']] = $attrId;

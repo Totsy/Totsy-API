@@ -155,7 +155,7 @@ class UserResource extends AbstractResource
 
         $item->addData(
             array(
-                'credit'         => intval($rewards->getPointsBalance()),
+                'credit'         => $rewards->getCurrencyAmount(),
                 'invitation_url' => $invitationUrl
             )
         );
@@ -166,10 +166,9 @@ class UserResource extends AbstractResource
     /**
      * Verify that an incoming request is logged in for a specific user.
      *
-     * @param $request \Sonno\Http\Request\RequestInterface
      * @param $userId int The user ID that the request is made on behalf of.
      *
-     * @return Mage_Customer_Model_Customer
+     * @return \Mage_Customer_Model_Customer
      * @throws \Totsy\Exception\WebApplicationException
      */
     public static function authorizeUser($userId)

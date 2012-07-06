@@ -192,6 +192,8 @@ class AddressResource extends AbstractResource
     {
         $userData = $this->_user->getData();
 
+        $item->setData('street', explode(PHP_EOL, $item->getData('street')));
+
         $item->setData(
             'default_billing',
             isset($userData['default_billing']) && $userData['default_billing'] == $item->getId()
@@ -243,6 +245,10 @@ class AddressResource extends AbstractResource
                 400,
                 "Validation Error: Invalid value in 'state' field."
             );
+        }
+
+        if (is_array($data['street'])) {
+            $data['street'] = implode(PHP_EOL, $data['street']);
         }
 
         // save the address object

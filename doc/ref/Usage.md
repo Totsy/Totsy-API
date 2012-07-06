@@ -25,6 +25,5 @@ Error Handling
 
 Errors generated on the server are communicated to the client by populating the `X-API-Error` HTTP header in a response. API clients may inspect the value of this header for error information pertaining to an unsuccessful request.
 
-## USERS and ORDERS ##
 
 

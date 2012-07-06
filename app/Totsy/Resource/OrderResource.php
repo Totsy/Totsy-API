@@ -27,23 +27,28 @@ use Sonno\Annotation\GET,
 /**
  * An Order is a collection of Product entities and their corresponding
  * quantities that a User purchases.
+ *
+ * @todo Accept payment.credits_used amount for placing orders.
+ * @todo Allow saved credit card as payment for placing orders.
  */
 class OrderResource extends AbstractResource
 {
     protected $_modelGroupName = 'sales/order';
 
     protected $_fields = array(
+        'number' => 'increment_id',
         'status',
         'created' => 'created_at',
         'updated' => 'updated_at',
         'coupon_code',
+        'credit_redeemed' => 'reward_currency_amount',
         'total_qty' => 'total_qty_ordered',
         'total_weight' => 'weight',
         'shipping' => 'shipping_amount',
         'tax' => 'tax_amount',
         'discount' => 'discount_amount',
         'subtotal',
-        'total' => 'grand_total',
+        'grand_total',
         'products',
         'payment',
         'addresses',
@@ -99,13 +104,6 @@ class OrderResource extends AbstractResource
             );
         }
 
-        // setup the countdown timer on the local session
-        // this is required to ensure that the current local session cart can
-        // be correctly evaluated for timeout/expiry
-        Mage::getSingleton('checkout/session')->setCountDownTimer(
-            $this->_getCurrentTime()
-        );
-
         $cart = Mage::getModel('checkout/cart');
         $quote = $cart->getQuote();
 
@@ -116,10 +114,22 @@ class OrderResource extends AbstractResource
         ) {
             // create the new order!
             try {
-                // setup the Payment for this order
                 $payment = $quote->getPayment();
-                $requestData['payment']['method'] = 'paymentfactory_tokenize';
-                $payment->importData($requestData['payment']);
+
+                // there is a balance due for this order, so payment is required
+                if ($quote->getGrandTotal()) {
+
+                    // determine the payment method to use for this order
+                    $requestData['payment']['method'] = (
+                        isset($requestData['payment']['use_credit'])
+                        && $requestData['payment']['use_credit'] == 1
+                        && $quote->getGrandTotal() <= $quote->getRewardCurrencyAmount()
+                    ) ? 'free' : 'paymentfactory_tokenize';
+
+                    $payment->importData($requestData['payment'])->save();
+                } else {
+                    $payment->importData(array('method' => 'free'))->save();
+                }
 
                 $quoteService = Mage::getModel('sales/service_quote', $quote);
                 $quoteService->submitAll();
@@ -140,8 +150,6 @@ class OrderResource extends AbstractResource
                 );
             }
         } else {
-            Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
-
             return new Response(
                 202,
                 json_encode($this->_formatCartItem($quote))
@@ -185,11 +193,10 @@ class OrderResource extends AbstractResource
         // used as well as any points redeemed
         $payment = $item->getPayment();
         $newData['payment'] = array(
-            'reward_points_used'   => ceil($item->getRewardCurrencyAmount()),
-            'creditcard_type'      => $payment->getCcType(),
-            'creditcard_last4'     => $payment->getCcLast4(),
-            'creditcard_exp_month' => $payment->getCcExpMonth(),
-            'creditcard_exp_year'  => $payment->getCcExpYear(),
+            'cc_type'      => $payment->getCcType(),
+            'cc_last4'     => $payment->getCcLast4(),
+            'cc_exp_month' => $payment->getCcExpMonth(),
+            'cc_exp_year'  => $payment->getCcExpYear(),
         );
 
         // construct a 'addresses' property with billing & shipping addresses
@@ -249,7 +256,7 @@ class OrderResource extends AbstractResource
 
             $newData['products'][] = array(
                 'name' => $product->getName(),
-                'price' => $product->getPrice(),
+                'price' => $product->getSpecialPrice(),
                 'qty' => $productItem->getQtyOrdered(),
                 'weight' => $product->getWeight(),
                 'links' => array(
@@ -281,16 +288,17 @@ class OrderResource extends AbstractResource
             $cartShelfLife = Mage::getConfig()->getStoresConfigByPath(
                 'config/rushcheckout_timer/limit_timer'
             );
-            $formattedData['expires'] = date(
-                'c',
-                strtotime("+$cartShelfLife[0] seconds")
-            );
+            $cartTime = Mage::getSingleton('checkout/session')
+                ->getCountDownTimer();
+            $formattedData['expires'] = date('c', $cartTime + $cartShelfLife[0]);
         }
 
         $quoteData = $quote->getData();
+
         $formattedData['grand_total'] = $quoteData['grand_total'];
         $formattedData['subtotal'] = $quoteData['subtotal'];
         $formattedData['coupon_code'] = $quoteData['coupon_code'];
+        $formattedData['use_credit'] = $quoteData['use_reward_points'];
 
         $builder = $this->_uriInfo->getBaseUriBuilder();
         $builder->resourcePath(
@@ -361,9 +369,30 @@ class OrderResource extends AbstractResource
 
         $this->_updateProducts($obj, $data);
         $this->_updateAddress($obj, $data);
-        $this->_updateCoupon($obj, $data);
+
+        // update coupon information
+        if (isset($data['coupon_code'])) {
+            $quote = $obj->getQuote();
+            $quote->getShippingAddress()->setCollectShippingRates(true);
+            $quote->setCouponCode($data['coupon_code'])
+                ->collectTotals()
+                ->save();
+
+            if ($data['coupon_code'] != $quote->getCouponCode()) {
+                throw new WebApplicationException(
+                    409,
+                    "Coupon code '$data[coupon_code]' was rejected."
+                );
+            }
+        }
+
+        // set the toggle for using reward points/credits
+        if (isset($data['use_credit'])) {
+            $obj->getQuote()->setUseRewardPoints($data['use_credit'])->save();
+        }
 
         try {
+            $obj->getQuote()->collectTotals();
             $obj->save();
         } catch(\Mage_Core_Exception $mageException) {
             Mage::logException($mageException);
@@ -397,6 +426,12 @@ class OrderResource extends AbstractResource
                     if (($offset = strrpos($addressUrl, '/')) !== FALSE) {
                         $addressId = substr($addressUrl, $offset + 1);
                         $address->load($addressId);
+                        if (!$address->getId()) {
+                            throw new WebApplicationException(
+                                409,
+                                "Invalid Address URI $addressUrl"
+                            );
+                        }
                     }
                 } else {
                     // create new address using address info
@@ -443,6 +478,7 @@ class OrderResource extends AbstractResource
     {
         if (isset($data['products']) && is_array($data['products'])) {
             $cartUpdates = array();
+            $cartUpdated = false;
             foreach ($data['products'] as $requestProduct) {
                 // locate the Product ID in the Product URL
                 $productUrl = $requestProduct['links'][0]['href'];
@@ -483,14 +519,14 @@ class OrderResource extends AbstractResource
                         ->getConfigurableAttributesAsArray();
 
                     foreach ($productConfigAttributes as $attr) {
-                        if (!isset($requestProduct['attributes'][$attr['label']])) {
+                        if (!isset($requestProduct['attributes'][$attr['attribute_code']])) {
                             throw new WebApplicationException(
                                 400,
-                                "Could not add Product $productUrl -- Missing attribute $attr[label]"
+                                "Could not add Product $productUrl -- Missing attribute $attr[attribute_code]"
                             );
                         }
 
-                        $reqAttrVal = $requestProduct['attributes'][$attr['label']];
+                        $reqAttrVal = $requestProduct['attributes'][$attr['attribute_code']];
                         $attrId = false;
                         foreach ($attr['values'] as $attrVal) {
                             if ($reqAttrVal == $attrVal['label']) {
@@ -501,7 +537,7 @@ class OrderResource extends AbstractResource
                         if (false === $attrId) {
                             throw new WebApplicationException(
                                 400,
-                                "Could not add Product $productUrl -- Attribute value '$reqAttrVal' is invalid for attribute '$attr[label]''"
+                                "Could not add Product $productUrl -- Attribute value '$reqAttrVal' is invalid for attribute '$attr[attribute_code]'"
                             );
                         }
 
@@ -519,6 +555,15 @@ class OrderResource extends AbstractResource
                         $cartUpdates[$productQuoteItemId] = array(
                             'qty' => $requestProduct['qty']
                         );
+                    } else if ('virtual' == $product->getTypeId()) {
+                        // remove the item from the cart when the requested qty
+                        // is zero
+                        if (0 == $requestProduct['qty']) {
+                            $productQuoteItemId = $obj->getQuote()
+                                ->getItemByProduct($product)
+                                ->getId();
+                            $obj->removeItem($productQuoteItemId);
+                        }
                     } else {
                         $quoteItems = $obj->getQuote()->getItemsCollection();
                         foreach ($quoteItems as $quoteItemId => $quoteItem) {
@@ -538,6 +583,7 @@ class OrderResource extends AbstractResource
                 if (false === $productQuoteItemId) {
                     try {
                         $item = $obj->addProduct($product, $productParams);
+                        $cartUpdated = true;
                     } catch (\Mage_Core_Exception $e) {
                         throw new WebApplicationException(
                             400,
@@ -559,31 +605,17 @@ class OrderResource extends AbstractResource
             if (count($cartUpdates)) {
                 $cartUpdates = $obj->suggestItemsQty($cartUpdates);
                 $obj->updateItems($cartUpdates)->save();
+                $cartUpdated = true;
             }
-        }
-    }
 
-    /**
-     * Update an existing cart object with a discount coupon or promo code.
-     *
-     * @param Mage_Checkout_Model_Cart $obj
-     * @param $data Request data containing coupon information.
-     *
-     * @return void
-     */
-    protected function _updateCoupon($obj, $data)
-    {
-        if (isset($data['coupon_code'])) {
-            $quote = $obj->getQuote();
-            $quote->getShippingAddress()->setCollectShippingRates(true);
-            $quote->setCouponCode($data['coupon_code'])
-                ->collectTotals()
-                ->save();
+            if ($cartUpdated) {
+                Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
 
-            if ($data['coupon_code'] != $quote->getCouponCode()) {
-                throw new WebApplicationException(
-                    409,
-                    "Coupon code '$data[coupon_code]' was rejected."
+                // setup the countdown timer on the local session
+                // this is required to ensure that the current local session
+                // cart can be correctly evaluated for timeout/expiry
+                Mage::getSingleton('checkout/session')->setCountDownTimer(
+                    $this->_getCurrentTime()
                 );
             }
         }

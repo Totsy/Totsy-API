@@ -191,9 +191,9 @@ class ProductResource extends AbstractResource
                 ->getConfigurableAttributesAsArray();
 
             foreach ($productAttrs as $attr) {
-                $formattedData['attributes'][$attr['label']] = array();
+                $formattedData['attributes'][$attr['attribute_code']] = array();
                 foreach ($attr['values'] as $attrVal) {
-                    $formattedData['attributes'][$attr['label']][] = $attrVal['label'];
+                    $formattedData['attributes'][$attr['attribute_code']][] = $attrVal['label'];
                 }
             }
         }

@@ -28,7 +28,6 @@ use Sonno\Annotation\GET,
  * An Order is a collection of Product entities and their corresponding
  * quantities that a User purchases.
  *
- * @todo Accept payment.credits_used amount for placing orders.
  * @todo Allow saved credit card as payment for placing orders.
  */
 class OrderResource extends AbstractResource
@@ -116,20 +115,39 @@ class OrderResource extends AbstractResource
             try {
                 $payment = $quote->getPayment();
 
-                // there is a balance due for this order, so payment is required
-                if ($quote->getGrandTotal()) {
+                // when there is no balance to collect on the order, use
+                // payment method 'free'
+                $requestData['payment']['method'] = ($quote->getGrandTotal())
+                    ? 'paymentfactory_tokenize'
+                    : 'free';
 
-                    // determine the payment method to use for this order
-                    $requestData['payment']['method'] = (
-                        isset($requestData['payment']['use_credit'])
-                        && $requestData['payment']['use_credit'] == 1
-                        && $quote->getGrandTotal() <= $quote->getRewardCurrencyAmount()
-                    ) ? 'free' : 'paymentfactory_tokenize';
+                // parse a saved credit card from the links collection
+                if (isset($requestData['payment']['links'])) {
+                    $ccUrl = $requestData['payment']['links'][0]['href'];
+                    unset($requestData['payment']['links']);
 
-                    $payment->importData($requestData['payment'])->save();
-                } else {
-                    $payment->importData(array('method' => 'free'))->save();
+                    $offset = strrpos($ccUrl, '/');
+                    if ($offset === FALSE) {
+                        throw new WebApplicationException(
+                            400,
+                            "Invalid Credit Card URI $ccUrl"
+                        );
+                    }
+
+                    $ccId = substr($ccUrl, $offset + 1);
+                    $cc = Mage::getModel('paymentfactory/profile')->load($ccId);
+                    if (!$cc->getId()) {
+                        throw new WebApplicationException(
+                            409,
+                            "Invalid Credit Card URI $ccUrl"
+                        );
+                    }
+
+                    $subId = $cc->getEncryptedSubscriptionId();
+                    $requestData['payment']['cybersource_subid'] = $subId;
                 }
+
+                $payment->importData($requestData['payment'])->save();
 
                 $quoteService = Mage::getModel('sales/service_quote', $quote);
                 $quoteService->submitAll();

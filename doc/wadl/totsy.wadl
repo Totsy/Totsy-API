@@ -4,7 +4,7 @@
   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
   <doc title="Totsy REST API Specification">
-    Last Modified: <time datetime="2012-06-25">Jun 25, 2012</time><br/>
+    Last Modified: <time datetime="2012-07-06">Jul 06, 2012</time><br/>
     Author: <a href="mailto:tbhuvanendran@totsy.com">Tharsan Bhuvanendran &lt;tbhuvanendran@totsy.com&gt;</a>
   </doc>
 
@@ -540,6 +540,8 @@
     "firstname": "Tharsan",
     "lastname": "Bhuvanendran",
     "credit": 0,
+    "invitation_url": "https://api.totsy.com/invite/tbhuvanendran_283821",
+    "facebook_uid": "29388811111",
     "links": [
         {
             "rel": "self",
@@ -589,10 +591,12 @@
               <doc title="Full User Entity">
                 <pre>
 {
-    "email": "tbhuvanendran+hara@totsy.com",
+    "email": "tbhuvanendran@totsy.com",
     "firstname": "Tharsan",
     "lastname": "Bhuvanendran",
     "credit": 50,
+    "invitation_url": "https://api.totsy.com/invite/tbhuvanendran_283821",
+    "facebook_uid": "29388811111",
     "links": [
         {
             "rel": "self",
@@ -648,6 +652,8 @@
     "firstname": "Tharsan",
     "lastname": "Bhuvanendran",
     "credit": 0,
+    "invitation_url": "https://api.totsy.com/invite/tbhuvanendran_283821",
+    "facebook_uid": "29388811111",
     "links": [
         {
             "rel": "self",
@@ -723,7 +729,7 @@
         "firstname": "Test First 2",
         "lastname": "Test Last 2",
         "company": null,
-        "street": "829 New Address Blvd",
+        "street": [ "123 Fake Street", "Suite 201" ],
         "city": "Alison",
         "state": "Arizona",
         "zip": "12224",
@@ -763,7 +769,7 @@
     "firstname": "Maya",
     "lastname": "Troublestone",
     "company": null,
-    "street": "482 5th Ave.",
+    "street": [ "482 5th Ave.", "Apt. 101" ],
     "city": "New York",
     "state": "New York",
     "zip": "10078",
@@ -785,7 +791,7 @@
     "firstname": "Maya",
     "lastname": "Troublestone",
     "company": null,
-    "street": "482 5th Ave.",
+    "street": [ "482 5th Ave.", "Apt. 101" ],
     "city": "New York",
     "state": "New York",
     "zip": "10078",
@@ -827,6 +833,7 @@
                   <pre>
 [
     {
+        "number": "1000283",
         "status": "pending",
         "created": "2012-03-28 21:21:39",
         "updated": "2012-03-28 21:21:39",
@@ -836,8 +843,9 @@
         "shipping": "0.0000",
         "tax": "0.8000",
         "discount": "0.0000",
+        "credit_redeemed": "0.0000",
         "subtotal": "10.0000",
-        "total": "0.0000",
+        "grand_total": "0.0000",
         "products": [
             {
                 "name": "Stripe Sling Stripe",
@@ -853,11 +861,10 @@
             }
         ],
         "payment": {
-            "credits_used": 11,
-            "creditcard_type": "VI",
-            "creditcard_last4": "1111",
-            "creditcard_exp_month": "1",
-            "creditcard_exp_year": "2015"
+            "cc_type": "VI",
+            "cc_last4": "1111",
+            "cc_exp_month": "1",
+            "cc_exp_year": "2015"
         },
         "addresses": [
             {
@@ -891,6 +898,7 @@
         ]
     },
     {
+        "number": "1000283",
         "status": "pending",
         "created": "2012-03-27 16:07:25",
         "updated": "2012-03-27 16:07:27",
@@ -900,8 +908,9 @@
         "shipping": "0.0000",
         "tax": "1.6000",
         "discount": "0.0000",
+        "credit_redeemed": "0.0000",
         "subtotal": "18.0000",
-        "total": "19.6000",
+        "grand_total": "19.6000",
         "products": [
             {
                 "name": "Bullfinches Long Sleeve Ruched Neck Tee Light Blue",
@@ -917,11 +926,10 @@
             }
         ],
         "payment": {
-            "credits_used": 0,
-            "creditcard_type": "VI",
-            "creditcard_last4": "1111",
-            "creditcard_exp_month": "6",
-            "creditcard_exp_year": "2016"
+            "cc_type": "VI",
+            "cc_last4": "1111",
+            "cc_exp_month": "6",
+            "cc_exp_year": "2016"
         },
         "addresses": [
             {
@@ -979,6 +987,7 @@
                   <pre>
 {
     "coupon_code": "DISCOUNT",
+    "use_credit": 1,
     "products": [
         {
             "qty": 5,
@@ -1006,7 +1015,32 @@
                 }
             ]
         }
-    ]
+    ],
+    "addresses": {
+        "billing": {
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/address",
+                    "href": "https://api.totsy.com/address/621508"
+                }
+            ]
+        },
+        "shipping": {
+            "links": [
+                {
+                    "rel": "http://rel.totsy.com/entity/address",
+                    "href": "https://api.totsy.com/address/621508"
+                }
+            ]
+        }
+    },
+    "payment": {
+        "cc_type": "VI",
+        "cc_number": "4111111111111111",
+        "cc_exp_month": 12,
+        "cc_exp_year": 2014,
+        "cc_cid": 111
+    }
 }
                   </pre>
                 </doc>
@@ -1019,8 +1053,10 @@
                   <pre>
 {
     "expires": "2012-04-02T00:26:54+00:00",
+    "grand_total": 69.80,
     "subtotal": 72.5,
     "coupon_code": "DISCOUNT",
+    "use_credit": 1,
     "products": [
         {
             "name": "Giggle Giggle Quack",
@@ -1065,6 +1101,7 @@
                   <pre>
 
 {
+    "number": "1000283",
     "status": "pending",
     "created": "2012-03-27 16:07:25",
     "updated": "2012-03-27 16:07:27",
@@ -1074,8 +1111,9 @@
     "shipping": "0.0000",
     "tax": "1.6000",
     "discount": "0.0000",
+    "credit_redeemed": "0.0000",
     "subtotal": "18.0000",
-    "total": "19.6000",
+    "grand_total": "19.6000",
     "products": [
         {
             "name": "Bullfinches Long Sleeve Ruched Neck Tee Light Blue",
@@ -1091,11 +1129,10 @@
         }
     ],
     "payment": {
-        "credits_used": 0,
-        "creditcard_type": "VI",
-        "creditcard_last4": "1111",
-        "creditcard_exp_month": "6",
-        "creditcard_exp_year": "2016"
+        "cc_type": "VI",
+        "cc_last4": "1111",
+        "cc_exp_month": "6",
+        "cc_exp_year": "2016"
     },
     "addresses": [
         {
@@ -1298,7 +1335,7 @@
     "firstname": "Stephen",
     "lastname": "Hawking",
     "company": "Fake Enterprise",
-    "street": "123 Fake Street\nApt. 108",
+    "street": [ "123 Fake Street", "Apt. 108" ],
     "city": "Springfield",
     "state": "Ohio",
     "zip": "12345",
@@ -1334,7 +1371,7 @@
     "firstname": "Stephen",
     "lastname": "Hawking",
     "company": "Fake Enterprise",
-    "street": "123 Fake Street\nApt. 108",
+    "street": [ "123 Fake Street", "Apt. 108" ],
     "city": "Springfield",
     "state": "Ohio",
     "zip": "12345",
@@ -1356,7 +1393,7 @@
     "firstname": "Stephen",
     "lastname": "Hawking",
     "company": "Fake Enterprise",
-    "street": "123 Fake Street\nApt. 108",
+    "street": [ "123 Fake Street", "Apt. 108" ],
     "city": "Springfield",
     "state": "Ohio",
     "zip": "12345",
@@ -1418,6 +1455,7 @@
               <doc title="Full Order Entity">
                 <pre>
 {
+    "number": "1000283",
     "status": "pending",
     "created": "2012-03-27 16:07:25",
     "updated": "2012-03-27 16:07:27",
@@ -1427,8 +1465,9 @@
     "shipping": "0.0000",
     "tax": "1.6000",
     "discount": "0.0000",
+    "credit_redeemed": "0.0000",
     "subtotal": "18.0000",
-    "total": "19.6000",
+    "grand_total": "19.6000",
     "products": [
         {
             "name": "Bullfinches Long Sleeve Ruched Neck Tee Light Blue",
@@ -1444,11 +1483,10 @@
         }
     ],
     "payment": {
-        "credits_used": 0,
-        "creditcard_type": "VI",
-        "creditcard_last4": "1111",
-        "creditcard_exp_month": "6",
-        "creditcard_exp_year": "2016"
+        "cc_type": "VI",
+        "cc_last4": "1111",
+        "cc_exp_month": "6",
+        "cc_exp_year": "2016"
     },
     "addresses": [
         {
@@ -1549,12 +1587,5 @@
         </method>
       </resource>
     </resource>
-
-    <!-- Parameter: Client Authorization Token -->
-    <param name="Authorization" type="xsd:string" style="header" required="true">
-      <doc title="Client Authorization Token">
-        The authorization token granted to the client application.
-      </doc>
-    </param>
   </resources>
 </application>

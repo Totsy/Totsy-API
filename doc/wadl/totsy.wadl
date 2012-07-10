@@ -1039,7 +1039,13 @@
         "cc_number": "4111111111111111",
         "cc_exp_month": 12,
         "cc_exp_year": 2014,
-        "cc_cid": 111
+        "cc_cid": 111,
+        "links": [
+            {
+                "rel": "http://rel.totsy.com/entity/creditcard",
+                "href": "https://api.totsy.com/creditcard/392"
+            }
+        ]
     }
 }
                   </pre>

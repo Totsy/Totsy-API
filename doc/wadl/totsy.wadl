@@ -4,7 +4,7 @@
   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
   <doc title="Totsy REST API Specification">
-    Last Modified: <time datetime="2012-07-06">Jul 06, 2012</time><br/>
+    Last Modified: <time datetime="2012-07-11">Jul 11, 2012</time><br/>
     Author: <a href="mailto:tbhuvanendran@totsy.com">Tharsan Bhuvanendran &lt;tbhuvanendran@totsy.com&gt;</a>
   </doc>
 
@@ -1058,7 +1058,7 @@
                 <doc title="Full Order Entity (Pending)">
                   <pre>
 {
-    "expires": "2012-04-02T00:26:54+00:00",
+    "expires": "374",
     "grand_total": 69.80,
     "subtotal": 72.5,
     "coupon_code": "DISCOUNT",

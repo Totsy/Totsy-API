@@ -27,8 +27,6 @@ use Sonno\Annotation\GET,
 /**
  * An Order is a collection of Product entities and their corresponding
  * quantities that a User purchases.
- *
- * @todo Allow saved credit card as payment for placing orders.
  */
 class OrderResource extends AbstractResource
 {
@@ -308,7 +306,9 @@ class OrderResource extends AbstractResource
             );
             $cartTime = Mage::getSingleton('checkout/session')
                 ->getCountDownTimer();
-            $formattedData['expires'] = date('c', $cartTime + $cartShelfLife[0]);
+            $formattedData['expires'] = $cartTime
+                + $cartShelfLife[0]
+                - $this->_getCurrentTime();
         }
 
         $quoteData = $quote->getData();
@@ -537,14 +537,14 @@ class OrderResource extends AbstractResource
                         ->getConfigurableAttributesAsArray();
 
                     foreach ($productConfigAttributes as $attr) {
-                        if (!isset($requestProduct['attributes'][$attr['attribute_code']])) {
+                        if (!isset($requestProduct['attributes'][$attr['label']])) {
                             throw new WebApplicationException(
                                 400,
-                                "Could not add Product $productUrl -- Missing attribute $attr[attribute_code]"
+                                "Could not add Product $productUrl -- Missing attribute $attr[label]"
                             );
                         }
 
-                        $reqAttrVal = $requestProduct['attributes'][$attr['attribute_code']];
+                        $reqAttrVal = $requestProduct['attributes'][$attr['label']];
                         $attrId = false;
                         foreach ($attr['values'] as $attrVal) {
                             if ($reqAttrVal == $attrVal['label']) {
@@ -555,7 +555,7 @@ class OrderResource extends AbstractResource
                         if (false === $attrId) {
                             throw new WebApplicationException(
                                 400,
-                                "Could not add Product $productUrl -- Attribute value '$reqAttrVal' is invalid for attribute '$attr[attribute_code]'"
+                                "Could not add Product $productUrl -- Attribute value '$reqAttrVal' is invalid for attribute '$attr[label]'"
                             );
                         }
 
@@ -574,13 +574,22 @@ class OrderResource extends AbstractResource
                             'qty' => $requestProduct['qty']
                         );
                     } else if ('virtual' == $product->getTypeId()) {
-                        // remove the item from the cart when the requested qty
-                        // is zero
-                        if (0 == $requestProduct['qty']) {
-                            $productQuoteItemId = $obj->getQuote()
-                                ->getItemByProduct($product)
-                                ->getId();
-                            $obj->removeItem($productQuoteItemId);
+                        // find the quote item by scanning through the quote
+                        $found = false;
+                        foreach ($obj->getQuote()->getAllItems() as $item) {
+                            if ($product->getId() == $item->getProductId()) {
+                                $found = $item;
+                                $productQuoteItemId = $item->getId();
+                            }
+                        }
+
+                        if (false !== $found && 0 == $requestProduct['qty']) {
+                            $obj->removeItem($found->getId())->save();
+                        } else if (false !== $found) {
+                            throw new WebApplicationException(
+                                409,
+                                "The quantity for a virtual product item cannot be modified."
+                            );
                         }
                     } else {
                         $quoteItems = $obj->getQuote()->getItemsCollection();

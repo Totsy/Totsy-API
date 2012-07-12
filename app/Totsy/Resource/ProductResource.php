@@ -57,6 +57,7 @@ class ProductResource extends AbstractResource
         'hot',
         'featured',
         'image',
+        'type',
     );
 
     protected $_links = array(
@@ -154,7 +155,8 @@ class ProductResource extends AbstractResource
         $sourceData    = $item->getData();
         $formattedData = array();
 
-        $imageBaseUrl = \Mage::getBaseUrl() . '/media/catalog/product';
+        $imageBaseUrl = trim(Mage::getBaseUrl(), '/')
+            . '/media/catalog/product';
 
         $formattedData['event_id'] = $this->_eventId;
 
@@ -191,9 +193,9 @@ class ProductResource extends AbstractResource
                 ->getConfigurableAttributesAsArray();
 
             foreach ($productAttrs as $attr) {
-                $formattedData['attributes'][$attr['attribute_code']] = array();
+                $formattedData['attributes'][$attr['label']] = array();
                 foreach ($attr['values'] as $attrVal) {
-                    $formattedData['attributes'][$attr['attribute_code']][] = $attrVal['label'];
+                    $formattedData['attributes'][$attr['label']][] = $attrVal['label'];
                 }
             }
         }
@@ -206,6 +208,8 @@ class ProductResource extends AbstractResource
                 }
             }
         }
+
+        $formattedData['type'] = $item->getTypeId();
 
         $item->addData($formattedData);
         return parent::_formatItem($item, $fields, $links);

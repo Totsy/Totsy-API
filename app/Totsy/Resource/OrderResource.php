@@ -585,7 +585,7 @@ class OrderResource extends AbstractResource
 
                         if (false !== $found && 0 == $requestProduct['qty']) {
                             $obj->removeItem($found->getId())->save();
-                        } else if (false !== $found) {
+                        } else if (false !== $found && $requestProduct['qty'] > 1) {
                             throw new WebApplicationException(
                                 409,
                                 "The quantity for a virtual product item cannot be modified."

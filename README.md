@@ -18,10 +18,12 @@ Dependencies
 
 4. APC module (PHP): A full copy of the parsed Configuration data is stored in a local APC cache, on all environments except for *dev*.
 
+5. Memcached (PHP): If available, response bodies will be stored in Memcached. Server settings are configured via file `etc/{API_ENV}/memcached.yaml`. In the absence of this file, the local APC cache will be used instead.
+
 Documentation
 -------------
 
-All documentation can be located in the `doc` directory.
+All documentation is located in the `doc` directory.
 
 Reference documentation (usage instructions) is located at `doc/ref/Usage.md`.
 
@@ -31,3 +33,5 @@ To-Do (Future)
 --------------
 
 * Add a domain model layer to decouple Magento models from the API server. Use Symfony DI to configure and instantiate classes.
+* Add logging using Monolog.
+

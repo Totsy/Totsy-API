@@ -19,6 +19,12 @@ use Sonno\Annotation\GET,
 
     Totsy\Exception\WebApplicationException,
 
+    Doctrine\Common\Cache\CacheProvider,
+    Doctrine\Common\Cache\ApcCache,
+    Doctrine\Common\Cache\MemcacheCache,
+
+    Memcache,
+
     Mage;
 
 /**
@@ -41,23 +47,18 @@ abstract class AbstractResource
     protected $_model;
 
     /**
-     * A prefix for the cache key for cache entries.
-     * When populated, response bodies will be cached using this prefix,
-     * followed by a hash of the incoming request, as the cache key.
-     * When empty, response bodies will never be cached.
+     * The local cache data store.
      *
-     * @var string
+     * @var Doctrine\Common\Cache\CacheProvider
      */
-    protected $_cachePrefix = '';
+    protected $_cache;
 
     /**
-     * The frequency with which to update cached response bodies.
-     * This is the number of requests to serve cached content to until it
-     * is considered stale and is refreshed.
+     * The default lifetime for cache entries added by this resource class.
      *
      * @var int
      */
-    protected $_cacheRefreshFrequency = 0;
+    protected $_cacheTimeout;
 
     /**
      * The incoming HTTP request.
@@ -78,6 +79,19 @@ abstract class AbstractResource
     public function __construct()
     {
         $this->_model = Mage::getSingleton($this->_modelGroupName);
+
+        // setup the local cache object by parsing the memcache configuration
+        $confMemcacheFile = 'etc/' . API_ENV . '/memcache.yaml';
+        if (extension_loaded('yaml') && file_exists($confMemcacheFile)) {
+            $confMemcache = yaml_parse_file($confMemcacheFile);
+            $memcache = new Memcache();
+            $memcache->addServer($confMemcache['host'], $confMemcache['port']);
+
+            $this->_cache = new MemcacheCache();
+            $this->_cache->setMemcache($memcache);
+        } else {
+            $this->_cache = new ApcCache();
+        }
     }
 
     /**
@@ -267,29 +281,47 @@ abstract class AbstractResource
      */
     protected function _inspectCache()
     {
+        // flush the cache store
+        if ($this->_request->getQueryParam('flushCache')) {
+            $this->_cache->flushAll();
+        }
+
         // ignore cache
         if ('dev' == API_ENV || // in a development environment
-            empty($this->_cachePrefix) || // without a prefix declared
-            (isset($this->_cacheRefreshFrequency) &&
-                rand(1, $this->_cacheRefreshFrequency) == 1
-            )
+            $this->_request->getQueryParam('skipCache')
         ) {
             return false;
         }
 
-        $cacheKey = $this->_cachePrefix . md5($this->_request->getRequestUri());
-        if (apc_exists($cacheKey)) {
-            return apc_fetch($cacheKey);
+        $cacheKey = 'TOTSY_REST_API_' . md5(
+            $this->_request->getRequestUri() .
+                http_build_query($this->_request->getQueryParams())
+        );
+
+        if ($this->_cache->contains($cacheKey)) {
+            return $this->_cache->fetch($cacheKey);
         }
 
         return false;
     }
 
+    /**
+     * Add a new entry to the local cache store.
+     *
+     * @param mixed $value The object to store.
+     *
+     * @return bool TRUE when the cache entry was added successfully.
+     */
     protected function _addCache($value)
     {
-        if (isset($this->_cachePrefix)) {
-            $cacheKey = $this->_cachePrefix . md5($this->_request->getRequestUri());
-            apc_add($cacheKey, $value);
+        $cacheKey = 'TOTSY_REST_API_' . md5(
+            $this->_request->getRequestUri() .
+                http_build_query($this->_request->getQueryParams())
+        );
+
+        $timeout = $this->_cacheTimeout ? $this->_cacheTimeout : 60;
+        if (!$this->_cache->contains($cacheKey)) {
+            return $this->_cache->save($cacheKey, $value, $timeout);
         }
     }
 

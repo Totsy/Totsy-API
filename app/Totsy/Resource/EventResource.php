@@ -21,10 +21,6 @@ use Sonno\Annotation\GET,
  */
 class EventResource extends AbstractResource
 {
-    protected $_cachePrefix = 'REST_API_EVENT_';
-
-    protected $_cacheRefreshFrequency = 25;
-
     protected $_modelGroupName = 'catalog/category';
 
     protected $_fields = array(

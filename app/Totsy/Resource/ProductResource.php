@@ -130,7 +130,10 @@ class ProductResource extends AbstractResource
 
         $model = Mage::getModel('catalog/category');
         $event = $model->load($id);
-        $products = $event->getProductCollection();
+
+        $layer = Mage::getSingleton('catalog/layer');
+        $layer->setCurrentCategory($event);
+        $products = $layer->getProductCollection();
 
         $results = array();
         foreach ($products as $product) {

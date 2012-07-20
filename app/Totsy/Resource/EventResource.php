@@ -182,10 +182,13 @@ class EventResource extends AbstractResource
         $formattedData['age'] = array();
         $formattedData['discount_pct'] = 0;
 
-        $products = $item->getProductCollection();
-        foreach ($products as $product) {
-            $product->load($product->getId());
+        $products = $item->getProductCollection()
+            ->addAttributeToSelect('departments')
+            ->addAttributeToSelect('ages')
+            ->addAttributeToSelect('price')
+            ->addAttributeToSelect('special_price');
 
+        foreach ($products as $product) {
             $departments = $product->getAttributeText('departments');
             $ages = $product->getAttributeText('ages');
 

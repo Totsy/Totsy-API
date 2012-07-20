@@ -85,7 +85,9 @@ abstract class AbstractResource
         if (extension_loaded('yaml') && file_exists($confMemcacheFile)) {
             $confMemcache = yaml_parse_file($confMemcacheFile);
             $memcache = new Memcache();
-            $memcache->addServer($confMemcache['host'], $confMemcache['port']);
+            foreach ($confMemcache['servers'] as $server) {
+                $memcache->addServer($server['host'], $server['port']);
+            }
 
             $this->_cache = new MemcacheCache();
             $this->_cache->setMemcache($memcache);

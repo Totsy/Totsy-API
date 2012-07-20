@@ -1,3 +1,8 @@
-host: localhost
-port: 11211
-lifetime: 60
+servers:
+  - host: localhost
+    port: 11211
+    lifetime: 60
+  - host: memcache0
+    port: 11212
+    lifetime: 30
+

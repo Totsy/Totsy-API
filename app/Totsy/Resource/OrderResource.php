@@ -607,7 +607,9 @@ class OrderResource extends AbstractResource
                 }
 
                 // add this product to the cart
-                if (false === $productQuoteItemId) {
+                if (false === $productQuoteItemId &&
+                    $productParams['qty'] > 0
+                ) {
                     try {
                         $item = $obj->addProduct($product, $productParams);
                         $cartUpdated = true;
@@ -630,9 +632,17 @@ class OrderResource extends AbstractResource
 
             // process any cart updates
             if (count($cartUpdates)) {
-                $cartUpdates = $obj->suggestItemsQty($cartUpdates);
-                $obj->updateItems($cartUpdates)->save();
-                $cartUpdated = true;
+                try {
+                    $cartUpdates = $obj->suggestItemsQty($cartUpdates);
+                    $obj->updateItems($cartUpdates)->save();
+                    $cartUpdated = true;
+                } catch(\Mage_Core_Exception $e) {
+                    Mage::logException($e);
+                    throw new WebApplicationException(
+                        409,
+                        $e->getMessage()
+                    );
+                }
             }
 
             if ($cartUpdated) {

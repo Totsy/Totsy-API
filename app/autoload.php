@@ -17,6 +17,10 @@ $sonnoLoader = new ClassLoader('Sonno', __DIR__ . '/../lib/vendor/sonno/src');
 $sonnoLoader->register();
 unset($sonnoLoader);
 
+$monologLoader = new ClassLoader('Monolog', __DIR__ . '/../lib/vendor/monolog/src');
+$monologLoader->register();
+unset($monologLoader);
+
 $commonLoader = new ClassLoader(
     'Doctrine\Common',
     __DIR__ . '/../lib/vendor/doctrine-common/lib'

@@ -70,6 +70,13 @@ abstract class AbstractResource
      */
     protected $_uriInfo;
 
+    /**
+     * Logging object.
+     *
+     * @var \Monolog\Logger;
+     */
+    protected $_logger;
+
     public function __construct()
     {
         $this->_model = Mage::getSingleton($this->_modelGroupName);
@@ -188,10 +195,8 @@ abstract class AbstractResource
                     }
                 } else if (isset($link['resource'])) {
                     $link['href'] = $builder->replaceQuery(null)
-                        ->resourcePath(
-                        $link['resource']['class'],
-                        $link['resource']['method']
-                    )->build();
+                        ->resourcePath($link['resource']['class'], $link['resource']['method'])
+                        ->build();
                     unset($link['resource']);
                 }
 
@@ -247,10 +252,10 @@ abstract class AbstractResource
         try {
             $obj->save();
         } catch(\Mage_Core_Exception $mageException) {
-            Mage::logException($mageException);
+            $this->_logger->err($mageException->getMessage());
             throw new WebApplicationException(400, $mageException->getMessage());
         } catch(\Exception $e) {
-            Mage::logException($e);
+            $this->_logger->err($e->getMessage());
             throw new WebApplicationException(500, $e);
         }
 
@@ -265,15 +270,11 @@ abstract class AbstractResource
      */
     protected function _inspectCache()
     {
-        // flush the cache store
-        if ($this->_request->getQueryParam('flushCache')) {
-            $this->_cache->flushAll();
-        }
-
         // ignore cache
         if ('dev' == API_ENV || // in a development environment
             $this->_request->getQueryParam('skipCache')
         ) {
+            $this->_logger->debug('Skipping cache for request');
             return false;
         }
 
@@ -283,6 +284,7 @@ abstract class AbstractResource
         );
 
         if ($this->_cache->contains($cacheKey)) {
+            $this->_logger->info("Using cached copy of $cacheKey to satisfy request");
             return $this->_cache->fetch($cacheKey);
         }
 
@@ -304,7 +306,12 @@ abstract class AbstractResource
         );
 
         $timeout = $this->_cacheTimeout ? $this->_cacheTimeout : 60;
-        if (!$this->_cache->contains($cacheKey)) {
+        if ('dev' != API_ENV && !$this->_cache->contains($cacheKey)) {
+            $this->_logger->info(
+                sprintf('New cache entry: %s (%d bytes)', $cacheKey, strlen($value)
+                )
+            );
+
             return $this->_cache->save($cacheKey, $value, $timeout);
         }
     }

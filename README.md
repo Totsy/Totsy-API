@@ -34,4 +34,5 @@ To-Do (Future)
 
 * Add a domain model layer to decouple Magento models from the API server. Use Symfony DI to configure and instantiate classes.
 * Add logging using Monolog.
+* Integrate Magento Web Service Role ACL for resource access.
 

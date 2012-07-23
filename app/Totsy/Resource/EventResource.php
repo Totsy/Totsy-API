@@ -225,22 +225,40 @@ class EventResource extends AbstractResource
         );
 
         // construct an object literal for event images
-        if (isset($sourceData['image'])) {
-            $formattedData['default_image'] = $sourceData['image'];
-        }
-        $formattedData['image'] = array();
-        if (isset($sourceData['default_image'])) {
+        $skinPlaceholderUrl = \Mage::getBaseUrl()
+            . 'skin/frontend/enterprise/harapartners/images/catalog/product/placeholder/';
+        $formattedData['image'] = array(
+            'default'   => $skinPlaceholderUrl . 'image.jpg',
+            'small'     => $skinPlaceholderUrl . 'small.jpg',
+            'thumbnail' => $skinPlaceholderUrl . 'thumbnail.jpg',
+        );
+
+        // 'default' image
+        if (isset($sourceData['default_image']) &&
+            !is_array($sourceData['default_image'])
+        ) {
             $formattedData['image']['default'] = $imageBaseUrl
                 . $sourceData['default_image'];
+        } else if (isset($sourceData['image']) &&
+            !is_array($sourceData['image'])
+        ) {
+            $formattedData['image']['default'] = $imageBaseUrl
+                . $sourceData['image'];
         }
+
+        // 'small' image
         if (isset($sourceData['small_image'])) {
             $formattedData['image']['small'] = $imageBaseUrl
                 . $sourceData['small_image'];
         }
+
+        // 'thumbnail' image
         if (isset($sourceData['thumbnail'])) {
             $formattedData['image']['thumbnail'] = $imageBaseUrl
                 . $sourceData['thumbnail'];
         }
+
+        // 'logo' image
         if (isset($sourceData['logo'])) {
             $formattedData['image']['logo'] = $imageBaseUrl
                 . $sourceData['logo'];

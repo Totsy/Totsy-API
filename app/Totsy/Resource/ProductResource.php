@@ -50,9 +50,8 @@ class ProductResource extends AbstractResource
         'sku',
         'weight',
         'price' => array(
-            'price',
-            'orig' => 'original_price',
-            'msrp'
+            'price' => 'special_price',
+            'orig'  => 'price'
         ),
         'hot',
         'featured',

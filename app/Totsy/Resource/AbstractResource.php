@@ -19,12 +19,6 @@ use Sonno\Annotation\GET,
 
     Totsy\Exception\WebApplicationException,
 
-    Doctrine\Common\Cache\CacheProvider,
-    Doctrine\Common\Cache\ApcCache,
-    Doctrine\Common\Cache\MemcacheCache,
-
-    Memcache,
-
     Mage;
 
 /**
@@ -80,20 +74,8 @@ abstract class AbstractResource
     {
         $this->_model = Mage::getSingleton($this->_modelGroupName);
 
-        // setup the local cache object by parsing the memcache configuration
-        $confMemcacheFile = 'etc/' . API_ENV . '/memcache.yaml';
-        if (extension_loaded('yaml') && file_exists($confMemcacheFile)) {
-            $confMemcache = yaml_parse_file($confMemcacheFile);
-            $memcache = new Memcache();
-            foreach ($confMemcache['servers'] as $server) {
-                $memcache->addServer($server['host'], $server['port']);
-            }
-
-            $this->_cache = new MemcacheCache();
-            $this->_cache->setMemcache($memcache);
-        } else {
-            $this->_cache = new ApcCache();
-        }
+        $cache = new \Totsy\Cache();
+        $this->_cache = $cache->getCache();
     }
 
     /**

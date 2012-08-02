@@ -105,11 +105,12 @@ class CreditCardResource extends AbstractResource
         $data['cc_type'] = $data['type'];
         unset($data['type']);
 
+
+        $customerAddress = Mage::getModel('customer/address');
         if (isset($data['links'])) {
             // fetch the billing address by URL
             $addressId = $this->_getEntityIdFromUrl($data['links'][0]['href']);
-            $customerAddress = Mage::getModel('customer/address')->load($addressId);
-            $address = $customerAddress->getData();
+            $customerAddress->load($addressId);
 
         } else if (isset($data['address'])) {
             // create a new billing address
@@ -126,17 +127,15 @@ class CreditCardResource extends AbstractResource
             }
             $address['region_id'] = $region->getId();
 
-            $customerAddress = Mage::getModel('customer/address')->addData($address)
+            $customerAddress->addData($address)
                 ->setCustomerId($id)
                 ->save();
         }
 
-        $address['street'] = array($address['street'], '');
-
         try {
             Mage::getModel('paymentfactory/tokenize')->createProfile(
                 new \Varien_Object($data),
-                new \Varien_Object($address),
+                new \Varien_Object($customerAddress->getData()),
                 $id,
                 $customerAddress->getId()
             );

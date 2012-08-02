@@ -19,6 +19,16 @@ use Sonno\Annotation\GET,
 
     Totsy\Exception\WebApplicationException,
 
+    Doctrine\Common\Cache\CacheProvider,
+    Doctrine\Common\Cache\ApcCache,
+    Doctrine\Common\Cache\MemcacheCache,
+
+    Memcache,
+
+    Monolog\Logger,
+    Monolog\Handler\StreamHandler,
+    Monolog\Handler\NativeMailerHandler,
+
     Mage;
 
 /**
@@ -81,8 +91,8 @@ abstract class AbstractResource
     {
         $this->_model = Mage::getSingleton($this->_modelGroupName);
 
-        $cache = new \Totsy\Cache();
-        $this->_cache = $cache->getCache();
+        $this->_initLogger();
+        $this->_initCache();
     }
 
     /**
@@ -308,8 +318,8 @@ abstract class AbstractResource
         $timeout = $this->_cacheTimeout ? $this->_cacheTimeout : 60;
         if ('dev' != API_ENV && !$this->_cache->contains($cacheKey)) {
             $this->_logger->info(
-                sprintf('New cache entry: %s (%d bytes)', $cacheKey, strlen($value)
-                )
+                'New cache entry added',
+                array('key' => $cacheKey, 'size' => strlen($value))
             );
 
             return $this->_cache->save($cacheKey, $value, $timeout);
@@ -335,6 +345,86 @@ abstract class AbstractResource
         }
 
         return intval(substr($url, $offset+1));
+    }
+
+    /**
+     * Setup the local logger object based on settings in an external file.
+     *
+     * @param string $configFile The file containing logging settings.
+     * @return void
+     */
+    protected function _initLogger($configFile = 'etc/logger.yaml')
+    {
+        if (extension_loaded('yaml') && file_exists($configFile)) {
+            $config = yaml_parse_file($configFile);
+            $config = $config[API_ENV];
+
+            $this->_logger = new Logger('restapi');
+
+            // setup a processor that adds request information to log records
+            $request = $this->_request;
+            $this->_logger->pushProcessor(function($record) use ($request) {
+                if ($request) {
+                    $record['extra']['uri'] = $request->getRequestUri();
+                }
+
+                return $record;
+            });
+
+            // add handlers for each specified handler in the config file
+            foreach ($config as $confLogger) {
+                $level = isset($confLogger['level'])
+                    ? constant('\Monolog\Logger::' . $confLogger['level'])
+                    : Logger::NOTICE;
+
+                switch ($confLogger['handler']) {
+                    case 'file':
+                        $this->_logger->pushHandler(
+                            new StreamHandler($confLogger['filename']),
+                            $level
+                        );
+                        break;
+                    case 'mail':
+                        $this->_logger->pushHandler(
+                            new NativeMailerHandler(
+                                $confLogger['recipient'],
+                                $confLogger['subject'],
+                                $confLogger['sender']
+                            ),
+                            $level
+                        );
+                }
+            }
+        }
+    }
+
+    /**
+     * Setup the local cache object based on settings in an external file.
+     *
+     * @param string $configFile The file containing cache settings.
+     * @return void
+     */
+    protected function _initCache($configFile = 'etc/cache.yaml')
+    {
+        if (extension_loaded('yaml') && file_exists($configFile)) {
+            $config = yaml_parse_file($configFile);
+            $config = $config[API_ENV];
+
+            switch ($config['backend']) {
+                case 'memcache':
+                    $memcache = new Memcache();
+                    foreach ($config['servers'] as $server) {
+                        $memcache->addServer($server['host'], $server['port']);
+                    }
+
+                    $this->_cache = new MemcacheCache();
+                    $this->_cache->setMemcache($memcache);
+
+                    break;
+                default:
+                    $this->_cache = new ApcCache();
+            }
+        }
     }
 
     /**

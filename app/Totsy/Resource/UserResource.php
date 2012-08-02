@@ -129,9 +129,8 @@ class UserResource extends AbstractResource
 
         try {
             $user->delete();
-        } catch(\Mage_Core_Exception $e) {
-            Mage::logException($e);
-
+        } catch(\Exception $e) {
+            $this->_logger->err($e->getMessage(), $e);
             throw new WebApplicationException(500, $e->getMessage());
         }
 

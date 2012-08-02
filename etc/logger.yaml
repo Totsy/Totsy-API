@@ -1,0 +1,9 @@
+dev:
+  - handler: file
+    level: DEBUG
+    filename: log/restapi.log
+  - handler: mail
+    level: ERROR
+    recipient: tbhuvanendran@totsy.com
+    sender: noreply-restapi@totsy.com
+    subject: Totsy REST API Error

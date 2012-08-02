@@ -139,10 +139,8 @@ class CreditCardResource extends AbstractResource
                 $id,
                 $customerAddress->getId()
             );
-        } catch (\Mage_Core_Exception $mageException) {
-            Mage::logException($mageException);
-            throw new WebApplicationException(500, $mageException->getMessage());
         } catch (\Exception $e) {
+            $this->_logger->err($e->getMessage(), $e);
             throw new WebApplicationException(500, $e->getMessage());
         }
 
@@ -203,7 +201,7 @@ class CreditCardResource extends AbstractResource
         try {
             $card->delete();
         } catch(\Exception $e) {
-            Mage::logException($e);
+            $this->_logger->err($e->getMessage(), $e);
             throw new WebApplicationException(500, $e->getMessage());
         }
 

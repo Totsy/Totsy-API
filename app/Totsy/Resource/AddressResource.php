@@ -175,7 +175,7 @@ class AddressResource extends AbstractResource
         try {
             $address->delete();
         } catch(\Exception $e) {
-            Mage::logException($e);
+            $this->_logger->err($e->getMessage(), $e);
             throw new WebApplicationException(500, $e);
         }
 

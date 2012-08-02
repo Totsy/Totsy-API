@@ -140,7 +140,7 @@ class EventResource extends AbstractResource
             return false;
         }
 
-        // setup filters on event start & end dates using the 'when' parameter
+        // fetch the event information for the desired event group
         $queue = json_decode($sortEntry->getLiveQueue(), true);
         if ('upcoming' == $this->_request->getQueryParam('when')) {
             $queue = json_decode($sortEntry->getUpcomingQueue(), true);
@@ -150,17 +150,21 @@ class EventResource extends AbstractResource
             return false;
         }
 
-        $eventIds = array();
+        // build the result, ignoring events without products or upcoming events
+        $results = array();
         foreach ($queue as $categoryInfo) {
-            $eventIds[] = $categoryInfo['entity_id'];
+            $category = $this->_model->load($categoryInfo['entity_id']);
+            $formattedEvent = $this->_formatItem($category);
+            if (false !== $formattedEvent &&
+                strtotime($categoryInfo['event_start_date']) < $this->_getCurrentTime()
+            ) {
+                $results[] = $formattedEvent;
+            }
         }
 
-        if (!count($eventIds)) {
-            return json_encode(array());
-        }
-
-        return $this->getCollection(array('entity_id' => $eventIds));
+        return json_encode($results);
     }
+
     /**
      * Add formatted fields to item data before deferring to the default
      * item formatting.
@@ -168,7 +172,7 @@ class EventResource extends AbstractResource
      * @param $item array|Mage_Core_Model_Abstract
      * @param $fields null|array
      * @param $links null|array
-     * @return array
+     * @return array|bool
      */
     protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
@@ -187,6 +191,10 @@ class EventResource extends AbstractResource
             ->addAttributeToSelect('ages')
             ->addAttributeToSelect('price')
             ->addAttributeToSelect('special_price');
+
+        if (!count($products)) {
+            return false;
+        }
 
         foreach ($products as $product) {
             $departments = $product->getAttributeText('departments');

@@ -143,6 +143,12 @@ class OrderResource extends AbstractResource
 
                     $subId = $cc->getEncryptedSubscriptionId();
                     $requestData['payment']['cybersource_subid'] = $subId;
+
+                    $cardAddress = Mage::getModel('customer/address')
+                        ->load($cc->getAddressId());
+                    $quoteAddress = Mage::getModel('sales/quote_address')
+                        ->importCustomerAddress($cardAddress);
+                    $quote->setBillingAddress($quoteAddress);
                 }
 
                 $payment->importData($requestData['payment'])->save();
@@ -152,6 +158,11 @@ class OrderResource extends AbstractResource
                 $order = $quoteService->getOrder();
 
                 $response = $this->_formatItem($order);
+
+                // destroy this cart object and reset the local checkout session
+                $quote->setIsActive(false);
+                $quote->delete();
+                Mage::getModel('checkout/session')->clear();
 
                 return new Response(
                     201,
@@ -315,8 +326,12 @@ class OrderResource extends AbstractResource
 
         $formattedData['grand_total'] = $quoteData['grand_total'];
         $formattedData['subtotal'] = $quoteData['subtotal'];
-        $formattedData['coupon_code'] = $quoteData['coupon_code'];
-        $formattedData['use_credit'] = $quoteData['use_reward_points'];
+        $formattedData['coupon_code'] = isset($quoteData['coupon_code'])
+            ? $quoteData['coupon_code']
+            : null;
+        $formattedData['use_credit'] = isset($quoteData['use_reward_points'])
+            ? $quoteData['use_reward_points']
+            : null;
 
         $builder = $this->_uriInfo->getBaseUriBuilder();
         $builder->resourcePath(
@@ -656,30 +671,5 @@ class OrderResource extends AbstractResource
                 );
             }
         }
-    }
-
-    /**
-     * Get the current time in the Magento-configured local timezone.
-     *
-     * @return int
-     */
-    protected function _getCurrentTime()
-    {
-        // remember the currently configured timezone
-        $defaultTimezone = date_default_timezone_get();
-
-        // find Magento's configured timezone, and set that as the date timezone
-        date_default_timezone_set(
-            Mage::getStoreConfig(
-                \Mage_Core_Model_Locale::XML_PATH_DEFAULT_TIMEZONE
-            )
-        );
-
-        $time = now();
-
-        // return the default timezone to the originally configured one
-        date_default_timezone_set($defaultTimezone);
-
-        return strtotime($time);
     }
 }

@@ -329,4 +329,29 @@ abstract class AbstractResource
 
         return intval(substr($url, $offset+1));
     }
+
+    /**
+     * Get the current time in the Magento-configured local timezone.
+     *
+     * @return int
+     */
+    protected function _getCurrentTime()
+    {
+        // remember the currently configured timezone
+        $defaultTimezone = date_default_timezone_get();
+
+        // find Magento's configured timezone, and set that as the date timezone
+        date_default_timezone_set(
+            Mage::getStoreConfig(
+                \Mage_Core_Model_Locale::XML_PATH_DEFAULT_TIMEZONE
+            )
+        );
+
+        $time = now();
+
+        // return the default timezone to the originally configured one
+        date_default_timezone_set($defaultTimezone);
+
+        return strtotime($time);
+    }
 }

@@ -23,6 +23,8 @@ class EventResource extends AbstractResource
 {
     protected $_modelGroupName = 'catalog/category';
 
+    protected $_cacheEntryLifetime = 300;
+
     protected $_fields = array(
         'name',
         'description',

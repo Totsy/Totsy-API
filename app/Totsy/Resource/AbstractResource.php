@@ -28,6 +28,7 @@ use Sonno\Annotation\GET,
     Monolog\Logger,
     Monolog\Handler\StreamHandler,
     Monolog\Handler\NativeMailerHandler,
+    Monolog\Processor\WebProcessor,
 
     Mage;
 
@@ -59,10 +60,11 @@ abstract class AbstractResource
 
     /**
      * The default lifetime for cache entries added by this resource class.
+     * Expressed in seconds.
      *
      * @var int
      */
-    protected $_cacheTimeout;
+    protected $_cacheEntryLifetime = 60;
 
     /**
      * The incoming HTTP request.
@@ -284,17 +286,19 @@ abstract class AbstractResource
         if ('dev' == API_ENV || // in a development environment
             $this->_request->getQueryParam('skipCache')
         ) {
-            $this->_logger->debug('Skipping cache for request');
             return false;
         }
 
-        $cacheKey = 'TOTSY_REST_API_' . md5(
+        $cacheKey = md5(
             $this->_request->getRequestUri() .
                 http_build_query($this->_request->getQueryParams())
         );
 
         if ($this->_cache->contains($cacheKey)) {
-            $this->_logger->info("Using cached copy of $cacheKey to satisfy request");
+            $this->_logger->info(
+                'Delivering content from cache',
+                array('key' => $cacheKey)
+            );
             return $this->_cache->fetch($cacheKey);
         }
 
@@ -305,24 +309,32 @@ abstract class AbstractResource
      * Add a new entry to the local cache store.
      *
      * @param mixed $value The object to store.
+     * @param int   $lifetime The lifetime of the cache entry (in seconds)
      *
      * @return bool TRUE when the cache entry was added successfully.
      */
-    protected function _addCache($value)
+    protected function _addCache($value, $lifetime = 0)
     {
-        $cacheKey = 'TOTSY_REST_API_' . md5(
+        $cacheKey = md5(
             $this->_request->getRequestUri() .
                 http_build_query($this->_request->getQueryParams())
         );
 
-        $timeout = $this->_cacheTimeout ? $this->_cacheTimeout : 60;
+        if (0 == $lifetime) {
+            $lifetime = $this->_cacheEntryLifetime;
+        }
+
         if ('dev' != API_ENV && !$this->_cache->contains($cacheKey)) {
             $this->_logger->info(
                 'New cache entry added',
-                array('key' => $cacheKey, 'size' => strlen($value))
+                array(
+                    'key' => $cacheKey,
+                    'size' => strlen($value),
+                    'lifetime' => $lifetime,
+                )
             );
 
-            return $this->_cache->save($cacheKey, $value, $timeout);
+            return $this->_cache->save($cacheKey, $value, $lifetime);
         }
     }
 
@@ -362,14 +374,8 @@ abstract class AbstractResource
             $this->_logger = new Logger('restapi');
 
             // setup a processor that adds request information to log records
-            $request = $this->_request;
-            $this->_logger->pushProcessor(function($record) use ($request) {
-                if ($request) {
-                    $record['extra']['uri'] = $request->getRequestUri();
-                }
-
-                return $record;
-            });
+            $request = &$this->_request;
+            $this->_logger->pushProcessor(new WebProcessor());
 
             // add handlers for each specified handler in the config file
             foreach ($config as $confLogger) {
@@ -419,6 +425,10 @@ abstract class AbstractResource
 
                     $this->_cache = new MemcacheCache();
                     $this->_cache->setMemcache($memcache);
+
+                    if (isset($config['namespace'])) {
+                        $this->_cache->setNamespace($config['namespace']);
+                    }
 
                     break;
                 default:

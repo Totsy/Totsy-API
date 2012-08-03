@@ -32,9 +32,7 @@ class ProductResource extends AbstractResource
      */
     protected $_eventId;
 
-    protected $_cachePrefix = 'REST_API_PRODUCT_';
-
-    protected $_cacheRefreshFrequency = 10;
+    protected $_cacheEntryLifetime = 600;
 
     protected $_modelGroupName = 'catalog/product';
 
@@ -125,6 +123,10 @@ class ProductResource extends AbstractResource
      */
     public function getEventProductCollection($id)
     {
+        if ($response = $this->_inspectCache()) {
+            return $response;
+        }
+
         $this->_eventId = $id;
 
         $model = Mage::getModel('catalog/category');
@@ -132,15 +134,31 @@ class ProductResource extends AbstractResource
 
         $layer = Mage::getSingleton('catalog/layer');
         $layer->setCurrentCategory($event);
-        $products = $layer->getProductCollection();
+        $products = $layer->getProductCollection()
+            ->addAttributeToSelect('description')
+            ->addAttributeToSelect('shipping_returns')
+            ->addAttributeToSelect('vendor_style')
+            ->addAttributeToSelect('weight')
+            ->addAttributeToSelect('departments')
+            ->addAttributeToSelect('ages')
+            ->addAttributeToSelect('hot_list')
+            ->addAttributeToSelect('featured');
 
         $results = array();
         foreach ($products as $product) {
-            $item = $this->_model->load($product->getId());
-            $results[] = $this->_formatItem($item, $this->_fields, $this->_links);
+            // this loads the media gallery to the product object
+            // hat tip: http://www.magentocommerce.com/boards/viewthread/17414/P15/#t400258
+            $attributes = $product->getTypeInstance(true)->getSetAttributes($product);
+            $media_gallery = $attributes['media_gallery'];
+            $media_gallery->getBackend()->afterLoad($product);
+
+            $results[] = $this->_formatItem($product, $this->_fields, $this->_links);
         }
 
-        return json_encode($results);
+        $response = json_encode($results);
+        $this->_addCache($response);
+
+        return $response;
     }
 
     /**
@@ -163,7 +181,7 @@ class ProductResource extends AbstractResource
         $formattedData['event_id'] = $this->_eventId;
 
         $formattedData['shipping_returns'] = trim(
-            strip_tags(html_entity_decode($item->getShippingReturns()))
+            strip_tags(html_entity_decode($sourceData['shipping_returns']))
         );
 
         // scrape together department & age data
@@ -188,10 +206,7 @@ class ProductResource extends AbstractResource
         if ('configurable' == $item->getTypeId()) {
             $formattedData['attributes'] = array();
 
-            // unsure why the item needs to be reloaded, but strange attribute
-            // values appear from $item
-            $product = Mage::getModel('catalog/product')->load($item->getId());
-            $productAttrs = $product->getTypeInstance()
+            $productAttrs = $item->getTypeInstance()
                 ->getConfigurableAttributesAsArray();
 
             foreach ($productAttrs as $attr) {

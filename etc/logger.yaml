@@ -7,3 +7,16 @@ dev:
     recipient: tbhuvanendran@totsy.com
     sender: noreply-restapi@totsy.com
     subject: Totsy REST API Error
+stg:
+  - handler: file
+    level: INFO
+    filename: /var/log/rest-api.log
+prd:
+  - handler: file
+    level: WARN
+    filename: /var/log/rest-api.log
+  - handler: mail
+    level: CRITICAL
+    recipient: tbhuvanendran@totsy.com
+    sender: noreply-restapi@totsy.com
+    subject: Totsy REST API Error

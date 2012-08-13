@@ -44,6 +44,7 @@ class CreditCardResource extends AbstractResource
         'cc_last4'     => 'last4no',
         'cc_exp_year'  => 'expire_year',
         'cc_exp_month' => 'expire_month',
+        'address',
     );
 
     protected $_links = array(
@@ -105,7 +106,6 @@ class CreditCardResource extends AbstractResource
         $data['cc_type'] = $data['type'];
         unset($data['type']);
 
-
         $customerAddress = Mage::getModel('customer/address');
         if (isset($data['links'])) {
             // fetch the billing address by URL
@@ -140,7 +140,7 @@ class CreditCardResource extends AbstractResource
                 $customerAddress->getId()
             );
         } catch (\Exception $e) {
-            $this->_logger->err($e->getMessage(), $e);
+            $this->_logger->err($e->getMessage(), $e->getTrace());
             throw new WebApplicationException(500, $e->getMessage());
         }
 
@@ -201,10 +201,35 @@ class CreditCardResource extends AbstractResource
         try {
             $card->delete();
         } catch(\Exception $e) {
-            $this->_logger->err($e->getMessage(), $e);
+            $this->_logger->err($e->getMessage(), $e->getTrace());
             throw new WebApplicationException(500, $e->getMessage());
         }
 
         return new Response(200);
+    }
+
+    /**
+     * Add address information to item data.
+     *
+     * @param \Mage_Core_Model_Abstract $item
+     * @param null                      $fields
+     * @param null                      $links
+     *
+     * @return array
+     */
+    protected function _formatItem($item, $fields = NULL, $links = NULL)
+    {
+        if ($addressId = $item->getAddressId()) {
+            $resource = new AddressResource();
+            $resource->setRequest($this->_request);
+            $resource->setUriInfo($this->_uriInfo);
+
+            $address = json_decode($resource->getEntity($addressId), true);
+            unset($address['links']);
+
+            $item->setData('address', $address);
+        }
+
+        return parent::_formatItem($item, $fields, $links);
     }
 }

@@ -170,7 +170,7 @@ class OrderResource extends AbstractResource
                     array('Location' => $response['links'][0]['href'])
                 );
             } catch (\Exception $e) {
-                $this->_logger->err($e->getMessage(), $e);
+                $this->_logger->err($e->getMessage(), $e->getTrace());
                 throw new WebApplicationException(400, $e->getMessage());
             }
         } else {
@@ -425,10 +425,10 @@ class OrderResource extends AbstractResource
             $obj->getQuote()->collectTotals();
             $obj->save();
         } catch(\Mage_Core_Exception $e) {
-            $this->_logger->err($e->getMessage(), $e);
+            $this->_logger->err($e->getMessage(), $e->getTrace());
             throw new WebApplicationException(400, $e->getMessage());
         } catch(\Exception $e) {
-            $this->_logger->err($e->getMessage(), $e);
+            $this->_logger->err($e->getMessage(), $e->getTrace());
             throw new WebApplicationException(500, $e->getMessage());
         }
     }
@@ -567,7 +567,8 @@ class OrderResource extends AbstractResource
                         if (false === $attrId) {
                             throw new WebApplicationException(
                                 400,
-                                "Could not add Product $productUrl -- Attribute value '$reqAttrVal' is invalid for attribute '$attr[label]'"
+                                "Could not add Product $productUrl -- Attribute "
+                                . "value '$reqAttrVal' is invalid for attribute '$attr[label]'"
                             );
                         }
 
@@ -628,8 +629,7 @@ class OrderResource extends AbstractResource
                     } catch (\Mage_Core_Exception $e) {
                         throw new WebApplicationException(
                             400,
-                            "Could not add Product $productUrl -- " .
-                                $e->getMessage()
+                            "Could not add Product $productUrl -- " . $e->getMessage()
                         );
                     }
 
@@ -649,10 +649,10 @@ class OrderResource extends AbstractResource
                     $obj->updateItems($cartUpdates)->save();
                     $cartUpdated = true;
                 } catch(\Mage_Core_Exception $e) {
-                    $this->_logger->err($e->getMessage(), $e);
+                    $this->_logger->err($e->getMessage(), $e->getTrace());
                     throw new WebApplicationException(409, $e->getMessage());
                 } catch(\Exception $e) {
-                    $this->_logger->err($e->getMessage(), $e);
+                    $this->_logger->err($e->getMessage(), $e->getTrace());
                     throw new WebApplicationException(500, $e->getMessage());
                 }
             }

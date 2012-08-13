@@ -175,7 +175,7 @@ class AddressResource extends AbstractResource
         try {
             $address->delete();
         } catch(\Exception $e) {
-            $this->_logger->err($e->getMessage(), $e);
+            $this->_logger->err($e->getMessage(), $e->getTrace());
             throw new WebApplicationException(500, $e);
         }
 

@@ -98,6 +98,26 @@ abstract class AbstractResource
     }
 
     /**
+     * Setter for the incoming HTTP request.
+     *
+     * @param \Sonno\Http\Request\RequestInterface $request
+     */
+    public function setRequest(\Sonno\Http\Request\RequestInterface $request)
+    {
+        $this->_request = $request;
+    }
+
+    /**
+     * Setter for information about the incoming URI.
+     *
+     * @param \Sonno\Uri\UriInfo $uriInfo
+     */
+    public function setUriInfo(\Sonno\Uri\UriInfo $uriInfo)
+    {
+        $this->_uriInfo = $uriInfo;
+    }
+
+    /**
      * Construct a response (application/json) of a entity collection from the
      * local model.
      *
@@ -122,7 +142,10 @@ abstract class AbstractResource
         $results = array();
         foreach ($hollowItems as $hollowItem) {
             $item = $this->_model->load($hollowItem->getId());
-            $results[] = $this->_formatItem($item);
+            $formattedItem = $this->_formatItem($item);;
+            if (false !== $formattedItem) {
+                $results[] = $formattedItem;
+            }
         }
 
         $response = json_encode($results);
@@ -267,7 +290,7 @@ abstract class AbstractResource
             $this->_logger->err($mageException->getMessage());
             throw new WebApplicationException(400, $mageException->getMessage());
         } catch(\Exception $e) {
-            $this->_logger->err($e->getMessage());
+            $this->_logger->err($e->getMessage(), $e->getTrace());
             throw new WebApplicationException(500, $e);
         }
 
@@ -290,8 +313,7 @@ abstract class AbstractResource
         }
 
         $cacheKey = md5(
-            $this->_request->getRequestUri() .
-                http_build_query($this->_request->getQueryParams())
+            $this->_request->getRequestUri() . http_build_query($this->_request->getQueryParams())
         );
 
         if ($this->_cache->contains($cacheKey)) {
@@ -316,8 +338,7 @@ abstract class AbstractResource
     protected function _addCache($value, $lifetime = 0)
     {
         $cacheKey = md5(
-            $this->_request->getRequestUri() .
-                http_build_query($this->_request->getQueryParams())
+            $this->_request->getRequestUri() . http_build_query($this->_request->getQueryParams())
         );
 
         if (0 == $lifetime) {

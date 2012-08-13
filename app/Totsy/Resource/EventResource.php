@@ -75,23 +75,23 @@ class EventResource extends AbstractResource
                 switch ($when) {
                     case 'past':
                         $filters['event_end_date'] = array(
-                            'to' => date('Y-m-d H:m:s'),
+                            'to' => date('Y-m-d H:m:s', $this->_getCurrentTime()),
                             'datetime' => true,
                         );
                         break;
                     case 'current':
                         $filters['event_start_date'] = array(
-                            'to' => date('Y-m-d H:m:s'),
+                            'to' => date('Y-m-d H:m:s', $this->_getCurrentTime()),
                             'datetime' => true,
                         );
                         $filters['event_end_date'] = array(
-                            'from' => date('Y-m-d H:m:s'),
+                            'from' => date('Y-m-d H:m:s', $this->_getCurrentTime()),
                             'datetime' => true,
                         );
                         break;
                     case 'upcoming':
                         $filters['event_start_date'] = array(
-                            'from' => date('Y-m-d H:m:s'),
+                            'from' => date('Y-m-d H:m:s', $this->_getCurrentTime()),
                             'datetime' => true,
                         );
                         break;
@@ -138,7 +138,7 @@ class EventResource extends AbstractResource
             ->addFilter('store_id', 1)
             ->getFirstItem();
 
-        if(is_null($sortEntry)) {
+        if (is_null($sortEntry)) {
             return false;
         }
 

@@ -321,6 +321,11 @@ class OrderResource extends AbstractResource
 
         $quoteData = $quote->getData();
 
+        if ($shippingAddress = $quote->getShippingAddress()) {
+            $formattedData['shipping_amount'] = $shippingAddress['shipping_amount'];
+            $formattedData['tax_amount'] = $shippingAddress['tax_amount'];
+        }
+
         $formattedData['grand_total'] = $quoteData['grand_total'];
         $formattedData['subtotal'] = $quoteData['subtotal'];
         $formattedData['coupon_code'] = isset($quoteData['coupon_code'])
@@ -328,7 +333,7 @@ class OrderResource extends AbstractResource
             : null;
         $formattedData['use_credit'] = isset($quoteData['use_reward_points'])
             ? $quoteData['use_reward_points']
-            : null;
+            : 0;
 
         $builder = $this->_uriInfo->getBaseUriBuilder();
         $builder->resourcePath(
@@ -336,6 +341,7 @@ class OrderResource extends AbstractResource
             'getProductEntity'
         );
 
+        $formattedData['savings_amount'] = 0;
         $formattedData['products'] = array();
         foreach ($cartProducts as $quoteItem) {
             // ignore this quote item if it's a simple product with a parent
@@ -347,8 +353,9 @@ class OrderResource extends AbstractResource
 
             $cartItemData = array(
                 'name' => $quoteItem->getName(),
-                'price' => $quoteItem->getPrice(),
+                'price' => number_format($quoteItem->getPrice(), 2),
                 'qty' => $quoteItem->getQty(),
+                'type' => $quoteItem->getProduct()->getTypeId(),
                 'links' => array(
                     array(
                         'rel' => 'http://rel.totsy.com/entity/product',
@@ -370,6 +377,10 @@ class OrderResource extends AbstractResource
             }
 
             $formattedData['products'][] = $cartItemData;
+
+            $product = $quoteItem->getProduct();
+            $formattedData['savings_amount'] += $quoteItem->getQty()
+                * ($product->getPrice() - $product->getSpecialPrice());
         }
 
         return $formattedData;
@@ -423,6 +434,10 @@ class OrderResource extends AbstractResource
 
         try {
             $obj->getQuote()->collectTotals();
+            if ($shippingAddress = $obj->getQuote()->getShippingAddress()) {
+                $shippingAddress->collectTotals();
+            }
+
             $obj->save();
         } catch(\Mage_Core_Exception $e) {
             $this->_logger->err($e->getMessage(), $e->getTrace());

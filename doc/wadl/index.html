@@ -99,31 +99,31 @@
                 </style></head><body><h1>Totsy REST API Specification</h1><p>
     Last Modified: <time xmlns="http://research.sun.com/wadl/2006/10" datetime="2012-07-11">Jul 11, 2012</time><br xmlns="http://research.sun.com/wadl/2006/10"></br>
     Author: <a xmlns="http://research.sun.com/wadl/2006/10" href="mailto:tbhuvanendran@totsy.com">Tharsan Bhuvanendran &lt;tbhuvanendran@totsy.com&gt;</a>
-  </p><ul><li><a href="#resources">Resources</a><ul><li><a href="#id217962">https://api.totsy.com/event</a><ul><li><a href="#id218124">https://api.totsy.com/event/{event_id}</a><ul><li><a href="#id218209">https://api.totsy.com/event/{event_id}/product</a></li></ul></li></ul></li><li><a href="#id218307">https://api.totsy.com/product</a><ul><li><a href="#id218315">https://api.totsy.com/product/{product_id}</a><ul><li><a href="#id218404">https://api.totsy.com/product/{product_id}/quantity</a></li></ul></li></ul></li><li><a href="#id218473">https://api.totsy.com/auth</a></li><li><a href="#id218595">https://api.totsy.com/user</a><ul><li><a href="#id218683">https://api.totsy.com/user/{user_id}</a><ul><li><a href="#id218861">https://api.totsy.com/user/{user_id}/address</a></li><li><a href="#id218988">https://api.totsy.com/user/{user_id}/order</a></li><li><a href="#id219204">https://api.totsy.com/user/{user_id}/creditcard</a></li></ul></li></ul></li><li><a href="#id219328">https://api.totsy.com/address</a><ul><li><a href="#id219358">https://api.totsy.com/address/{address_id}</a></li></ul></li><li><a href="#id219508">https://api.totsy.com/order</a><ul><li><a href="#id219539">https://api.totsy.com/order/{order_id}</a></li></ul></li><li><a href="#id219636">https://api.totsy.com/creditcard</a><ul><li><a href="#id219665">https://api.totsy.com/creditcard/{creditcard_id}</a></li></ul></li></ul></li><li><a href="#representations">Representations</a><ul><li><a href="#id218059">Event Collection (application/json)</a></li><li><a href="#id218166">Full Event Entity (application/json)</a></li><li><a href="#id218237">Product Collection (application/json)</a></li><li><a href="#id218363">Full Product Entity (application/json)</a></li><li><a href="#id218431">Product Quantity (application/json)</a></li><li><a href="#id218501">Login Request (application/json)</a></li><li><a href="#id218531">User Authorization Entity (application/json)</a></li><li><a href="#id218630">Partial User Entity (application/json)</a></li><li><a href="#id218658">Full User Entity (application/json)</a></li><li><a href="#id218749">Full User Entity (application/json)</a></li><li><a href="#id218792">Partial User Entity (application/json)</a></li><li><a href="#id218817">Full User Entity (application/json)</a></li><li><a href="#id218892">Address Collection (application/json)</a></li><li><a href="#id218936">Partial Address Entity (application/json)</a></li><li><a href="#id218963">Full Address Entity (application/json)</a></li><li><a href="#id219014">Order Collection (application/json)</a></li><li><a href="#id219086">Partial Order Entity (application/json)</a></li><li><a href="#id219125">Full Order Entity (Pending) (application/json)</a></li><li><a href="#id219160">Full Order Entity (Placed) (application/json)</a></li><li><a href="#id219232">Credit Card Collection (application/json)</a></li><li><a href="#id219274">Partial Credit Card Entity (application/json)</a></li><li><a href="#id219302">Full Credit Card Entity (application/json)</a></li><li><a href="#id219419">Full Address Entity (application/json)</a></li><li><a href="#id219456">Partial Address Entity (application/json)</a></li><li><a href="#id219481">Full Address Entity (application/json)</a></li><li><a href="#id219599">Full Order Entity (application/json)</a></li><li><a href="#id219726">Full Credit Card Entity (application/json)</a></li></ul></li></ul><h2 id="resources">Resources</h2><div class="resource"><h3 id="id217962">Event<span class="resource-uri">/event<span class="optional">?when</span></span></h3><span class="resource-uri"></span><p>
+  </p><ul><li><a href="#resources">Resources</a><ul><li><a href="#id271067">https://api.totsy.com/event</a><ul><li><a href="#id271228">https://api.totsy.com/event/{event_id}</a><ul><li><a href="#id271313">https://api.totsy.com/event/{event_id}/product</a></li></ul></li></ul></li><li><a href="#id271411">https://api.totsy.com/product</a><ul><li><a href="#id271420">https://api.totsy.com/product/{product_id}</a><ul><li><a href="#id271512">https://api.totsy.com/product/{product_id}/quantity</a></li></ul></li></ul></li><li><a href="#id271574">https://api.totsy.com/auth</a></li><li><a href="#id271697">https://api.totsy.com/user</a><ul><li><a href="#id271811">https://api.totsy.com/user/{user_id}</a><ul><li><a href="#id272008">https://api.totsy.com/user/{user_id}/address</a></li><li><a href="#id272138">https://api.totsy.com/user/{user_id}/order</a></li><li><a href="#id272353">https://api.totsy.com/user/{user_id}/creditcard</a></li></ul></li></ul></li><li><a href="#id272478">https://api.totsy.com/address</a><ul><li><a href="#id272508">https://api.totsy.com/address/{address_id}</a></li></ul></li><li><a href="#id272658">https://api.totsy.com/order</a><ul><li><a href="#id272689">https://api.totsy.com/order/{order_id}</a></li></ul></li><li><a href="#id272786">https://api.totsy.com/creditcard</a><ul><li><a href="#id272815">https://api.totsy.com/creditcard/{creditcard_id}</a></li></ul></li></ul></li><li><a href="#representations">Representations</a><ul><li><a href="#id271165">Event Collection (application/json)</a></li><li><a href="#id271271">Full Event Entity (application/json)</a></li><li><a href="#id271341">Product Collection (application/json)</a></li><li><a href="#id271470">Full Product Entity (application/json)</a></li><li><a href="#id271538">Product Quantity (application/json)</a></li><li><a href="#id271602">Login Request (application/json)</a></li><li><a href="#id271632">User Authorization Entity (application/json)</a></li><li><a href="#id271428">Partial User Entity (application/json)</a></li><li><a href="#id271779">Full User Entity (application/json)</a></li><li><a href="#id271889">Full User Entity (application/json)</a></li><li><a href="#id271942">Partial User Entity (application/json)</a></li><li><a href="#id271966">Full User Entity (application/json)</a></li><li><a href="#id272038">Address Collection (application/json)</a></li><li><a href="#id272087">Partial Address Entity (application/json)</a></li><li><a href="#id272113">Full Address Entity (application/json)</a></li><li><a href="#id272165">Order Collection (application/json)</a></li><li><a href="#id272236">Partial Order Entity (application/json)</a></li><li><a href="#id272276">Full Order Entity (Pending) (application/json)</a></li><li><a href="#id272311">Full Order Entity (Placed) (application/json)</a></li><li><a href="#id272382">Credit Card Collection (application/json)</a></li><li><a href="#id272425">Partial Credit Card Entity (application/json)</a></li><li><a href="#id272452">Full Credit Card Entity (application/json)</a></li><li><a href="#id272569">Full Address Entity (application/json)</a></li><li><a href="#id272606">Partial Address Entity (application/json)</a></li><li><a href="#id272631">Full Address Entity (application/json)</a></li><li><a href="#id272749">Full Order Entity (application/json)</a></li><li><a href="#id272876">Full Credit Card Entity (application/json)</a></li></ul></li></ul><h2 id="resources">Resources</h2><div class="resource"><h3 id="id271067">Event<span class="resource-uri">/event<span class="optional">?when</span></span></h3><span class="resource-uri"></span><p>
         An Event is a time-limited sale of zero or more Product items.
-      </p><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id217981">GET</h4><p>
+      </p><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id271086">GET</h4><p>
           Retrieve a collection of all active/current Event instances.
-        </p><h6>request query parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>when</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (repeating)</small></p><p><em>One of:</em></p><ul><li><tt>past</tt></li><li><tt>current</tt></li><li><tt>upcoming</tt></li></ul></td><td><p>A comma-separated list of time period names to filter events on.</p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id218059">Event Collection (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id218124">Event Entity<span class="resource-uri">/event/{event_id}</span></h3><span class="resource-uri"></span><p>A single sale Event instance.</p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>event_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique Event identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id218148">GET</h4><p><em>available response representations:</em></p><ul><li><a href="#id218166">Full Event Entity (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id218209">Event Product Collection<span class="resource-uri">/event/{event_id}/product</span></h3><span class="resource-uri"></span><p>Products that are part of an Event.</p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>event_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique Event identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id218217">GET</h4><p><em>available response representations:</em></p><ul><li><a href="#id218237">Product Collection (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id218307">Product<span class="resource-uri">/product</span></h3><span class="resource-uri"></span><p>
+        </p><h6>request query parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>when</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (repeating)</small></p><p><em>One of:</em></p><ul><li><tt>past</tt></li><li><tt>current</tt></li><li><tt>upcoming</tt></li></ul></td><td><p>A comma-separated list of time period names to filter events on.</p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id271165">Event Collection (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id271228">Event Entity<span class="resource-uri">/event/{event_id}</span></h3><span class="resource-uri"></span><p>A single sale Event instance.</p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>event_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique Event identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id271252">GET</h4><p><em>available response representations:</em></p><ul><li><a href="#id271271">Full Event Entity (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id271313">Event Product Collection<span class="resource-uri">/event/{event_id}/product</span></h3><span class="resource-uri"></span><p>Products that are part of an Event.</p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>event_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique Event identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id271322">GET</h4><p><em>available response representations:</em></p><ul><li><a href="#id271341">Product Collection (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id271411">Product<span class="resource-uri">/product</span></h3><span class="resource-uri"></span><p>
         A Product is a single item that is available for sale.
-      </p><h6>Methods</h6><div class="methods"></div></div><div class="resource"><h3 id="id218315">Product Entity<span class="resource-uri">/product/{product_id}</span></h3><span class="resource-uri"></span><p>A single Product instance.</p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>product_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique Product identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id218344">GET</h4><p><em>available response representations:</em></p><ul><li><a href="#id218363">Full Product Entity (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id218404">Product Quantity<span class="resource-uri">/product/{product_id}/quantity</span></h3><span class="resource-uri"></span><p>
+      </p><h6>Methods</h6><div class="methods"></div></div><div class="resource"><h3 id="id271420">Product Entity<span class="resource-uri">/product/{product_id}</span></h3><span class="resource-uri"></span><p>A single Product instance.</p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>product_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique Product identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id271451">GET</h4><p><em>available response representations:</em></p><ul><li><a href="#id271470">Full Product Entity (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id271512">Product Quantity<span class="resource-uri">/product/{product_id}/quantity</span></h3><span class="resource-uri"></span><p>
             The available quantity of a single product.
-          </p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>product_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique Product identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id218413">GET</h4><p><em>available response representations:</em></p><ul><li><a href="#id218431">Product Quantity (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id218473">User Authorization<span class="resource-uri">/auth</span></h3><span class="resource-uri"></span><p>
+          </p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>product_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique Product identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id271520">GET</h4><p><em>available response representations:</em></p><ul><li><a href="#id271538">Product Quantity (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id271574">User Authorization<span class="resource-uri">/auth</span></h3><span class="resource-uri"></span><p>
         A user authorization is the analog to logging into the system on behalf
         of an existing system User in order to perform sensitive operations on
         their behalf.
-      </p><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id218485">POST</h4><p>
+      </p><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id271586">POST</h4><p>
           Login to the system on behalf of an existing system User.
           Upon successful login, an HTTP cookie will be supplied in the response
           to allow further requests on behalf of the logged-in user.
-        </p><p><em>acceptable request representations:</em></p><ul><li><a href="#id218501">Login Request (application/json)</a></li></ul><p><em>available response representations:</em></p><ul><li><a href="#id218531">User Authorization Entity (application/json)</a></li></ul></div><div class="method"><h4 id="id218569">DELETE</h4><p>
+        </p><p><em>acceptable request representations:</em></p><ul><li><a href="#id271602">Login Request (application/json)</a></li></ul><p><em>available response representations:</em></p><ul><li><a href="#id271632">User Authorization Entity (application/json)</a></li></ul></div><div class="method"><h4 id="id271671">DELETE</h4><p>
           Destroy an existing user session and log the system User out of the system.
-        </p></div></div></div><div class="resource"><h3 id="id218595">User<span class="resource-uri">/user</span></h3><span class="resource-uri"></span><p>
+        </p></div></div></div><div class="resource"><h3 id="id271697">User<span class="resource-uri">/user</span></h3><span class="resource-uri"></span><p>
         A system User represents an account that enables the holder to perform
         certain activities, including purchasing Products.
-      </p><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id218608">POST</h4><p>
+      </p><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id271711">POST</h4><p>
             Add a new User to the system.
             NOTE: The <code xmlns="http://research.sun.com/wadl/2006/10">credit</code> property will be ignored when creating or updating users.
-        </p><p><em>acceptable request representations:</em></p><ul><li><a href="#id218630">Partial User Entity (application/json)</a></li></ul><p><em>available response representations:</em></p><ul><li><a href="#id218658">Full User Entity (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id218683">User Entity<span class="resource-uri">/user/{user_id}</span></h3><span class="resource-uri"></span><p>A single system User instance.</p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>user_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique User identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id218730">GET</h4><p>
+        </p><p><em>acceptable request representations:</em></p><ul><li><a href="#id271428">Partial User Entity (application/json)</a></li></ul><p><em>available response representations:</em></p><ul><li><a href="#id271779">Full User Entity (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id271811">User Entity<span class="resource-uri">/user/{user_id}</span></h3><span class="resource-uri"></span><p>A single system User instance.</p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>user_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique User identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id271862">GET</h4><p>
             Retrieve a single User entity.
           </p><h6>request header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
@@ -131,24 +131,24 @@
           </p></td></tr></table><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
             into the system.
-          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id218749">Full User Entity (application/json)</a></li></ul></div><div class="method"><h4 id="id218776">PUT</h4><p>
+          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id271889">Full User Entity (application/json)</a></li></ul></div><div class="method"><h4 id="id271926">PUT</h4><p>
             Update the record of an existing system User.
             NOTE: The <code xmlns="http://research.sun.com/wadl/2006/10">credit</code> property will be ignored when creating or updating users.
           </p><h6>request header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
             into the system.
-          </p></td></tr></table><p><em>acceptable request representations:</em></p><ul><li><a href="#id218792">Partial User Entity (application/json)</a></li></ul><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
+          </p></td></tr></table><p><em>acceptable request representations:</em></p><ul><li><a href="#id271942">Partial User Entity (application/json)</a></li></ul><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
             into the system.
-          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id218817">Full User Entity (application/json)</a></li></ul></div><div class="method"><h4 id="id218842">DELETE</h4><p>Remove the record of an existing system User.</p><h6>request header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
+          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id271966">Full User Entity (application/json)</a></li></ul></div><div class="method"><h4 id="id271992">DELETE</h4><p>Remove the record of an existing system User.</p><h6>request header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
             into the system.
           </p></td></tr></table><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
             into the system.
-          </p></td></tr></table></div></div></div><div class="resource"><h3 id="id218861">User Addresses<span class="resource-uri">/user/{user_id}/address</span></h3><span class="resource-uri"></span><p>
+          </p></td></tr></table></div></div></div><div class="resource"><h3 id="id272008">User Addresses<span class="resource-uri">/user/{user_id}/address</span></h3><span class="resource-uri"></span><p>
             The collection of all Address instances associated with a system User.
-          </p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>user_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique User identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id218872">GET</h4><p>
+          </p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>user_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique User identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id272018">GET</h4><p>
               Retrieve all Addresses associated with a system User.
             </p><h6>request header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
@@ -156,22 +156,22 @@
           </p></td></tr></table><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
             into the system.
-          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id218892">Address Collection (application/json)</a></li></ul></div><div class="method"><h4 id="id218925">POST</h4><p>
+          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id272038">Address Collection (application/json)</a></li></ul></div><div class="method"><h4 id="id272075">POST</h4><p>
               Add a new Address to an existing system User.
            </p><h6>request header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
             into the system.
-          </p></td></tr></table><p><em>acceptable request representations:</em></p><ul><li><a href="#id218936">Partial Address Entity (application/json)</a></li></ul><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
+          </p></td></tr></table><p><em>acceptable request representations:</em></p><ul><li><a href="#id272087">Partial Address Entity (application/json)</a></li></ul><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
             into the system.
-          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id218963">Full Address Entity (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id218988">User Orders<span class="resource-uri">/user/{user_id}/order</span></h3><span class="resource-uri"></span><p>
+          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id272113">Full Address Entity (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id272138">User Orders<span class="resource-uri">/user/{user_id}/order</span></h3><span class="resource-uri"></span><p>
             The collection of all orders that a user has ever placed.
-          </p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>user_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique User identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id218997">GET</h4><p>
+          </p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>user_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique User identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id272148">GET</h4><p>
               Retrieve the collection of all orders that a user has ever placed.
             </p><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
             into the system.
-          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id219014">Order Collection (application/json)</a></li></ul></div><div class="method"><h4 id="id219065">POST</h4><p>
+          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id272165">Order Collection (application/json)</a></li></ul></div><div class="method"><h4 id="id272216">POST</h4><p>
               Submit a new Order for this user. An order is intially created
               with one or more product items, and is assigned an expiration date.
               Then an order can be continually updated with more items, which
@@ -183,18 +183,18 @@
             </p><h6>request header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
             into the system.
-          </p></td></tr></table><p><em>acceptable request representations:</em></p><ul><li><a href="#id219086">Partial Order Entity (application/json)</a></li></ul><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
+          </p></td></tr></table><p><em>acceptable request representations:</em></p><ul><li><a href="#id272236">Partial Order Entity (application/json)</a></li></ul><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
             into the system.
-          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id219125">Full Order Entity (Pending) (application/json)</a></li></ul><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
+          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id272276">Full Order Entity (Pending) (application/json)</a></li></ul><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
             into the system.
-          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id219160">Full Order Entity (Placed) (application/json)</a></li></ul><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
+          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id272311">Full Order Entity (Placed) (application/json)</a></li></ul><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
             into the system.
-          </p></td></tr></table></div></div></div><div class="resource"><h3 id="id219204">User Credit Cards<span class="resource-uri">/user/{user_id}/creditcard</span></h3><span class="resource-uri"></span><p>
+          </p></td></tr></table></div></div></div><div class="resource"><h3 id="id272353">User Credit Cards<span class="resource-uri">/user/{user_id}/creditcard</span></h3><span class="resource-uri"></span><p>
             The collection of all Credit Cards saved for a system User.
-          </p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>user_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique User identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id219213">GET</h4><p>
+          </p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>user_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique User identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id272363">GET</h4><p>
               Retrieve a collection of all user Credit Cards.
             </p><h6>request header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
@@ -202,47 +202,47 @@
           </p></td></tr></table><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
             into the system.
-          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id219232">Credit Card Collection (application/json)</a></li></ul></div><div class="method"><h4 id="id219262">POST</h4><p>
+          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id272382">Credit Card Collection (application/json)</a></li></ul></div><div class="method"><h4 id="id272413">POST</h4><p>
               Add a new User Credit Card to the system.
             </p><h6>request header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
             into the system.
-          </p></td></tr></table><p><em>acceptable request representations:</em></p><ul><li><a href="#id219274">Partial Credit Card Entity (application/json)</a></li></ul><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
+          </p></td></tr></table><p><em>acceptable request representations:</em></p><ul><li><a href="#id272425">Partial Credit Card Entity (application/json)</a></li></ul><h6>response header parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>Cookie</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
             The HTTP cookie provided by the server when logging a system User
             into the system.
-          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id219302">Full Credit Card Entity (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id219328">Address<span class="resource-uri">/address</span></h3><span class="resource-uri"></span><p>
+          </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id272452">Full Credit Card Entity (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id272478">Address<span class="resource-uri">/address</span></h3><span class="resource-uri"></span><p>
         An Address represents a physical real-world location that is used to
         ship products to, or as a billing address.
-      </p><h6>Methods</h6><div class="methods"></div></div><div class="resource"><h3 id="id219358">Address Entity<span class="resource-uri">/address/{address_id}</span></h3><span class="resource-uri"></span><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>address_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique address identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id219384">DELETE</h4><p>Delete an existing Address.</p><h6>request query parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>auth_token</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
+      </p><h6>Methods</h6><div class="methods"></div></div><div class="resource"><h3 id="id272508">Address Entity<span class="resource-uri">/address/{address_id}</span></h3><span class="resource-uri"></span><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>address_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique address identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id272534">DELETE</h4><p>Delete an existing Address.</p><h6>request query parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>auth_token</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
           The authorization token granted to the client to perform sensitive
           operations on behalf of a User.
-        </p></td></tr></table></div><div class="method"><h4 id="id219400">GET</h4><p>Retrieve a single Address instance.</p><h6>request query parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>auth_token</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
+        </p></td></tr></table></div><div class="method"><h4 id="id272550">GET</h4><p>Retrieve a single Address instance.</p><h6>request query parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>auth_token</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
           The authorization token granted to the client to perform sensitive
           operations on behalf of a User.
-        </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id219419">Full Address Entity (application/json)</a></li></ul></div><div class="method"><h4 id="id219443">PUT</h4><p>Update the record of an existing Address instance.</p><h6>request query parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>auth_token</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
+        </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id272569">Full Address Entity (application/json)</a></li></ul></div><div class="method"><h4 id="id272593">PUT</h4><p>Update the record of an existing Address instance.</p><h6>request query parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>auth_token</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
           The authorization token granted to the client to perform sensitive
           operations on behalf of a User.
-        </p></td></tr></table><p><em>acceptable request representations:</em></p><ul><li><a href="#id219456">Partial Address Entity (application/json)</a></li></ul><p><em>available response representations:</em></p><ul><li><a href="#id219481">Full Address Entity (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id219508">Order<span class="resource-uri">/order</span></h3><span class="resource-uri"></span><p>
+        </p></td></tr></table><p><em>acceptable request representations:</em></p><ul><li><a href="#id272606">Partial Address Entity (application/json)</a></li></ul><p><em>available response representations:</em></p><ul><li><a href="#id272631">Full Address Entity (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id272658">Order<span class="resource-uri">/order</span></h3><span class="resource-uri"></span><p>
         An Order is a collection of Product entities and their corresponding quantities that a User purchases.
-      </p><h6>Methods</h6><div class="methods"></div></div><div class="resource"><h3 id="id219539">Order Entity<span class="resource-uri">/order/{order_id}</span></h3><span class="resource-uri"></span><p>A single Order instance.</p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>order_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique Order identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id219564">DELETE</h4><p>Delete an existing Order.</p><h6>request query parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>auth_token</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
+      </p><h6>Methods</h6><div class="methods"></div></div><div class="resource"><h3 id="id272689">Order Entity<span class="resource-uri">/order/{order_id}</span></h3><span class="resource-uri"></span><p>A single Order instance.</p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>order_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique Order identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id272714">DELETE</h4><p>Delete an existing Order.</p><h6>request query parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>auth_token</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
           The authorization token granted to the client to perform sensitive
           operations on behalf of a User.
-        </p></td></tr></table></div><div class="method"><h4 id="id219583">GET</h4><p>
+        </p></td></tr></table></div><div class="method"><h4 id="id272733">GET</h4><p>
             Retrieve a single Order entity instance.
-          </p><p><em>available response representations:</em></p><ul><li><a href="#id219599">Full Order Entity (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id219636">Credit Card<span class="resource-uri">/creditcard</span></h3><span class="resource-uri"></span><p>
+          </p><p><em>available response representations:</em></p><ul><li><a href="#id272749">Full Order Entity (application/json)</a></li></ul></div></div></div><div class="resource"><h3 id="id272786">Credit Card<span class="resource-uri">/creditcard</span></h3><span class="resource-uri"></span><p>
         A Credit Card represents a payment method whose information is saved by
         the system for the user for future purchases.
-      </p><h6>Methods</h6><div class="methods"></div></div><div class="resource"><h3 id="id219665">Credit Card Entity<span class="resource-uri">/creditcard/{creditcard_id}</span></h3><span class="resource-uri"></span><p>
+      </p><h6>Methods</h6><div class="methods"></div></div><div class="resource"><h3 id="id272815">Credit Card Entity<span class="resource-uri">/creditcard/{creditcard_id}</span></h3><span class="resource-uri"></span><p>
           A single Credit Card Entity instance.
-        </p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>creditcard_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique Credit Card identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id219690">DELETE</h4><p>Delete an existing Credit Card.</p><h6>request query parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>auth_token</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
+        </p><h6>resource-wide template parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>creditcard_id</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em></p></td><td><p>The unique Credit Card identifier.</p></td></tr></table><h6>Methods</h6><div class="methods"><div class="method"><h4 id="id272840">DELETE</h4><p>Delete an existing Credit Card.</p><h6>request query parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>auth_token</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
           The authorization token granted to the client to perform sensitive
           operations on behalf of a User.
-        </p></td></tr></table></div><div class="method"><h4 id="id219707">GET</h4><p>
+        </p></td></tr></table></div><div class="method"><h4 id="id272857">GET</h4><p>
             Retrieve a single Credit Card Entity instance.
           </p><h6>request query parameters</h6><table><tr><th>parameter</th><th>value</th><th>description</th></tr><tr><td><p><strong>auth_token</strong></p></td><td><p><em><a href="http://www.w3.org/TR/xmlschema-2/#string">string</a></em><small> (required)</small></p></td><td><p>
           The authorization token granted to the client to perform sensitive
           operations on behalf of a User.
-        </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id219726">Full Credit Card Entity (application/json)</a></li></ul></div></div></div><h2 id="representations">Representations</h2><h3 id="id218059">Event Collection (application/json)</h3><p>
+        </p></td></tr></table><p><em>available response representations:</em></p><ul><li><a href="#id272876">Full Credit Card Entity (application/json)</a></li></ul></div></div></div><h2 id="representations">Representations</h2><h3 id="id271165">Event Collection (application/json)</h3><p>
               <pre xmlns="http://research.sun.com/wadl/2006/10">
 [
     {
@@ -336,7 +336,7 @@
     }
 ]
               </pre>
-            </p><h3 id="id218166">Full Event Entity (application/json)</h3><p>
+            </p><h3 id="id271271">Full Event Entity (application/json)</h3><p>
                 <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "name": "Event02",
@@ -369,7 +369,7 @@
     ]
 }
                 </pre>
-              </p><h3 id="id218237">Product Collection (application/json)</h3><p>
+              </p><h3 id="id271341">Product Collection (application/json)</h3><p>
                   <pre xmlns="http://research.sun.com/wadl/2006/10">
 [
     {
@@ -518,7 +518,7 @@
     }
 ]
                   </pre>
-                </p><h3 id="id218363">Full Product Entity (application/json)</h3><p>
+                </p><h3 id="id271470">Full Product Entity (application/json)</h3><p>
                 <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "name": "Blue Umbrella Blowout",
@@ -573,20 +573,20 @@
     ]
 }
                 </pre>
-              </p><h3 id="id218431">Product Quantity (application/json)</h3><p>
+              </p><h3 id="id271538">Product Quantity (application/json)</h3><p>
                   <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "quantity": 10
 }
                   </pre>
-                </p><h3 id="id218501">Login Request (application/json)</h3><p>
+                </p><h3 id="id271602">Login Request (application/json)</h3><p>
               <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "email": "...",
     "password": "..."
 }
               </pre>
-            </p><h3 id="id218531">User Authorization Entity (application/json)</h3><p>
+            </p><h3 id="id271632">User Authorization Entity (application/json)</h3><p>
               <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "links": [
@@ -597,7 +597,7 @@
     ]
 }
               </pre>
-            </p><h3 id="id218630">Partial User Entity (application/json)</h3><p>
+            </p><h3 id="id271428">Partial User Entity (application/json)</h3><p>
               <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "email": "tbhuvanendran@totsy.com",
@@ -607,7 +607,7 @@
     "confirmation": "123456789"
 }
               </pre>
-            </p><h3 id="id218658">Full User Entity (application/json)</h3><p>
+            </p><h3 id="id271779">Full User Entity (application/json)</h3><p>
               <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "email": "tbhuvanendran@totsy.com",
@@ -636,7 +636,7 @@
     ]
 }
               </pre>
-            </p><h3 id="id218749">Full User Entity (application/json)</h3><p>
+            </p><h3 id="id271889">Full User Entity (application/json)</h3><p>
                 <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "email": "tbhuvanendran@totsy.com",
@@ -665,7 +665,7 @@
     ]
 }
                 </pre>
-              </p><h3 id="id218792">Partial User Entity (application/json)</h3><p>
+              </p><h3 id="id271942">Partial User Entity (application/json)</h3><p>
                 <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "email": "tbhuvanendran@totsy.com",
@@ -675,7 +675,7 @@
     "confirmation": "monkeywrench"
 }
                 </pre>
-              </p><h3 id="id218817">Full User Entity (application/json)</h3><p>
+              </p><h3 id="id271966">Full User Entity (application/json)</h3><p>
                 <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "email": "tbhuvanendran@totsy.com",
@@ -704,7 +704,7 @@
     ]
 }
                 </pre>
-              </p><h3 id="id218892">Address Collection (application/json)</h3><p>
+              </p><h3 id="id272038">Address Collection (application/json)</h3><p>
                   <pre xmlns="http://research.sun.com/wadl/2006/10">
 [
     {
@@ -757,7 +757,7 @@
     }
 ]
                   </pre>
-                </p><h3 id="id218936">Partial Address Entity (application/json)</h3><p>
+                </p><h3 id="id272087">Partial Address Entity (application/json)</h3><p>
                   <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "firstname": "Maya",
@@ -774,7 +774,7 @@
     "default_shipping": true
 }
                   </pre>
-                </p><h3 id="id218963">Full Address Entity (application/json)</h3><p>
+                </p><h3 id="id272113">Full Address Entity (application/json)</h3><p>
                   <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "firstname": "Maya",
@@ -801,7 +801,7 @@
     ]
 }
                   </pre>
-                </p><h3 id="id219014">Order Collection (application/json)</h3><p>
+                </p><h3 id="id272165">Order Collection (application/json)</h3><p>
                   <pre xmlns="http://research.sun.com/wadl/2006/10">
 [
     {
@@ -936,7 +936,7 @@
     }
 ]
                   </pre>
-                </p><h3 id="id219086">Partial Order Entity (application/json)</h3><p>
+                </p><h3 id="id272236">Partial Order Entity (application/json)</h3><p>
                   <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "coupon_code": "DISCOUNT",
@@ -1002,19 +1002,23 @@
     }
 }
                   </pre>
-                </p><h3 id="id219125">Full Order Entity (Pending) (application/json)</h3><p>
+                </p><h3 id="id272276">Full Order Entity (Pending) (application/json)</h3><p>
                   <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
-    "expires": "374",
-    "grand_total": 69.80,
-    "subtotal": 72.5,
-    "coupon_code": "DISCOUNT",
-    "use_credit": 1,
+    "expires" : 893,
+    "shipping_amount" : 7.95,
+    "tax_amount" : 1.59,
+    "grand_total" : 19.54,
+    "subtotal" : 10,
+    "coupon_code" : null,
+    "use_credit" : 0,
+    "savings_amount" : 10,
     "products": [
         {
             "name": "Giggle Giggle Quack",
-            "price": "10.5000",
-            "qty": 5,
+            "price": "15.50",
+            "qty": 1,
+            "type": "configurable",
             "attributes": {
                 "Size": "0-3M",
                 "Color": "Green"
@@ -1028,12 +1032,9 @@
         },
         {
             "name": "Blue Umbrella Blowout",
-            "price": "10.0000",
+            "price": "10.00",
             "qty": 2,
-            "attributes": {
-                "Size": "0-3M",
-                "Color": "Green"
-            },
+            "type": "simple",
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/product",
@@ -1044,7 +1045,7 @@
     ]
 }
                   </pre>
-                </p><h3 id="id219160">Full Order Entity (Placed) (application/json)</h3><p>
+                </p><h3 id="id272311">Full Order Entity (Placed) (application/json)</h3><p>
                   <pre xmlns="http://research.sun.com/wadl/2006/10">
 
 {
@@ -1113,7 +1114,7 @@
     ]
 }
                   </pre>
-                </p><h3 id="id219232">Credit Card Collection (application/json)</h3><p>
+                </p><h3 id="id272382">Credit Card Collection (application/json)</h3><p>
                   <pre xmlns="http://research.sun.com/wadl/2006/10">
 [
     {
@@ -1150,7 +1151,7 @@
     }
 ]
                   </pre>
-                </p><h3 id="id219274">Partial Credit Card Entity (application/json)</h3><p>
+                </p><h3 id="id272425">Partial Credit Card Entity (application/json)</h3><p>
                   <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "type": "VI",
@@ -1177,7 +1178,7 @@
     ]
 }
                   </pre>
-                </p><h3 id="id219302">Full Credit Card Entity (application/json)</h3><p>
+                </p><h3 id="id272452">Full Credit Card Entity (application/json)</h3><p>
                   <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "type": "MC",
@@ -1196,7 +1197,7 @@
     ]
 }
                   </pre>
-                </p><h3 id="id219419">Full Address Entity (application/json)</h3><p>
+                </p><h3 id="id272569">Full Address Entity (application/json)</h3><p>
                 <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "firstname": "Stephen",
@@ -1223,7 +1224,7 @@
     ]
 }
                 </pre>
-              </p><h3 id="id219456">Partial Address Entity (application/json)</h3><p>
+              </p><h3 id="id272606">Partial Address Entity (application/json)</h3><p>
                 <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "firstname": "Stephen",
@@ -1240,7 +1241,7 @@
     "default_shipping": false
 }
                 </pre>
-              </p><h3 id="id219481">Full Address Entity (application/json)</h3><p>
+              </p><h3 id="id272631">Full Address Entity (application/json)</h3><p>
                 <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "firstname": "Stephen",
@@ -1267,7 +1268,7 @@
     ]
 }
                 </pre>
-              </p><h3 id="id219599">Full Order Entity (application/json)</h3><p>
+              </p><h3 id="id272749">Full Order Entity (application/json)</h3><p>
                 <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "number": "1000283",
@@ -1335,7 +1336,7 @@
     ]
 }
                 </pre>
-              </p><h3 id="id219726">Full Credit Card Entity (application/json)</h3><p>
+              </p><h3 id="id272876">Full Credit Card Entity (application/json)</h3><p>
                 <pre xmlns="http://research.sun.com/wadl/2006/10">
 {
     "type": "MC",

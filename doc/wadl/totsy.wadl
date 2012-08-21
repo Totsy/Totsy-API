@@ -1069,9 +1069,10 @@
     "products": [
         {
             "name": "Giggle Giggle Quack",
-            "price": "15.50",
+            "price": "15.5000",
             "qty": 1,
             "type": "configurable",
+            "estimated_shipping": "2012-06-30",
             "attributes": {
                 "Size": "0-3M",
                 "Color": "Green"
@@ -1085,9 +1086,10 @@
         },
         {
             "name": "Blue Umbrella Blowout",
-            "price": "10.00",
+            "price": "10.0000",
             "qty": 2,
             "type": "simple",
+            "estimated_shipping": "2012-06-30",
             "links": [
                 {
                     "rel": "http://rel.totsy.com/entity/product",

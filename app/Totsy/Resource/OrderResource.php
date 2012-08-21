@@ -341,6 +341,8 @@ class OrderResource extends AbstractResource
             'getProductEntity'
         );
 
+        $estimatedShipping = Mage::helper('sales/order')->calculateEstimatedShipDate($quote);
+
         $formattedData['savings_amount'] = 0;
         $formattedData['products'] = array();
         foreach ($cartProducts as $quoteItem) {
@@ -353,7 +355,7 @@ class OrderResource extends AbstractResource
 
             $cartItemData = array(
                 'name' => $quoteItem->getName(),
-                'price' => number_format($quoteItem->getPrice(), 2),
+                'price' => $quoteItem->getPrice(),
                 'qty' => $quoteItem->getQty(),
                 'type' => $quoteItem->getProduct()->getTypeId(),
                 'links' => array(
@@ -374,6 +376,13 @@ class OrderResource extends AbstractResource
                 }
 
                 $cartItemData['attributes'] = $productAttributes;
+            }
+
+            if ('virtual' != $quoteItem->getProductType()) {
+                $cartItemData['estimated_shipping'] = date(
+                    'Y-m-d',
+                    $estimatedShipping
+                );
             }
 
             $formattedData['products'][] = $cartItemData;

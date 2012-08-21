@@ -39,7 +39,7 @@
         "name": "Event01",
         "description": "The Smocked Boutique by Candlyand Kids offers a collection of hand embroidered dresses",
         "short_description": "The Smocked Boutique by Candlyand",
-        "discount_pct": 50,
+        "max_discount_pct": 50,
         "department": [
             "accessories"
         ],
@@ -72,7 +72,7 @@
         "name": "Event02",
         "description": "You and your girl can amp up your accessory collections with fun and stretchy LED watches by Popochos. Featuring their signature oblong LED screen, these cool digital timepieces will match any outfit, with easy snap-on covers that change your look in an instant. Choose from a wide range of covers with animal prints for the wild child of the family, or luscious lips for the sweet and sassy!",
         "short_description": "Stretchy LED watches by Popochos",
-        "discount_pct": 50,
+        "max_discount_pct": 50,
         "department": [],
         "age": [
             "0_6m",
@@ -102,7 +102,7 @@
         "name": "Event03",
         "description": "Remain chic, confident and ready for anything with Perry Mackin bags.  Stylishly structured for carry-all convenience that any haute mama will appreciate, this selection of diaper bags boasts plenty of pockets, easy accessibility and water-resistant construction. They're the ideal complement to your busy lifestyle without sacrificing fashion.",
         "short_description": "Perry Mackin bags",
-        "discount_pct": 50,
+        "max_discount_pct": 50,
         "department": [],
         "age": [],
         "start": "2012-03-06 11:50:00",
@@ -148,7 +148,7 @@
     "name": "Event02",
     "description": "You and your girl can amp up your accessory collections with fun and stretchy LED watches by Popochos. Featuring their signature oblong LED screen, these cool digital timepieces will match any outfit, with easy snap-on covers that change your look in an instant. Choose from a wide range of covers with animal prints for the wild child of the family, or luscious lips for the sweet and sassy!",
     "short_description": "Stretchy LED watches by Popochos",
-    "discount_pct": 50,
+    "max_discount_pct": 50,
     "department": [],
     "age": [
         "0_6m",

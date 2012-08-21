@@ -29,7 +29,7 @@ class EventResource extends AbstractResource
         'name',
         'description',
         'short_description',
-        'discount_pct',
+        'max_discount_pct',
         'department',
         'age',
         'start'  => 'event_start_date',
@@ -161,11 +161,8 @@ class EventResource extends AbstractResource
         // build the result, ignoring events without products or upcoming events
         $results = array();
         foreach ($queue as $categoryInfo) {
-            $category = $this->_model->load($categoryInfo['entity_id']);
-            $formattedEvent = $this->_formatItem($category);
-            if (false !== $formattedEvent &&
-                strtotime($categoryInfo['event_start_date']) < $this->_getCurrentTime()
-            ) {
+            $formattedEvent = $this->_formatItem($categoryInfo);
+            if (false !== $formattedEvent) {
                 $results[] = $formattedEvent;
             }
         }
@@ -177,107 +174,53 @@ class EventResource extends AbstractResource
      * Add formatted fields to item data before deferring to the default
      * item formatting.
      *
-     * @param $item array|Mage_Core_Model_Abstract
+     * @param $item array
      * @param $fields null|array
      * @param $links null|array
      * @return array|bool
      */
     protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
-        $sourceData    = $item->getData();
-        $formattedData = array();
-
         $imageBaseUrl = \Mage::getBaseUrl() . 'media/catalog/category/';
-
-        // scrape together department & age data from event products
-        $formattedData['department'] = array();
-        $formattedData['age'] = array();
-        $formattedData['discount_pct'] = 0;
-
-        $products = $item->getProductCollection()
-            ->addAttributeToSelect('departments')
-            ->addAttributeToSelect('ages')
-            ->addAttributeToSelect('price')
-            ->addAttributeToSelect('special_price');
-
-        if (!count($products)) {
-            return false;
-        }
-
-        foreach ($products as $product) {
-            $departments = $product->getAttributeText('departments');
-            $ages = $product->getAttributeText('ages');
-
-            if (is_array($departments)) {
-                $formattedData['department'] = $formattedData['department']
-                    + $departments;
-            } else if (is_string($departments)) {
-                $formattedData['department'][] = $departments;
-            }
-
-            if (is_array($ages)) {
-                $formattedData['age'] = $formattedData['age']
-                    + $ages;
-            } else if (is_string($ages)) {
-                $formattedData['age'][] = $ages;
-            }
-
-            // calculate discount percentage for the event
-            $priceDiff = $product->getPrice() - $product->getSpecialPrice();
-            if ($product->getPrice()) {
-                $discount = round($priceDiff / $product->getPrice() * 100);
-                $formattedData['discount_pct'] = max(
-                    $formattedData['discount_pct'],
-                    $discount
-                );
-            }
-        }
-
-        $formattedData['department'] = array_values(
-            array_unique($formattedData['department'])
-        );
-        $formattedData['age'] = array_values(
-            array_unique($formattedData['age'])
-        );
 
         // construct an object literal for event images
         $skinPlaceholderUrl = \Mage::getBaseUrl()
             . 'skin/frontend/enterprise/harapartners/images/catalog/product/placeholder/';
-        $formattedData['image'] = array(
+        $item['image'] = array(
             'default'   => $skinPlaceholderUrl . 'image.jpg',
             'small'     => $skinPlaceholderUrl . 'small.jpg',
             'thumbnail' => $skinPlaceholderUrl . 'thumbnail.jpg',
         );
 
         // 'default' image
-        if (isset($sourceData['default_image']) &&
-            !is_array($sourceData['default_image'])
+        if (isset($item['default_image']) &&
+            !is_array($item['default_image'])
         ) {
             $formattedData['image']['default'] = $imageBaseUrl
-                . $sourceData['default_image'];
-        } else if (isset($sourceData['image']) &&
-            !is_array($sourceData['image'])
+                . $item['default_image'];
+        } else if (isset($item['image']) &&
+            !is_array($item['image'])
         ) {
             $formattedData['image']['default'] = $imageBaseUrl
-                . $sourceData['image'];
+                . $item['image'];
         }
 
         // 'small' image
-        if (isset($sourceData['small_image'])) {
+        if (isset($item['small_image'])) {
             $formattedData['image']['small'] = $imageBaseUrl
-                . $sourceData['small_image'];
+                . $item['small_image'];
         }
 
         // 'thumbnail' image
-        if (isset($sourceData['thumbnail'])) {
+        if (isset($item['thumbnail'])) {
             $formattedData['image']['thumbnail'] = $imageBaseUrl
-                . $sourceData['thumbnail'];
+                . $item['thumbnail'];
         }
 
         // 'logo' image
-        if (isset($sourceData['logo'])) {
+        if (isset($item['logo'])) {
             $formattedData['image']['logo'] = $imageBaseUrl
-                . $sourceData['logo'];
+                . $item['logo'];
         }
 
         if (empty($links)) {
@@ -285,13 +228,12 @@ class EventResource extends AbstractResource
         }
 
         $eventUrl = \Mage::getBaseUrl() .
-            'sales/' . $sourceData['url_key'] . '.html';
+            'sales/' . $item['url_key'] . '.html';
         $links[] = array(
             'rel' => 'alternate',
             'href' => $eventUrl
         );
 
-        $item->addData($formattedData);
         return parent::_formatItem($item, $fields, $links);
     }
 }

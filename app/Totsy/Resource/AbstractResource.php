@@ -179,9 +179,13 @@ abstract class AbstractResource
      */
     protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
-        $sourceData    = ($item instanceof \Mage_Core_Model_Abstract)
-            ? $item->getData()
-            : array();
+        $sourceData = array();
+        if ($item instanceof \Mage_Core_Model_Abstract) {
+            $sourceData = $item->getData();
+        } else if (is_array($item)) {
+            $sourceData = $item;
+        }
+
         $formattedData = array();
 
         if (is_null($fields)) {

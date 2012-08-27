@@ -13,7 +13,7 @@ stg:
     filename: /var/log/rest-api.log
 prd:
   - handler: file
-    level: WARN
+    level: WARNING
     filename: /var/log/rest-api.log
   - handler: mail
     level: CRITICAL

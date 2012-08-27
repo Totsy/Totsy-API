@@ -281,10 +281,7 @@ abstract class AbstractResource
         if (method_exists($obj, 'validate')) {
             $validationErrors = $obj->validate();
             if (is_array($validationErrors) && count($validationErrors)) {
-                throw new WebApplicationException(
-                    400,
-                    "Entity Validation Error: " . $validationErrors[0]
-                );
+                throw new WebApplicationException(400, $validationErrors[0]);
             }
         }
 

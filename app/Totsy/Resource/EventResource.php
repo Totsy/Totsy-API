@@ -92,6 +92,7 @@ class EventResource extends AbstractResource
                     case 'upcoming':
                         $filters['event_start_date'] = array(
                             'from' => date('Y-m-d H:m:s', $this->_getCurrentTime()),
+                            'to'   => date('Y-m-d H:m:s', $this->_getCurrentTime() + 5 * 24 * 60 * 60),
                             'datetime' => true,
                         );
                         break;
@@ -162,7 +163,12 @@ class EventResource extends AbstractResource
         $results = array();
         foreach ($queue as $categoryInfo) {
             $formattedEvent = $this->_formatItem($categoryInfo);
-            if (false !== $formattedEvent) {
+            if (false !== $formattedEvent &&
+                (
+                    'upcoming' == $this->_request->getQueryParam('when') ||
+                    strtotime($categoryInfo['event_start_date']) < $this->_getCurrentTime()
+                )
+            ) {
                 $results[] = $formattedEvent;
             }
         }
@@ -181,59 +187,56 @@ class EventResource extends AbstractResource
      */
     protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
+        $data = array();
+        if ($item instanceof \Mage_Core_Model_Abstract) {
+            $data = $item->getData();
+        } else if (is_array($item)) {
+            $data = $item;
+        }
+
         $imageBaseUrl = \Mage::getBaseUrl() . 'media/catalog/category/';
 
         // construct an object literal for event images
         $skinPlaceholderUrl = \Mage::getBaseUrl()
             . 'skin/frontend/enterprise/harapartners/images/catalog/product/placeholder/';
-        $item['image'] = array(
+        $data['image'] = array(
             'default'   => $skinPlaceholderUrl . 'image.jpg',
             'small'     => $skinPlaceholderUrl . 'small.jpg',
             'thumbnail' => $skinPlaceholderUrl . 'thumbnail.jpg',
         );
 
         // 'default' image
-        if (isset($item['default_image']) &&
-            !is_array($item['default_image'])
-        ) {
-            $formattedData['image']['default'] = $imageBaseUrl
-                . $item['default_image'];
-        } else if (isset($item['image']) &&
-            !is_array($item['image'])
-        ) {
-            $formattedData['image']['default'] = $imageBaseUrl
-                . $item['image'];
+        if (isset($data['default_image']) && !is_array($data['default_image'])) {
+            $data['image']['default'] = $imageBaseUrl . $data['default_image'];
+        } else if (isset($data['image']) && !is_array($data['image'])) {
+            $data['image']['default'] = $imageBaseUrl . $data['image'];
         }
 
         // 'small' image
-        if (isset($item['small_image'])) {
-            $formattedData['image']['small'] = $imageBaseUrl
-                . $item['small_image'];
+        if (isset($data['small_image'])) {
+            $data['image']['small'] = $imageBaseUrl . $data['small_image'];
         }
 
         // 'thumbnail' image
-        if (isset($item['thumbnail'])) {
-            $formattedData['image']['thumbnail'] = $imageBaseUrl
-                . $item['thumbnail'];
+        if (isset($data['thumbnail'])) {
+            $data['image']['thumbnail'] = $imageBaseUrl . $data['thumbnail'];
         }
 
         // 'logo' image
-        if (isset($item['logo'])) {
-            $formattedData['image']['logo'] = $imageBaseUrl
-                . $item['logo'];
+        if (isset($data['logo'])) {
+            $data['image']['logo'] = $imageBaseUrl . $data['logo'];
         }
 
         if (empty($links)) {
             $links = $this->_links;
         }
 
-        $eventUrl = \Mage::getBaseUrl() .
-            'sales/' . $item['url_key'] . '.html';
+        $eventUrl = \Mage::getBaseUrl() . 'sales/' . $data['url_key'] . '.html';
         $links[] = array(
             'rel' => 'alternate',
             'href' => $eventUrl
         );
 
-        return parent::_formatItem($item, $fields, $links);
+        return parent::_formatItem($data, $fields, $links);
     }
 }

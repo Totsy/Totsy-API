@@ -52,21 +52,6 @@ abstract class AbstractResource
     protected $_model;
 
     /**
-     * The local cache data store.
-     *
-     * @var Doctrine\Common\Cache\CacheProvider
-     */
-    protected $_cache;
-
-    /**
-     * The default lifetime for cache entries added by this resource class.
-     * Expressed in seconds.
-     *
-     * @var int
-     */
-    protected $_cacheEntryLifetime = 60;
-
-    /**
      * The incoming HTTP request.
      *
      * @var \Sonno\Http\Request\RequestInterface
@@ -94,7 +79,6 @@ abstract class AbstractResource
         $this->_model = Mage::getSingleton($this->_modelGroupName);
 
         $this->_initLogger();
-        $this->_initCache();
     }
 
     /**
@@ -313,16 +297,18 @@ abstract class AbstractResource
             return false;
         }
 
-        $cacheKey = md5(
+        $cache = Mage::app()->getCache();
+
+        $cacheKey = 'RESTAPI_' . md5(
             $this->_request->getRequestUri() . http_build_query($this->_request->getQueryParams())
         );
 
-        if ($this->_cache->contains($cacheKey)) {
+        if ($cache->test($cacheKey)) {
             $this->_logger->info(
                 'Delivering content from cache',
                 array('key' => $cacheKey)
             );
-            return $this->_cache->fetch($cacheKey);
+            return $cache->load($cacheKey);
         }
 
         return false;
@@ -332,31 +318,32 @@ abstract class AbstractResource
      * Add a new entry to the local cache store.
      *
      * @param mixed $value The object to store.
-     * @param int   $lifetime The lifetime of the cache entry (in seconds)
      *
      * @return bool TRUE when the cache entry was added successfully.
      */
-    protected function _addCache($value, $lifetime = 0)
+    protected function _addCache($value, $tags = array())
     {
-        $cacheKey = md5(
+        if (!is_array($tags)) {
+            $tags = array($tags);
+        }
+
+        $cacheKey = 'RESTAPI_' . md5(
             $this->_request->getRequestUri() . http_build_query($this->_request->getQueryParams())
         );
 
-        if (0 == $lifetime) {
-            $lifetime = $this->_cacheEntryLifetime;
-        }
+        $cache = Mage::app()->getCache();
 
-        if ('dev' != API_ENV && !$this->_cache->contains($cacheKey)) {
+        if ('dev' != API_ENV && !$cache->test($cacheKey)) {
             $this->_logger->info(
                 'New cache entry added',
                 array(
                     'key' => $cacheKey,
                     'size' => strlen($value),
-                    'lifetime' => $lifetime,
+                    'tags' => implode('|', $tags),
                 )
             );
 
-            return $this->_cache->save($cacheKey, $value, $lifetime);
+            return $cache->save($value, $cacheKey, $tags);
         }
     }
 
@@ -422,39 +409,6 @@ abstract class AbstractResource
                             $level
                         );
                 }
-            }
-        }
-    }
-
-    /**
-     * Setup the local cache object based on settings in an external file.
-     *
-     * @param string $configFile The file containing cache settings.
-     * @return void
-     */
-    protected function _initCache($configFile = 'etc/cache.yaml')
-    {
-        if (extension_loaded('yaml') && file_exists($configFile)) {
-            $config = yaml_parse_file($configFile);
-            $config = $config[API_ENV];
-
-            switch ($config['backend']) {
-                case 'memcache':
-                    $memcache = new Memcache();
-                    foreach ($config['servers'] as $server) {
-                        $memcache->addServer($server['host'], $server['port']);
-                    }
-
-                    $this->_cache = new MemcacheCache();
-                    $this->_cache->setMemcache($memcache);
-
-                    if (isset($config['namespace'])) {
-                        $this->_cache->setNamespace($config['namespace']);
-                    }
-
-                    break;
-                default:
-                    $this->_cache = new ApcCache();
             }
         }
     }

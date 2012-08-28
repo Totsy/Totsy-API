@@ -23,8 +23,6 @@ class EventResource extends AbstractResource
 {
     protected $_modelGroupName = 'catalog/category';
 
-    protected $_cacheEntryLifetime = 300;
-
     protected $_fields = array(
         'name',
         'description',
@@ -64,7 +62,7 @@ class EventResource extends AbstractResource
         // look for a category event sort entry
         // this is a cached version of all events, indexed by date
         if ($events = $this->_getEventsFromSortEntry()) {
-            $this->_addCache($events);
+            $this->_addCache($events, 'FPC'); // @todo use correct cache tag
             return $events;
         } else {
             $filters = array('level' => 3);
@@ -121,7 +119,20 @@ class EventResource extends AbstractResource
      */
     public function getEventEntity($id)
     {
-        return $this->getItem($id);
+        if ($response = $this->_inspectCache()) {
+            return $response;
+        }
+
+        $item = $this->_model->load($id);
+
+        if ($item->isObjectNew()) {
+            return new Response(404);
+        }
+
+        $response = json_encode($this->_formatItem($item));
+        $this->_addCache($response, $item->getCacheTags());
+
+        return $response;
     }
 
     /**

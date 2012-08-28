@@ -32,8 +32,6 @@ class ProductResource extends AbstractResource
      */
     protected $_eventId;
 
-    protected $_cacheEntryLifetime = 600;
-
     protected $_modelGroupName = 'catalog/product';
 
     protected $_fields = array(
@@ -93,27 +91,6 @@ class ProductResource extends AbstractResource
     }
 
     /**
-     * The available quantity of a single product.
-     *
-     * @GET
-     * @Path("/product/{id}/quantity")
-     * @Produces({"application/json"})
-     * @PathParam("id")
-     */
-    public function getProductQuantity($id)
-    {
-        $product = $this->_model->load($id);
-
-        if ($product->isObjectNew()) {
-            return new Response(404);
-        }
-
-        return json_encode(
-            array('quantity' => $product->getStockItem()->getStockQty())
-        );
-    }
-
-    /**
      * Products that are part of an Event.
      * 
      * @GET
@@ -134,29 +111,36 @@ class ProductResource extends AbstractResource
 
         $layer = Mage::getSingleton('catalog/layer');
         $layer->setCurrentCategory($event);
-        $products = $layer->getProductCollection()
-            ->addAttributeToSelect('description')
-            ->addAttributeToSelect('shipping_returns')
-            ->addAttributeToSelect('vendor_style')
-            ->addAttributeToSelect('weight')
-            ->addAttributeToSelect('departments')
-            ->addAttributeToSelect('ages')
-            ->addAttributeToSelect('hot_list')
-            ->addAttributeToSelect('featured');
+        $products = $layer->getProductCollection()->addAttributeToSelect(
+            array(
+                'description',
+                'shipping_returns',
+                'vendor_style',
+                'weight',
+                'departments',
+                'ages',
+                'hot_list',
+                'featured'
+            )
+        );
 
-        $results = array();
+        $results   = array();
         foreach ($products as $product) {
+            if (!$product->isAvailable()) {
+                continue;
+            }
+
             // this loads the media gallery to the product object
             // hat tip: http://www.magentocommerce.com/boards/viewthread/17414/P15/#t400258
             $attributes = $product->getTypeInstance(true)->getSetAttributes($product);
-            $media_gallery = $attributes['media_gallery'];
-            $media_gallery->getBackend()->afterLoad($product);
+            $gallery = $attributes['media_gallery'];
+            $gallery->getBackend()->afterLoad($product);
 
             $results[] = $this->_formatItem($product, $this->_fields, $this->_links);
         }
 
         $response = json_encode($results);
-        $this->_addCache($response);
+        $this->_addCache($response, $event->getCacheTags());
 
         return $response;
     }

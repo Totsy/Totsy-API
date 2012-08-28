@@ -422,28 +422,6 @@
             </representation>
           </response>
         </method>
-
-        <resource path="quantity">
-          <doc title="Product Quantity">
-            The available quantity of a single product.
-          </doc>
-
-          <method name="GET">
-            <request>
-            </request>
-            <response>
-              <representation mediaType="application/json">
-                <doc title="Product Quantity">
-                  <pre>
-{
-    "quantity": 10
-}
-                  </pre>
-                </doc>
-              </representation>
-            </response>
-          </method>
-        </resource>
       </resource>
     </resource>
 

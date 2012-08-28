@@ -73,9 +73,7 @@ class UserResource extends AbstractResource
         $user = Mage::getModel($this->_modelGroupName);
         $this->_populateModelInstance($user);
 
-        if ($user->isConfirmationRequired()) {
-            $user->sendNewAccountEmail('confirmation');
-        }
+        $user->sendNewAccountEmail();
 
         $response = $this->_formatItem($user, $this->_fields, $this->_links);
         $responseBody = json_encode($response);

@@ -124,7 +124,7 @@ class ProductResource extends AbstractResource
             )
         );
 
-        $results   = array();
+        $results = array();
         foreach ($products as $product) {
             if (!$product->isAvailable()) {
                 continue;
@@ -187,6 +187,21 @@ class ProductResource extends AbstractResource
             $formattedData['image'][] = $imageBaseUrl . $image['file'];
         }
 
+        // rewrite the 'shipping_returns' field with data from a CMS block
+        $cmsBlockId = 'shipping_and_return';
+        if ('virtual' == $item->getTypeId()) {
+            $cmsBlockId .= '_virtual';
+        }
+
+        $block = \Mage::getModel('cms/block')->getCollection()
+            ->addFieldToFilter('identifier', $cmsBlockId)
+            ->getFirstItem();
+
+        if (null != $block) {
+            $formattedData['shipping_returns'] = trim(strip_tags($block->getContent()));
+        }
+
+        // setup 'attributes' object for configurable products
         if ('configurable' == $item->getTypeId()) {
             $formattedData['attributes'] = array();
 
@@ -201,6 +216,7 @@ class ProductResource extends AbstractResource
             }
         }
 
+        // build the product's static web site page URL
         $productUrl = \Mage::getBaseUrl() . $sourceData['url_key'] . '.html';
         if (is_array($links)) {
             foreach ($links as &$link) {

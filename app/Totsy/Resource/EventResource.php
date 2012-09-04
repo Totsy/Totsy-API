@@ -174,8 +174,8 @@ class EventResource extends AbstractResource
         $results = array();
         foreach ($queue as $categoryInfo) {
             $formattedEvent = $this->_formatItem($categoryInfo);
-            $category = Mage::getModel('catalog/category')
-                ->load($categoryInfo['event_id']);
+            $category = \Mage::getModel('catalog/category')
+                ->load($categoryInfo['entity_id']);
             if ('upcoming' == $this->_request->getQueryParam('when')
                 || (strtotime($categoryInfo['event_start_date']) < $this->_getCurrentTime()
                     && count($category->getProductCollection()) > 0

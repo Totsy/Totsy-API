@@ -23,14 +23,10 @@ use Sonno\Annotation\GET,
     Doctrine\Common\Cache\ApcCache,
     Doctrine\Common\Cache\MemcacheCache,
 
-    Memcache,
-
     Monolog\Logger,
     Monolog\Handler\StreamHandler,
     Monolog\Handler\NativeMailerHandler,
-    Monolog\Processor\WebProcessor,
-
-    Mage;
+    Monolog\Processor\WebProcessor;
 
 /**
  * The base class for all supported Totsy resource classes.
@@ -76,7 +72,7 @@ abstract class AbstractResource
 
     public function __construct()
     {
-        $this->_model = Mage::getSingleton($this->_modelGroupName);
+        $this->_model = \Mage::getSingleton($this->_modelGroupName);
 
         $this->_initLogger();
     }
@@ -156,7 +152,7 @@ abstract class AbstractResource
     }
 
     /**
-     * @param $item Mage_Core_Model_Abstract
+     * @param $item \Mage_Core_Model_Abstract
      * @param $fields array|null
      * @param $links array|null
      * @return array
@@ -234,7 +230,7 @@ abstract class AbstractResource
      * Populate a Magento model object with an array of data, and persist the
      * updated object.
      *
-     * @param $obj Mage_Core_Model_Abstract
+     * @param $obj \Mage_Core_Model_Abstract
      * @param $data array The data to populate, or NULL which will use the
      *                    incoming request data.
      * @return bool
@@ -297,7 +293,7 @@ abstract class AbstractResource
             return false;
         }
 
-        $cache = Mage::app()->getCache();
+        $cache = \Mage::app()->getCache();
 
         $cacheKey = 'RESTAPI_' . md5(
             $this->_request->getRequestUri() . http_build_query($this->_request->getQueryParams())
@@ -331,7 +327,7 @@ abstract class AbstractResource
             $this->_request->getRequestUri() . http_build_query($this->_request->getQueryParams())
         );
 
-        $cache = Mage::app()->getCache();
+        $cache = \Mage::app()->getCache();
 
         if ('dev' != API_ENV && !$cache->test($cacheKey)) {
             $this->_logger->info(
@@ -425,7 +421,7 @@ abstract class AbstractResource
 
         // find Magento's configured timezone, and set that as the date timezone
         date_default_timezone_set(
-            Mage::getStoreConfig(
+            \Mage::getStoreConfig(
                 \Mage_Core_Model_Locale::XML_PATH_DEFAULT_TIMEZONE
             )
         );

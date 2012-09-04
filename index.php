@@ -69,7 +69,7 @@ if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
  */
 
 // inspect the APC cache for configuration first
-if ('dev' !== API_ENV && apc_exists(APC_CONFIG_KEY)) {
+if ('dev' !== API_ENV && extension_loaded('apc') && apc_exists(APC_CONFIG_KEY)) {
     $config = apc_fetch(APC_CONFIG_KEY);
 
 // build a new Configuration object using Doctrine Annotations

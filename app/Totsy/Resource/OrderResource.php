@@ -74,7 +74,13 @@ class OrderResource extends AbstractResource
     {
         $user = UserResource::authorizeUser($id);
 
-        return $this->getCollection(array('customer_id' => array('eq' => $id)));
+        return $this->getCollection(
+            array(
+                'customer_id' => array('eq' => $id),
+                'status'      => array('nin' => array('splitted', 'updated'))
+            ),
+            'updated_at DESC'
+        );
     }
 
     /**
@@ -163,6 +169,10 @@ class OrderResource extends AbstractResource
                 $quote->setIsActive(false);
                 $quote->delete();
                 Mage::getModel('checkout/session')->clear();
+
+                if ($order->getCanSendNewEmailFlag()) {
+                    $order->sendNewOrderEmail();
+                }
 
                 return new Response(
                     201,
@@ -673,7 +683,7 @@ class OrderResource extends AbstractResource
                     $obj->updateItems($cartUpdates)->save();
                     $cartUpdated = true;
                 } catch(\Mage_Core_Exception $e) {
-                    $this->_logger->err($e->getMessage(), $e->getTrace());
+                    $this->_logger->info($e->getMessage(), $e->getTrace());
                     throw new WebApplicationException(409, $e->getMessage());
                 } catch(\Exception $e) {
                     $this->_logger->err($e->getMessage(), $e->getTrace());

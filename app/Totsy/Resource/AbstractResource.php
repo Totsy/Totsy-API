@@ -102,9 +102,10 @@ abstract class AbstractResource
      * local model.
      *
      * @param $filters array The set of Magento ORM filters to apply.
+     * @param $order   string The sort criteria.
      * @return string json-encoded
      */
-    public function getCollection($filters = array())
+    public function getCollection($filters = array(), $order = null)
     {
         // hollow items are ID values only
         $hollowItems = $this->_model->getCollection();
@@ -115,8 +116,17 @@ abstract class AbstractResource
             }
         } else {
             foreach ($filters as $filterName => $condition) {
-                $hollowItems->addFilter($filterName, $condition);
+                $hollowItems->addFieldToFilter($filterName, $condition);
             }
+        }
+
+        if (null != $order) {
+            $direction = 'ASC';
+            if (strpos($order, ' ') !== false) {
+                list($order, $direction) = explode(' ', $order);
+            }
+
+            $hollowItems->setOrder($order, $direction);
         }
 
         $results = array();

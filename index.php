@@ -31,8 +31,21 @@ if (!is_dir($mageRoot)) {
     throw new Exception("Could not find Magento installation at $mageRoot.");
 }
 
+// determine the Magento store to used by inspecting the request's user-agent
+$code = '';
+if (isset($_SERVER['HTTP_USER_AGENT']) &&
+    preg_match('/iPhone/', $_SERVER['HTTP_USER_AGENT'])
+) {
+    $code = 'iphone';
+}
+if (isset($_SERVER['HTTP_USER_AGENT']) &&
+    preg_match('/Android/', $_SERVER['HTTP_USER_AGENT'])
+) {
+    $code = 'android';
+}
+
 require_once "$mageRoot/app/Mage.php";
-Mage::app();
+Mage::app($code);
 if ('dev' === API_ENV) {
     Mage::setIsDeveloperMode(true);
 }

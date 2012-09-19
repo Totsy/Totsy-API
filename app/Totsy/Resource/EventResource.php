@@ -164,12 +164,6 @@ class EventResource extends AbstractResource
             return false;
         }
 
-        // look for any preconditions satisfiable in the incoming request
-        $result = $this->_request->evaluatePreconditions($sortEntry->getUpdatedAt());
-        if (null !== $result) {
-            return $result;
-        }
-
         // build the result, ignoring events without products or upcoming events
         $results = array();
         foreach ($queue as $categoryInfo) {

@@ -13,6 +13,10 @@ use Sonno\Configuration\Driver\AnnotationDriver,
     Doctrine\Common\Annotations\AnnotationReader,
     Doctrine\Common\Annotations\AnnotationRegistry;
 
+// allow requests from any origin
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Headers: Authorization');
+
 /**
  * Setup autoloaders for the API application, and other application settings as
  * global constants.
@@ -108,7 +112,7 @@ if ('dev' !== API_ENV && extension_loaded('apc') && apc_exists(APC_CONFIG_KEY)) 
     $driver = new AnnotationDriver($resources, $annotationReader);
     $config = $driver->parseConfig();
 
-    if ('dev' !== API_ENV) {
+    if ('dev' !== API_ENV && extension_loaded('apc')) {
         apc_add(APC_CONFIG_KEY, $config);
     }
 }

@@ -292,7 +292,7 @@ abstract class AbstractResource
      * Check the local cache for a copy of a response body that can fulfill the
      * current request.
      *
-     * @return bool|mixed
+     * @return mixed
      */
     protected function _inspectCache()
     {
@@ -305,15 +305,18 @@ abstract class AbstractResource
 
         $cache = \Mage::app()->getCache();
 
-        $cacheKey = 'RESTAPI_' . md5(
-            $this->_request->getRequestUri() . http_build_query($this->_request->getQueryParams())
-        );
+        $cacheKey = $this->_getCacheKey();
 
         if ($cache->test($cacheKey)) {
-            $this->_logger->info(
-                'Delivering content from cache',
-                array('key' => $cacheKey)
+            // look to fulfill a conditional GET request first
+            $metadata = $cache->getMetadatas($cacheKey);
+            $result = $this->_request->evaluatePreconditions(
+                date('c', $metadata['mtime'])
             );
+            if (null !== $result) {
+                return $result;
+            }
+
             return $cache->load($cacheKey);
         }
 
@@ -333,24 +336,25 @@ abstract class AbstractResource
             $tags = array($tags);
         }
 
-        $cacheKey = 'RESTAPI_' . md5(
-            $this->_request->getRequestUri() . http_build_query($this->_request->getQueryParams())
-        );
+        $cacheKey = $this->_getCacheKey();
 
         $cache = \Mage::app()->getCache();
 
         if ('dev' != API_ENV && !$cache->test($cacheKey)) {
-            $this->_logger->info(
-                'New cache entry added',
-                array(
-                    'key' => $cacheKey,
-                    'size' => strlen($value),
-                    'tags' => implode('|', $tags),
-                )
-            );
-
             return $cache->save($value, $cacheKey, $tags);
         }
+    }
+
+    /**
+     * Create and return the cache key that represents this request.
+     *
+     * @return string
+     */
+    protected function _getCacheKey()
+    {
+        return 'RESTAPI_' . md5(
+            $this->_request->getRequestUri() . http_build_query($this->_request->getQueryParams())
+        );
     }
 
     /**

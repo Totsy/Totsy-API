@@ -43,24 +43,76 @@ class AuthResource extends AbstractResource
      */
     public function login()
     {
-        $request = json_decode($this->_request->getRequestBody());
+        $request = json_decode($this->_request->getRequestBody(), true);
 
         if (!$this->_model->isLoggedIn()) {
-            try {
-                $this->_model->login($request->email, $request->password);
-            } catch(\Mage_Core_Exception $e) {
-                return new Response(
-                    403,
-                    null,
-                    array('X-API-Error' => 'Invalid login credentials.')
-                );
+            if (isset($request['email']) && isset($request['password'])) {
+                try {
+                    $this->_model->login($request['email'], $request['password']);
+                } catch(\Mage_Core_Exception $e) {
+                    return new Response(
+                        403,
+                        null,
+                        array('X-API-Error' => 'Invalid login credentials.')
+                    );
+                }
+            } else if (isset($request['facebook_access_token'])) {
+                // login as Facebook user
+                $fbSession = \Mage::getModel('inchoo_facebook/session');
+                $fbClient  = $fbSession->getClient();
+                $fbClient->setAccessToken($request['facebook_access_token']);
+
+                // search for an existing customer with this facebook_uid
+                $fbUser   = $fbClient->graph('/me');
+                $customer = \Mage::getModel('customer/customer')->getCollection()
+                    ->addAttributeToFilter('facebook_uid', $fbUser['id'])
+                    ->addAttributeToFilter('store_id', \Mage::app()->getStore()->getId())
+                    ->getFirstItem();
+
+                // fallback to searching by e-mail
+                if (!$customer || !$customer->getId()) {
+                    $customer = \Mage::getModel('customer/customer')->getCollection()
+                        ->addAttributeToFilter('email', $fbUser['email'])
+                        ->addAttributeToFilter('store_id', \Mage::app()->getStore()->getId())
+                        ->getFirstItem();
+                }
+
+                // create a new customer because one does not exist for this
+                // Facebook user
+                if (!$customer || !$customer->getId()) {
+                    $customerData = array(
+                        'facebook_uid' => $fbUser['id'],
+                        'firstname'    => $fbUser['first_name'],
+                        'lastname'     => $fbUser['last_name'],
+                        'email'        => $fbUser['email'],
+                    );
+
+                    $customer = \Mage::getModel('customer/customer');
+                    $randomPassword = $customer->generatePassword(8);
+
+                    try {
+                        $customer->setData($customerData)
+                            ->setPassword($randomPassword)
+                            ->setConfirmation($randomPassword)
+                            ->save();
+
+                        $customer->sendNewAccountEmail('confirmed');
+                    } catch(\Mage_Core_Exception $e) {
+                        $this->_logger->err($e->getMessage());
+                        return new Response(
+                            500,
+                            null,
+                            $e->getMessage()
+                        );
+                    }
+                }
+
+                $this->_model->setCustomerAsLoggedIn($customer);
             }
         }
 
         $user = $this->_model->getCustomer();
-        return json_encode(
-            $this->_formatItem($user, null, $this->_links)
-        );
+        return json_encode($this->_formatItem($user, null, $this->_links));
     }
 
     /**

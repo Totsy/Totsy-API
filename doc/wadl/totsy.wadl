@@ -4,8 +4,8 @@
   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
   <doc title="Totsy REST API Specification">
-    Version: 0.9<br/>
-    Last Modified: <time datetime="2012-08-21">Aug 21, 2012</time><br/>
+    Version: 1.2<br/>
+    Last Modified: <time datetime="2012-09-20">Sep 20, 2012</time><br/>
     Author: <a href="mailto:tbhuvanendran@totsy.com">Tharsan Bhuvanendran &lt;tbhuvanendran@totsy.com&gt;</a>
   </doc>
 
@@ -435,17 +435,26 @@
 
       <method name="POST">
         <doc title="Login">
-          Login to the system on behalf of an existing system User.
+          Login to the system on behalf of an existing system User or Facebook user.
           Upon successful login, an HTTP cookie will be supplied in the response
           to allow further requests on behalf of the logged-in user.
         </doc>
         <request>
           <representation mediaType="application/json">
-            <doc title="Login Request">
+            <doc title="Login Request (system user)">
               <pre>
 {
     "email": "...",
     "password": "..."
+}
+              </pre>
+            </doc>
+          </representation>
+          <representation mediaType="application/json">
+            <doc title="Login Request (Facebook user)">
+              <pre>
+{
+    "facebook_access_token": "AAAB2T8fT3t4BADSajxA8jo3bIBwQNDEHcUIBJOnaTeCZCZAtZBL9YRj6yQP6fEks22RXFrjHcVFzpYJLJDQVoAjfISbOnRtz2j8l8rA2gZDZD"
 }
               </pre>
             </doc>

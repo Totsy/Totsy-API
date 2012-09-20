@@ -6,6 +6,10 @@ Users are a read/write interface to Totsy customer accounts.
 `POST /auth` with the e-mail address & plaintext password of a user, which will perform a user login.
 The client receives an HTTP cookie along with a link [`rel=http://rel.totsy.com/entity/user`] to the User entity.
 
+### Authenticate a User via Facebook ###
+`POST /auth` with the Facebook access token, which will perform a user login (and registration, if necessary).
+The client receives an HTTP cookie along with a link [`rel=http://rel.totsy.com/entity/user`] to the User entity.
+
 ### End a User session ###
 `DELETE /auth` will destroy the current User session and log the user out of the system.
 

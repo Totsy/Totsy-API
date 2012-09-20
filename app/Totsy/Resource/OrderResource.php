@@ -465,6 +465,13 @@ class OrderResource extends AbstractResource
             $this->_logger->err($e->getMessage(), $e->getTrace());
             throw new WebApplicationException(500, $e->getMessage());
         }
+
+        // setup the countdown timer on the local session
+        // this is required to ensure that the current local session
+        // cart can be correctly evaluated for timeout/expiry
+        Mage::getSingleton('checkout/session')->setCountDownTimer(
+            $this->_getCurrentTime()
+        );
     }
 
     /**
@@ -691,16 +698,7 @@ class OrderResource extends AbstractResource
                 }
             }
 
-            if ($cartUpdated) {
-                Mage::getSingleton('checkout/session')->setCartWasUpdated(true);
-
-                // setup the countdown timer on the local session
-                // this is required to ensure that the current local session
-                // cart can be correctly evaluated for timeout/expiry
-                Mage::getSingleton('checkout/session')->setCountDownTimer(
-                    $this->_getCurrentTime()
-                );
-            }
+            Mage::getSingleton('checkout/session')->setCartWasUpdated($cartUpdated);
         }
     }
 }

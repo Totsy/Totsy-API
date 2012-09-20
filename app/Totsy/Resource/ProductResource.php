@@ -124,6 +124,13 @@ class ProductResource extends AbstractResource
             )
         );
 
+        $sortby = array_keys(
+            Mage::getModel('catalog/config')->getAttributeUsedForSortByArray()
+        );
+        if (!empty($sortby)) {
+            $products->addAttributeToSort($sortby[0]);
+        }
+
         $results = array();
         foreach ($products as $product) {
             if (!$product->isAvailable()) {

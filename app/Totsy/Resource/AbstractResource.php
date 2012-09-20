@@ -340,6 +340,9 @@ abstract class AbstractResource
 
         $cache = \Mage::app()->getCache();
 
+        // add a generic tag for this application
+        $tags[] = 'RESTAPI';
+
         if ('dev' != API_ENV && !$cache->test($cacheKey)) {
             return $cache->save($value, $cacheKey, $tags);
         }

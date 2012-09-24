@@ -61,52 +61,40 @@ class EventResource extends AbstractResource
 
         // look for a category event sort entry
         // this is a cached version of all events, indexed by date
-        if ($events = $this->_getEventsFromSortEntry()) {
-            $this->_addCache($events, 'FPC'); // @todo use correct cache tag
-            return $events;
-        } else {
-            $filters = array('level' => 3);
+        $sortEntry = \Mage::getModel('categoryevent/sortentry')->loadCurrent();
 
-            // setup filters on event start & end dates using the 'when'
-            // request parameter
-            if ($when = $this->_request->getQueryParam('when')) {
-                switch ($when) {
-                    case 'past':
-                        $filters['event_end_date'] = array(
-                            'to' => date('Y-m-d H:m:s', $this->_getCurrentTime()),
-                            'datetime' => true,
-                        );
-                        break;
-                    case 'current':
-                        $filters['event_start_date'] = array(
-                            'to' => date('Y-m-d H:m:s', $this->_getCurrentTime()),
-                            'datetime' => true,
-                        );
-                        $filters['event_end_date'] = array(
-                            'from' => date('Y-m-d H:m:s', $this->_getCurrentTime()),
-                            'datetime' => true,
-                        );
-                        break;
-                    case 'upcoming':
-                        $filters['event_start_date'] = array(
-                            'from' => date('Y-m-d H:m:s', $this->_getCurrentTime()),
-                            'to'   => date('Y-m-d H:m:s', $this->_getCurrentTime() + 5 * 24 * 60 * 60),
-                            'datetime' => true,
-                        );
-                        break;
-                    default:
-                        $errorMessage = "Invalid value for 'when' parameter: "
-                            . $when;
-                        $e = new WebApplicationException(400);
-                        $e->getResponse()->setHeaders(
-                            array('X-API-Error' => $errorMessage)
-                        );
-                        throw $e;
-                }
-            }
-
-            return $this->getCollection($filters);
+        // fetch the event information for the desired event group
+        $when = $this->_request->getQueryParam('when');
+        switch ($when) {
+            case 'current':
+                $queue = json_decode($sortEntry->getLiveQueue(), true);
+                break;
+            case 'upcoming':
+                $queue = json_decode($sortEntry->getUpcomingQueue(), true);
+                break;
+            default:
+                throw new WebApplicationException(
+                    400,
+                    "Invalid value for 'when' parameter: $when"
+                );
         }
+
+        // build the result, ignoring events without products or upcoming events
+        $results = array();
+        foreach ($queue as $categoryInfo) {
+            $category = \Mage::getModel('catalog/category')
+                ->load($categoryInfo['entity_id']);
+            if ('upcoming' == $when
+                || (strtotime($categoryInfo['event_start_date']) < $this->_getCurrentTime()
+                    && count($category->getProductCollection()) > 0
+                )
+            ) {
+                $formattedEvent = $this->_formatItem($categoryInfo);
+                $results[] = $formattedEvent;
+            }
+        }
+
+        return json_encode($results);
     }
 
     /**
@@ -133,53 +121,6 @@ class EventResource extends AbstractResource
         $this->_addCache($response, $item->getCacheTags());
 
         return $response;
-    }
-
-    /**
-     * Get the event collection to fulfill the current request from the local
-     * event cache (category sort entry).
-     *
-     * @return bool|string The JSON response for the current request, or false
-     *                     if there is no available sort entry.
-     */
-    protected function _getEventsFromSortEntry()
-    {
-        $sortEntry = \Mage::getModel('categoryevent/sortentry')
-            ->getCollection()
-            ->addFilter('date', date('Y-m-d'))
-            ->addFilter('store_id', 1)
-            ->getFirstItem();
-
-        if (is_null($sortEntry)) {
-            return false;
-        }
-
-        // fetch the event information for the desired event group
-        $queue = json_decode($sortEntry->getLiveQueue(), true);
-        if ('upcoming' == $this->_request->getQueryParam('when')) {
-            $queue = json_decode($sortEntry->getUpcomingQueue(), true);
-        }
-
-        if (empty($queue)) {
-            return false;
-        }
-
-        // build the result, ignoring events without products or upcoming events
-        $results = array();
-        foreach ($queue as $categoryInfo) {
-            $formattedEvent = $this->_formatItem($categoryInfo);
-            $category = \Mage::getModel('catalog/category')
-                ->load($categoryInfo['entity_id']);
-            if ('upcoming' == $this->_request->getQueryParam('when')
-                || (strtotime($categoryInfo['event_start_date']) < $this->_getCurrentTime()
-                    && count($category->getProductCollection()) > 0
-                )
-            ) {
-                $results[] = $formattedEvent;
-            }
-        }
-
-        return json_encode($results);
     }
 
     /**

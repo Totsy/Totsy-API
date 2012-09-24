@@ -14,7 +14,9 @@ use Sonno\Annotation\POST,
     Sonno\Annotation\Path,
     Sonno\Annotation\Consumes,
     Sonno\Annotation\Produces,
-    Sonno\Http\Response\Response;
+    Sonno\Http\Response\Response,
+
+    Totsy\Exception\WebApplicationException;
 
 /**
  * A user authorization is the analog to logging into the system on behalf
@@ -50,11 +52,7 @@ class AuthResource extends AbstractResource
                 try {
                     $this->_model->login($request['email'], $request['password']);
                 } catch(\Mage_Core_Exception $e) {
-                    return new Response(
-                        403,
-                        null,
-                        array('X-API-Error' => 'Invalid login credentials.')
-                    );
+                    throw new WebApplicationException(403, 'Invalid login credentials.');
                 }
             } else if (isset($request['facebook_access_token'])) {
                 // login as Facebook user
@@ -63,7 +61,12 @@ class AuthResource extends AbstractResource
                 $fbClient->setAccessToken($request['facebook_access_token']);
 
                 // search for an existing customer with this facebook_uid
-                $fbUser   = $fbClient->graph('/me');
+                try {
+                    $fbUser   = $fbClient->graph('/me');
+                } catch (\Mage_Core_Exception $e) {
+                    throw new WebApplicationException(403, 'Invalid login credentials.');
+                }
+
                 $customer = \Mage::getModel('customer/customer')->getCollection()
                     ->addAttributeToFilter('facebook_uid', $fbUser['id'])
                     ->addAttributeToFilter('store_id', \Mage::app()->getStore()->getId())
@@ -108,6 +111,8 @@ class AuthResource extends AbstractResource
                 }
 
                 $this->_model->setCustomerAsLoggedIn($customer);
+            } else {
+                throw new WebApplicationException(403, 'Invalid login credentials.');
             }
         }
 

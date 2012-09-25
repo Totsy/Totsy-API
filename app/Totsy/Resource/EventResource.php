@@ -94,7 +94,10 @@ class EventResource extends AbstractResource
             }
         }
 
-        return json_encode($results);
+        $result = json_encode($results);
+        $this->_addCache($result, \Harapartners_Categoryevent_Model_Cache_Index::CACHE_TAG);
+
+        return $result;
     }
 
     /**

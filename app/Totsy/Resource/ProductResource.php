@@ -63,10 +63,6 @@ class ProductResource extends AbstractResource
         array(
             'rel' => 'http://rel.totsy.com/entity/event',
             'href' => '/event/{event_id}'
-        ),
-        array(
-            'rel' => 'alternate',
-            'href' => '{$web_base_url}/{$url_key}.html'
         )
     );
 
@@ -80,6 +76,10 @@ class ProductResource extends AbstractResource
      */
     public function getProductEntity($id)
     {
+        if ($response = $this->_inspectCache()) {
+            return $response;
+        }
+
         $product = $this->_model->load($id);
         $event   = $product->getCategoryCollection()->getFirstItem();
 
@@ -87,7 +87,12 @@ class ProductResource extends AbstractResource
             $this->_eventId = $event->getId();
         }
 
-        return $this->getItem($id);
+        $result = $this->getItem($id);
+        if ($response = $this->_addCache($result, $product->getCacheTags(), 3600)) {
+            return $response;
+        }
+
+        return $result;
     }
 
     /**
@@ -120,7 +125,9 @@ class ProductResource extends AbstractResource
                 'departments',
                 'ages',
                 'hot_list',
-                'featured'
+                'featured',
+                'color',
+                'size',
             )
         );
 
@@ -146,10 +153,12 @@ class ProductResource extends AbstractResource
             $results[] = $this->_formatItem($product, $this->_fields, $this->_links);
         }
 
-        $response = json_encode($results);
-        $this->_addCache($response, $event->getCacheTags());
+        $result = json_encode($results);
+        if ($response = $this->_addCache($result, $event->getCacheTags(), 3600)) {
+            return $response;
+        }
 
-        return $response;
+        return $result;
     }
 
     /**
@@ -221,21 +230,37 @@ class ProductResource extends AbstractResource
                     $formattedData['attributes'][$attr['label']][] = $attrVal['label'];
                 }
             }
+        } else if ('simple' == $item->getTypeId()) {
+            $formattedData['attributes'] = array();
+            if ($value = $item->getAttributeText('color')) {
+                $formattedData['attributes']['Color'] = $value;
+            }
+            if ($value = $item->getAttributeText('size')) {
+                $formattedData['attributes']['Size'] = $value;
+            }
         }
 
         // build the product's static web site page URL
-        $productUrl = \Mage::getBaseUrl() . $sourceData['url_key'] . '.html';
-        if (is_array($links)) {
-            foreach ($links as &$link) {
-                if ('alternate' == $link['rel']) {
-                    $link['href'] = $productUrl;
-                }
-            }
-        }
+        $now = Mage::getModel('core/date')->timestamp();
+        $category = $item->getCategoryCollection()
+            ->addAttributeToSelect('url_key')
+            ->addAttributeToFilter('event_start_date', array('to' => $now, 'datetime' => true))
+            ->addAttributeToFilter('event_end_date', array('from' => $now, 'datetime' => true))
+            ->getFirstItem();
+
+        $productUrl = Mage::getBaseUrl() .
+            $category->getUrlKey() . '/' .
+            $sourceData['url_key'] . '.html';
+
+        $links[] = array(
+            'rel' => 'alternate',
+            'href' => $productUrl
+        );
 
         $formattedData['type'] = $item->getTypeId();
 
         $item->addData($formattedData);
+
         return parent::_formatItem($item, $fields, $links);
     }
 }

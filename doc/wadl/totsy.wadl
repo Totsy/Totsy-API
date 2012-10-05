@@ -25,7 +25,6 @@
         <request>
           <param name="when" style="query" type="xsd:string" default="current,upcoming" repeating="true">
             <doc title="When">A comma-separated list of time period names to filter events on.</doc>
-            <option value="past" />
             <option value="current" />
             <option value="upcoming" />
           </param>
@@ -66,6 +65,10 @@
             {
                 "rel": "http://rel.totsy.com/collection/product",
                 "href": "https://api.totsy.com/event/3/product"
+            },
+            {
+                "rel": "alternate",
+                "href": "http://www.totsy.com/sales/event-01.html"
             }
         ]
     },
@@ -96,6 +99,10 @@
             {
                 "rel": "http://rel.totsy.com/collection/product",
                 "href": "https://api.totsy.com/event/4/product"
+            },
+            {
+                "rel": "alternate",
+                "href": "http://www.totsy.com/sales/event-02.html"
             }
         ]
     },
@@ -122,6 +129,10 @@
             {
                 "rel": "http://rel.totsy.com/collection/product",
                 "href": "https://api.totsy.com/event/5/product"
+            },
+            {
+                "rel": "alternate",
+                "href": "http://www.totsy.com/sales/event-03.html"
             }
         ]
     }
@@ -172,6 +183,10 @@
         {
             "rel": "http://rel.totsy.com/collection/product",
             "href": "https://api.totsy.com/event/4/product"
+        },
+        {
+            "rel": "alternate",
+            "href": "http://www.totsy.com/sales/event-02.html"
         }
     ]
 }
@@ -219,14 +234,14 @@
         "weight": "1.0000",
         "price": {
             "price": "10.0000",
-            "orig": null,
-            "msrp": null
+            "orig": null
         },
         "hot": false,
         "featured": false,
         "image": [
             "http://www.totsy.com/media/catalog/product/w/i/winter-stroller-cover-blue.jpg"
         ],
+        "type": "configurable",
         "links": [
             {
                 "rel": "self",
@@ -235,6 +250,10 @@
             {
                 "rel": "http://rel.totsy.com/entity/event",
                 "href": "https://api.totsy.com/event/42"
+            },
+            {
+                "rel": "alternate",
+                "href": "http://www.totsy.com/stroller-sale/winter-stroller-cover-blue.html"
             }
         ]
     },
@@ -255,21 +274,14 @@
             "5_up"
         ],
         "attributes": {
-            "Size": [
-                "0-3M",
-                "0-6M"
-            ],
-            "Color": [
-                "Green"
-            ]
+            "Color": "Green"
         },
         "vendor_style": "dotcom",
         "sku": "SKU-334-2423501",
         "weight": "1.0000",
         "price": {
             "price": "10.0000",
-            "orig": "12.0000",
-            "msrp": "15.0000"
+            "orig": "12.0000"
         },
         "hot": false,
         "featured": false,
@@ -279,6 +291,7 @@
             "http://www.totsy.com/media/catalog/product/s/m/small_1.gif",
             "http://www.totsy.com/media/catalog/product/l/a/large_1.gif"
         ],
+        "type": "simple",
         "links": [
             {
                 "rel": "self",
@@ -287,6 +300,10 @@
             {
                 "rel": "http://rel.totsy.com/entity/event",
                 "href": "https://api.totsy.com/event/42"
+            },
+            {
+                "rel": "alternate",
+                "href": "http://www.totsy.com/stroller-sale/blue-umbrella-blowout.html"
             }
         ]
     },
@@ -317,14 +334,14 @@
         "weight": "1.0000",
         "price": {
             "price": "10.0000",
-            "orig": null,
-            "msrp": null
+            "orig": null
         },
         "hot": false,
         "featured": false,
         "image": [
             "http://www.totsy.com/media/catalog/product/o/p/open-ultra-fold-lady-umbrella-with-hard-case.jpg"
         ],
+        "type": "configurable",
         "links": [
             {
                 "rel": "self",
@@ -333,6 +350,10 @@
             {
                 "rel": "http://rel.totsy.com/entity/event",
                 "href": "https://api.totsy.com/event/42"
+            },
+            {
+                "rel": "alternate",
+                "href": "http://www.totsy.com/stroller-sale/open-ultra-fold.html"
             }
         ]
     }
@@ -395,8 +416,7 @@
     "weight": "1.0000",
     "price": {
         "price": "10.0000",
-        "orig": "12.0000",
-        "msrp": "15.0000"
+        "orig": "12.0000"
     },
     "hot": false,
     "featured": false,
@@ -406,6 +426,7 @@
         "http://www.totsy.com/media/catalog/product/s/m/small_1.gif",
         "http://www.totsy.com/media/catalog/product/l/a/large_1.gif"
     ],
+    "type": "configurable",
     "links": [
         {
             "rel": "self",
@@ -414,6 +435,10 @@
         {
             "rel": "http://rel.totsy.com/entity/event",
             "href": "https://api.totsy.com/event/42"
+        },
+        {
+            "rel": "alternate",
+            "href": "http://www.totsy.com/stroller-sale/blue-umbrella-blowout.html"
         }
     ]
 }

@@ -61,7 +61,9 @@ class EventResource extends AbstractResource
 
         // look for a category event sort entry
         // this is a cached version of all events, indexed by date
-        $sortEntry = \Mage::getModel('categoryevent/sortentry')->loadCurrent();
+        $sortEntry = \Mage::getModel('categoryevent/sortentry')
+            ->loadCurrent()
+            ->adjustQueuesForCurrentTime();
 
         // fetch the event information for the desired event group
         $when = $this->_request->getQueryParam('when');
@@ -80,14 +82,13 @@ class EventResource extends AbstractResource
         }
 
         // build the result, ignoring events without products or upcoming events
+        $now = \Mage::getModel('core/date')->timestamp();
         $results = array();
         foreach ($queue as $categoryInfo) {
             $category = \Mage::getModel('catalog/category')
                 ->load($categoryInfo['entity_id']);
-            if ('upcoming' == $when
-                || (strtotime($categoryInfo['event_start_date']) < $this->_getCurrentTime()
-                    && count($category->getProductCollection()) > 0
-                )
+            if ('upcoming' == $when ||
+                (strtotime($categoryInfo['event_end_date']) > $now && count($category->getProductCollection()) > 0)
             ) {
                 $formattedEvent = $this->_formatItem($categoryInfo);
                 $results[] = $formattedEvent;
@@ -95,7 +96,10 @@ class EventResource extends AbstractResource
         }
 
         $result = json_encode($results);
-        $this->_addCache($result, \Harapartners_Categoryevent_Model_Cache_Index::CACHE_TAG);
+        $cacheTags = \Harapartners_Categoryevent_Model_Cache_Index::CACHE_TAG;
+        if ($response = $this->_addCache($result, $cacheTags, 3600)) {
+            return $response;
+        }
 
         return $result;
     }
@@ -120,10 +124,12 @@ class EventResource extends AbstractResource
             return new Response(404);
         }
 
-        $response = json_encode($this->_formatItem($item));
-        $this->_addCache($response, $item->getCacheTags());
+        $result = json_encode($this->_formatItem($item));
+        if ($response = $this->_addCache($response, $item->getCacheTags())) {
+            return $response;
+        }
 
-        return $response;
+        return $result;
     }
 
     /**

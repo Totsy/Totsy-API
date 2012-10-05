@@ -326,7 +326,7 @@ class OrderResource extends AbstractResource
                 ->getCountDownTimer();
             $formattedData['expires'] = $cartTime
                 + $cartShelfLife[0]
-                - $this->_getCurrentTime();
+                - Mage::getModel('core/date')->timestamp();
         }
 
         $quoteData = $quote->getData();
@@ -469,9 +469,8 @@ class OrderResource extends AbstractResource
         // setup the countdown timer on the local session
         // this is required to ensure that the current local session
         // cart can be correctly evaluated for timeout/expiry
-        Mage::getSingleton('checkout/session')->setCountDownTimer(
-            $this->_getCurrentTime()
-        );
+        $now = Mage::getModel('core/date')->timestamp();
+        Mage::getSingleton('checkout/session')->setCountDownTimer($now);
     }
 
     /**

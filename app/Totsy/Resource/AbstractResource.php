@@ -158,7 +158,7 @@ abstract class AbstractResource
             return new Response(404);
         }
 
-        return json_encode($this->_formatItem($item));
+        return json_encode($this->_formatItem($item, $this->_fields, $this->_links));
     }
 
     /**
@@ -198,6 +198,10 @@ abstract class AbstractResource
                     $dataFieldName,
                     array()
                 );
+
+                // the formatItem call for the embedded element may have added
+                // links, which don't belong in embedded elements
+                unset($formattedData[$outputFieldName]['links']);
 
             // data field is an alias of an existing field
             } else if (is_string($dataFieldName)) {
@@ -317,7 +321,11 @@ abstract class AbstractResource
                 return $result;
             }
 
-            return $cache->load($cacheKey);
+            return new Response(
+                200,
+                $cache->load($cacheKey),
+                array('Cache-Control' => 'max-age=' . ($metadata['expire'] - time()))
+            );
         }
 
         return false;
@@ -328,9 +336,9 @@ abstract class AbstractResource
      *
      * @param mixed $value The object to store.
      *
-     * @return bool TRUE when the cache entry was added successfully.
+     * @return \Sonno\Http\Response\Response|false
      */
-    protected function _addCache($value, $tags = array())
+    protected function _addCache($value, $tags = array(), $lifetime = false)
     {
         if (!is_array($tags)) {
             $tags = array($tags);
@@ -344,8 +352,15 @@ abstract class AbstractResource
         $tags[] = 'RESTAPI';
 
         if ('dev' != API_ENV && !$cache->test($cacheKey)) {
-            return $cache->save($value, $cacheKey, $tags);
+            $cache->save($value, $cacheKey, $tags, $lifetime);
+            return new Response(
+                200,
+                $value,
+                array('Cache-Control' => "max-age=$lifetime")
+            );
         }
+
+        return false;
     }
 
     /**
@@ -424,30 +439,5 @@ abstract class AbstractResource
                 }
             }
         }
-    }
-
-    /**
-     * Get the current time in the Magento-configured local timezone.
-     *
-     * @return int
-     */
-    protected function _getCurrentTime()
-    {
-        // remember the currently configured timezone
-        $defaultTimezone = date_default_timezone_get();
-
-        // find Magento's configured timezone, and set that as the date timezone
-        date_default_timezone_set(
-            \Mage::getStoreConfig(
-                \Mage_Core_Model_Locale::XML_PATH_DEFAULT_TIMEZONE
-            )
-        );
-
-        $time = now();
-
-        // return the default timezone to the originally configured one
-        date_default_timezone_set($defaultTimezone);
-
-        return strtotime($time);
     }
 }

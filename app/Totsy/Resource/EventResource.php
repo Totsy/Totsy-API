@@ -125,7 +125,7 @@ class EventResource extends AbstractResource
         }
 
         $result = json_encode($this->_formatItem($item));
-        if ($response = $this->_addCache($response, $item->getCacheTags())) {
+        if ($response = $this->_addCache($result, $item->getCacheTags(), 3600)) {
             return $response;
         }
 

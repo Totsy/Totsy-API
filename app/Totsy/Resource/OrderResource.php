@@ -181,7 +181,7 @@ class OrderResource extends AbstractResource
                 );
             } catch (\Exception $e) {
                 $this->_logger->err($e->getMessage(), $e->getTrace());
-                throw new WebApplicationException(400, $e->getMessage());
+                throw new WebApplicationException(500, $e->getMessage());
             }
         } else {
             return new Response(
@@ -343,6 +343,9 @@ class OrderResource extends AbstractResource
             : null;
         $formattedData['use_credit'] = isset($quoteData['use_reward_points'])
             ? $quoteData['use_reward_points']
+            : 0;
+        $formattedData['credit_used'] = isset($quoteData['reward_currency_amount'])
+            ? min($quoteData['reward_currency_amount'], $quoteData['subtotal'])
             : 0;
 
         $builder = $this->_uriInfo->getBaseUriBuilder();

@@ -1001,6 +1001,8 @@
 {
     "coupon_code": "DISCOUNT",
     "use_credit": 1,
+    "credit_used": 0,
+    "credit_used": 35.25,
     "products": [
         {
             "qty": 5,
@@ -1078,6 +1080,7 @@
     "subtotal" : 10,
     "coupon_code" : null,
     "use_credit" : 0,
+    "credit_used": 0,
     "savings_amount" : 10,
     "products": [
         {

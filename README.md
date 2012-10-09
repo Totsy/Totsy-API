@@ -4,7 +4,9 @@ Totsy REST API Server
 The Totsy REST API server implementation is a PHP web application built atop the open-source REST web service framework [Sonno](http://sonno.360i.com) and the [Magento](http://www.magentocommerce.com) e-commerce platform.
 
 The application expects two environment variables set (typically provided in the web server configuration):
+
 1. `API_ENV` is the application environment: dev | stg | prod
+
 2. `MAGENTO_ROOT` is the base path to the Magento web application root.
 
 Dependencies
@@ -34,3 +36,4 @@ To-Do (Future)
 
 * Add a domain model layer to decouple Magento models from the API server. Use Symfony DI to configure and instantiate classes.
 * Integrate Magento Web Service Role ACL for resource access.
+* Add a suite of integration tests using [Guzzle](http://guzzlephp.org) and unit tests using the EcomDev_PHPUnit module.

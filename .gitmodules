@@ -1,9 +1,0 @@
-[submodule "lib/vendor/sonno"]
-	path = lib/vendor/sonno
-	url = git@github.com:360i/sonno.git
-[submodule "lib/vendor/doctrine-common"]
-	path = lib/vendor/doctrine-common
-	url = git://github.com/doctrine/common.git
-[submodule "lib/vendor/monolog"]
-	path = lib/vendor/monolog
-	url = git://github.com/Seldaek/monolog.git

@@ -13,6 +13,7 @@ use Sonno\Configuration\Driver\AnnotationDriver,
     Doctrine\Common\Annotations\AnnotationReader,
     Doctrine\Common\Annotations\AnnotationRegistry;
 
+ini_set('display_errors', 1);
 // allow requests from any origin
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Authorization');
@@ -21,7 +22,8 @@ header('Access-Control-Allow-Headers: Authorization');
  * Setup autoloaders for the API application, and other application settings as
  * global constants.
  */
-require_once 'app/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../src/autoload.php';
 
 define('API_ENV', getenv('API_ENV') ? getenv('API_ENV') : 'dev');
 define('APC_CONFIG_KEY', 'api_config');
@@ -94,7 +96,7 @@ if ('dev' !== API_ENV && extension_loaded('apc') && apc_exists(APC_CONFIG_KEY)) 
     $doctrineReader = new AnnotationReader();
     AnnotationRegistry::registerAutoloadNamespace(
         'Sonno\Annotation',
-        __DIR__ . '/lib/vendor/sonno/src'
+        __DIR__ . '/../vendor/360i/sonno/src'
     );
 
     $annotationReader = new DoctrineReader($doctrineReader);

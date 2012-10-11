@@ -248,7 +248,7 @@ abstract class AbstractResource
      * @param $data array The data to populate, or NULL which will use the
      *                    incoming request data.
      * @return bool
-     * @throws Sonno\Application\WebApplicationException
+     * @throws \Sonno\Application\WebApplicationException
      */
     protected function _populateModelInstance($obj, $data = NULL)
     {
@@ -389,7 +389,7 @@ abstract class AbstractResource
         if ($offset === false) {
             throw new WebApplicationException(
                 400,
-                "Invalid Resource URL $link[href]"
+                "Invalid Resource URL $url"
             );
         }
 
@@ -402,16 +402,14 @@ abstract class AbstractResource
      * @param string $configFile The file containing logging settings.
      * @return void
      */
-    protected function _initLogger($configFile = 'etc/logger.yaml')
+    protected function _initLogger($configFile = '../etc/logger.yaml')
     {
         if (extension_loaded('yaml') && file_exists($configFile)) {
             $config = yaml_parse_file($configFile);
-            $config = $config[API_ENV];
 
             $this->_logger = new Logger('restapi');
 
             // setup a processor that adds request information to log records
-            $request = &$this->_request;
             $this->_logger->pushProcessor(new WebProcessor());
 
             // add handlers for each specified handler in the config file

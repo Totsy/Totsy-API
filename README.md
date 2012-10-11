@@ -12,15 +12,9 @@ The application expects two environment variables set (typically provided in the
 Dependencies
 ------------
 
-1. Magento: The path to a local Magento installation must be supplied in a `$MAGENTO_ROOT` environment variable.
+The project uses PHP [Composer](http://www.getcomposer.com) for dependency management. Specific dependencies can be found in the `package.json` file.
 
-2. Sonno: Configured as a Git submodule in `lib/vendor/sonno`.
-
-3. Doctrine-Common: Configured as a Git submodule in `lib/vendor/doctrine-common`.
-
-4. APC module (PHP): A full copy of the parsed Configuration data is stored in a local APC cache, on all environments except for *dev*.
-
-5. Memcache module (PHP): If available, response bodies will be stored in Memcached. Server settings are configured via file `etc/cache.yaml`. In the absence of this file, the local APC cache will be used instead for this purpose.
+However, the only other dependency of the project, outside the scope of composer, is a Magento installation. The path to a local Magento installation must be supplied in a `$MAGENTO_ROOT` environment variable.
 
 Documentation
 -------------
@@ -34,6 +28,4 @@ The official Web Application Description Language (WADL) specification document 
 To-Do (Future)
 --------------
 
-* Add a domain model layer to decouple Magento models from the API server. Use Symfony DI to configure and instantiate classes.
-* Integrate Magento Web Service Role ACL for resource access.
 * Add a suite of integration tests using [Guzzle](http://guzzlephp.org) and unit tests using the EcomDev_PHPUnit module.

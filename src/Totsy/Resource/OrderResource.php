@@ -342,7 +342,7 @@ class OrderResource extends AbstractResource
             ? $quoteData['coupon_code']
             : null;
         $formattedData['use_credit'] = isset($quoteData['use_reward_points'])
-            ? $quoteData['use_reward_points']
+            ? intval($quoteData['use_reward_points'])
             : 0;
         $formattedData['credit_used'] = isset($quoteData['reward_currency_amount'])
             ? min($quoteData['reward_currency_amount'], $quoteData['subtotal'])

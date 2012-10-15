@@ -115,6 +115,14 @@ class OrderResource extends AbstractResource
         if (count($quote->getAllVisibleItems()) &&
             isset($requestData['payment'])
         ) {
+            if ($errors = $quote->getShippingAddress()->validate()) {
+                throw new WebApplicationException(400, 'A valid shipping address must be specified.');
+            }
+
+            if ($errors = $quote->getBillingAddress()->validate()) {
+                throw new WebApplicationException(400, 'A valid shipping address must be specified.');
+            }
+
             // create the new order!
             try {
                 $payment = $quote->getPayment();
@@ -338,10 +346,10 @@ class OrderResource extends AbstractResource
 
         $formattedData['grand_total'] = $quoteData['grand_total'];
         $formattedData['subtotal'] = $quoteData['subtotal'];
-        $formattedData['coupon_code'] = isset($quoteData['coupon_code'])
+        $formattedData['coupon_code'] = isset($quoteData['coupon_code']) && $quoteData['coupon_code']
             ? $quoteData['coupon_code']
             : null;
-        $formattedData['use_credit'] = isset($quoteData['use_reward_points'])
+        $formattedData['use_credit'] = isset($quoteData['use_reward_points']) && $quoteData['use_reward_points']
             ? intval($quoteData['use_reward_points'])
             : 0;
         $formattedData['credit_used'] = isset($quoteData['reward_currency_amount'])

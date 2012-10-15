@@ -13,20 +13,24 @@ use Sonno\Configuration\Driver\AnnotationDriver,
     Doctrine\Common\Annotations\AnnotationReader,
     Doctrine\Common\Annotations\AnnotationRegistry;
 
-ini_set('display_errors', 1);
-// allow requests from any origin
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Headers: Authorization');
-
 /**
- * Setup autoloaders for the API application, and other application settings as
- * global constants.
+ * Setup autoloaders for the API application, and vendor dependencies.
  */
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../src/autoload.php';
 
 define('API_ENV', getenv('API_ENV') ? getenv('API_ENV') : 'dev');
 define('APC_CONFIG_KEY', 'api_config');
+
+/**
+ * Setup default headers for CORS (Cross-Origin Resource Sharing) support, and
+ * API environment information.
+ */
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Headers: Authorization');
+
+header("X-Api-Environment: " . API_ENV);
+header("X-Api-Version: " . substr(exec('git rev-parse --verify HEAD'), 0, 8));
 
 /**
  * Bootstrap the Magento environment.
@@ -52,14 +56,11 @@ if (isset($_SERVER['HTTP_USER_AGENT']) &&
 
 require_once "$mageRoot/app/Mage.php";
 Mage::app($code);
-if ('dev' === API_ENV) {
-    Mage::setIsDeveloperMode(true);
-}
+Mage::setIsDeveloperMode('dev' === API_ENV);
 
 /**
- * Authorize the incoming request.
+ * Authorize the incoming request against the Magento web service user database.
  */
-
 function deny()
 {
     header('HTTP/1.1 401 Unauthorized');
@@ -118,9 +119,6 @@ if ('dev' !== API_ENV && extension_loaded('apc') && apc_exists(APC_CONFIG_KEY)) 
         apc_add(APC_CONFIG_KEY, $config);
     }
 }
-
-header("X-API-Environment: " . API_ENV);
-header("X-API-Version: " . substr(exec('git rev-parse --verify HEAD'), 0, 8));
 
 /**
  * Run a Sonno application!

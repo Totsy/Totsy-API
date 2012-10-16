@@ -115,12 +115,14 @@ class OrderResource extends AbstractResource
         if (count($quote->getAllVisibleItems()) &&
             isset($requestData['payment'])
         ) {
-            if ($errors = $quote->getShippingAddress()->validate()) {
+            $errors = $quote->getShippingAddress()->validate();
+            if (is_array($errors)) {
                 throw new WebApplicationException(400, 'A valid shipping address must be specified.');
             }
 
-            if ($errors = $quote->getBillingAddress()->validate()) {
-                throw new WebApplicationException(400, 'A valid shipping address must be specified.');
+            $errors = $quote->getBillingAddress()->validate();
+            if (is_array($errors)) {
+                throw new WebApplicationException(400, 'A valid billing address must be specified.');
             }
 
             // create the new order!

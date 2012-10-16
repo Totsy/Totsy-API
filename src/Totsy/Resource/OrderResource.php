@@ -354,9 +354,6 @@ class OrderResource extends AbstractResource
         $formattedData['use_credit'] = isset($quoteData['use_reward_points']) && $quoteData['use_reward_points']
             ? intval($quoteData['use_reward_points'])
             : 0;
-        $formattedData['credit_used'] = isset($quoteData['reward_currency_amount'])
-            ? min($quoteData['reward_currency_amount'], $quoteData['subtotal'])
-            : 0;
 
         $builder = $this->_uriInfo->getBaseUriBuilder();
         $builder->resourcePath(
@@ -444,7 +441,7 @@ class OrderResource extends AbstractResource
         $this->_updateAddress($obj, $data);
 
         // update coupon information
-        if (isset($data['coupon_code'])) {
+        if (isset($data['coupon_code']) && $data['coupon_code']) {
             $quote = $obj->getQuote();
             $quote->getShippingAddress()->setCollectShippingRates(true);
             $quote->setCouponCode($data['coupon_code'])

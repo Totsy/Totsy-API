@@ -348,11 +348,19 @@ class OrderResource extends AbstractResource
 
         $formattedData['grand_total'] = $quoteData['grand_total'];
         $formattedData['subtotal'] = $quoteData['subtotal'];
+        $formattedData['discount_amount'] = isset($quoteData['subtotal_with_discount']) && $quoteData['subtotal_with_discount']
+            ? $quoteData['subtotal'] - $quoteData['subtotal_with_discount']
+            : 0;
         $formattedData['coupon_code'] = isset($quoteData['coupon_code']) && $quoteData['coupon_code']
             ? $quoteData['coupon_code']
             : null;
         $formattedData['use_credit'] = isset($quoteData['use_reward_points']) && $quoteData['use_reward_points']
             ? intval($quoteData['use_reward_points'])
+            : 0;
+
+        $totals = $quote->getTotals();
+        $formattedData['credit_used'] = isset($totals['reward'])
+            ? -1 * $totals['reward']->getValue()
             : 0;
 
         $builder = $this->_uriInfo->getBaseUriBuilder();
@@ -444,9 +452,7 @@ class OrderResource extends AbstractResource
         if (isset($data['coupon_code']) && $data['coupon_code']) {
             $quote = $obj->getQuote();
             $quote->getShippingAddress()->setCollectShippingRates(true);
-            $quote->setCouponCode($data['coupon_code'])
-                ->collectTotals()
-                ->save();
+            $quote->setCouponCode($data['coupon_code'])->collectTotals();
 
             if ($data['coupon_code'] != $quote->getCouponCode()) {
                 throw new WebApplicationException(
@@ -458,7 +464,7 @@ class OrderResource extends AbstractResource
 
         // set the toggle for using reward points/credits
         if (isset($data['use_credit'])) {
-            $obj->getQuote()->setUseRewardPoints($data['use_credit'])->save();
+            $obj->getQuote()->setUseRewardPoints($data['use_credit']);
         }
 
         try {
@@ -508,7 +514,7 @@ class OrderResource extends AbstractResource
                         $address->load($addressId);
                         if (!$address->getId()) {
                             throw new WebApplicationException(
-                                409,
+                                400,
                                 "Invalid Address URI $addressUrl"
                             );
                         }

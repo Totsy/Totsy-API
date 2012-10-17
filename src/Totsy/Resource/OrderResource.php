@@ -72,7 +72,7 @@ class OrderResource extends AbstractResource
      */
     public function getUserOrders($id)
     {
-        $user = UserResource::authorizeUser($id);
+        UserResource::authorizeUser($id);
 
         return $this->getCollection(
             array(
@@ -115,14 +115,18 @@ class OrderResource extends AbstractResource
         if (count($quote->getAllVisibleItems()) &&
             isset($requestData['payment'])
         ) {
-            $errors = $quote->getShippingAddress()->validate();
-            if (is_array($errors)) {
-                throw new WebApplicationException(400, 'A valid shipping address must be specified.');
+            if (!$quote->isVirtual()) {
+                $errors = $quote->getShippingAddress()->validate();
+                if (is_array($errors)) {
+                    throw new WebApplicationException(400, 'A valid shipping address must be specified.');
+                }
             }
 
-            $errors = $quote->getBillingAddress()->validate();
-            if (is_array($errors)) {
-                throw new WebApplicationException(400, 'A valid billing address must be specified.');
+            if (!$quote->getGrandTotal()) {
+                $errors = $quote->getBillingAddress()->validate();
+                if (is_array($errors)) {
+                    throw new WebApplicationException(400, 'A valid billing address must be specified.');
+                }
             }
 
             // create the new order!

@@ -449,7 +449,11 @@ class OrderResource extends AbstractResource
         $this->_updateAddress($obj, $data);
 
         // update coupon information
-        if (isset($data['coupon_code']) && $data['coupon_code']) {
+        if (isset($data['coupon_code'])) {
+            if (!$data['coupon_code']) {
+                $data['coupon_code'] = 0;
+            }
+
             $quote = $obj->getQuote();
             $quote->getShippingAddress()->setCollectShippingRates(true);
             $quote->setCouponCode($data['coupon_code'])->collectTotals();

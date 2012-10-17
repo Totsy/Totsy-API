@@ -131,7 +131,7 @@ class OrderResource extends AbstractResource
 
                 // when there is no balance to collect on the order, use
                 // payment method 'free'
-                $requestData['payment']['method'] = ($quote->getGrandTotal())
+                $requestData['payment']['method'] = $quote->getGrandTotal()
                     ? 'paymentfactory_tokenize'
                     : 'free';
 
@@ -348,9 +348,10 @@ class OrderResource extends AbstractResource
 
         $formattedData['grand_total'] = $quoteData['grand_total'];
         $formattedData['subtotal'] = $quoteData['subtotal'];
-        $formattedData['discount_amount'] = isset($quoteData['subtotal_with_discount']) && $quoteData['subtotal_with_discount']
-            ? $quoteData['subtotal'] - $quoteData['subtotal_with_discount']
-            : 0;
+        $formattedData['discount_amount'] = isset($quoteData['subtotal_with_discount']) &&
+            $quoteData['subtotal_with_discount']
+                ? $quoteData['subtotal'] - $quoteData['subtotal_with_discount']
+                : 0;
         $formattedData['coupon_code'] = isset($quoteData['coupon_code']) && $quoteData['coupon_code']
             ? $quoteData['coupon_code']
             : null;
@@ -448,17 +449,23 @@ class OrderResource extends AbstractResource
         $this->_updateProducts($obj, $data);
         $this->_updateAddress($obj, $data);
 
+        $quote = $obj->getQuote();
+
+        // set the toggle for using reward points/credits
+        if (isset($data['use_credit'])) {
+            $quote->setUseRewardPoints($data['use_credit']);
+        }
+
         // update coupon information
         if (isset($data['coupon_code'])) {
             if (!$data['coupon_code']) {
                 $data['coupon_code'] = 0;
             }
 
-            $quote = $obj->getQuote();
-            $quote->getShippingAddress()->setCollectShippingRates(true);
-            $quote->setCouponCode($data['coupon_code'])->collectTotals();
-
-            if ($data['coupon_code'] != $quote->getCouponCode()) {
+            $quote->setCouponCode($data['coupon_code'])->collectTotals()->save();
+            if ($data['coupon_code'] &&
+                $data['coupon_code'] != $quote->getCouponCode()
+            ) {
                 throw new WebApplicationException(
                     409,
                     "Coupon code '$data[coupon_code]' was rejected."
@@ -466,17 +473,12 @@ class OrderResource extends AbstractResource
             }
         }
 
-        // set the toggle for using reward points/credits
-        if (isset($data['use_credit'])) {
-            $obj->getQuote()->setUseRewardPoints($data['use_credit']);
-        }
-
         try {
-            $obj->getQuote()->collectTotals();
-            if ($shippingAddress = $obj->getQuote()->getShippingAddress()) {
+            if ($shippingAddress = $quote->getShippingAddress()) {
                 $shippingAddress->collectTotals();
             }
 
+            $quote->collectTotals()->save();
             $obj->save();
         } catch(\Mage_Core_Exception $e) {
             $this->_logger->err($e->getMessage(), $e->getTrace());

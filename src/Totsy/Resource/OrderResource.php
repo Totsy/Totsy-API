@@ -466,15 +466,7 @@ class OrderResource extends AbstractResource
                 $data['coupon_code'] = 0;
             }
 
-            $quote->setCouponCode($data['coupon_code'])->collectTotals()->save();
-            if ($data['coupon_code'] &&
-                $data['coupon_code'] != $quote->getCouponCode()
-            ) {
-                throw new WebApplicationException(
-                    409,
-                    "Coupon code '$data[coupon_code]' was rejected."
-                );
-            }
+            $quote->setCouponCode($data['coupon_code']);
         }
 
         try {

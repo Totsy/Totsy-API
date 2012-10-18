@@ -17,8 +17,10 @@ Submit a `POST /user/345/order` cart update request. Only the `coupon_code` fiel
         "coupon_code": "DISCOUNT"
     }
 
-If the code supplied is valid, the server will respond with the usual `202 Accepted` status, and the code supplied will be reflected in the `coupon_code` field of the cart representation in the response.
-However, if the code supplied is invalid, the server will respond with a `409 Conflict` status.
+The server will respond with the usual `202 Accepted` status, and the code supplied will be reflected in the `coupon_code` field of the cart representation in the response, if the coupon code was valid and accepted.
+On the other hand, if the code supplied is invalid, the value of the `coupon_code` field of the cart representation in the response, will be `null`.
+
+If a valid coupon is already part of an order, and then an invalid coupon code is supplied as part of a request, the original coupon will also be lost and the value of the `coupon_code` field of the cart representation in the response will be `null`.
 
 ### Using credits ###
 
@@ -28,20 +30,10 @@ Submit a `POST /user/345/order` cart update request. Only the `use_credit` field
         "use_credit": 1
     }
 
-The value of this field is boolean (1 or 0). The updated value of this field will be reflected in the `use_credit` field of the cart representation in the response, along with the `grand_total` field.
+The data type of this field is boolean (1 or 0). The updated value of this field will be reflected in the `use_credit` field of the cart representation in the response, along with the `grand_total` field and the `credit_used` field.
 
 ### Submitting Payment ###
 
 Once the final pieces of information are added (specifically the `payment` and `addresses` object), an Order resource will be created and the server will respond with a `201 Created` response, along with a Location header specifying the URL for the newly created resource.
 
 When the `grand_total` field of the cart representation is 0, an empty `payment` object will suffice to complete the order.
-
-
-## Error Handling ##
-
-Any order update (`PUT /user/345/order`) could possibly respond with a `409 Conflict` status in the following scenarios:
-1. One or more of the items in the order are not available (out of stock).
-2. The coupon code specified is invalid.
-3. One of the resource URIs specified in the request are invalid.
-
-When a `409 Conflict` status is returned, an `X-API-Error` response header will also be supplied with a specific error message.

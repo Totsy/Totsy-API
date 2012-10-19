@@ -462,7 +462,7 @@ class OrderResource extends AbstractResource
 
         // update coupon information
         if (isset($data['coupon_code'])) {
-            if (!$data['coupon_code']) {
+            if (empty($data['coupon_code'])) {
                 $data['coupon_code'] = 0;
             }
 

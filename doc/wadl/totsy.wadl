@@ -5,35 +5,13 @@
 
   <doc title="Totsy REST API Specification">
     Version: 1.2<br/>
-    Last Modified: <time datetime="2012-09-20">Sep 20, 2012</time><br/>
+    Last Modified: <time datetime="2012-10-19">Oct 19, 2012</time><br/>
     Author: <a href="mailto:tbhuvanendran@totsy.com">Tharsan Bhuvanendran &lt;tbhuvanendran@totsy.com&gt;</a>
   </doc>
 
-  <resources base="https://api.totsy.com/">
-
-    <!-- Resource: Event -->
-    <resource path="event">
-      <doc title="Event">
-        An Event is a time-limited sale of zero or more Product items.
-      </doc>
-
-      <method name="GET">
-        <doc title="Retrieve All Events">
-          Retrieve a collection of all active/current Event instances.
-        </doc>
-
-        <request>
-          <param name="when" style="query" type="xsd:string" default="current,upcoming" repeating="true">
-            <doc title="When">A comma-separated list of time period names to filter events on.</doc>
-            <option value="current" />
-            <option value="upcoming" />
-          </param>
-        </request>
-
-        <response status="200">
-          <representation mediaType="application/json">
-            <doc title="Event Collection">
-              <pre>
+  <representation mediaType="application/json" id="event_collection">
+    <doc title="Event Collection">
+      <pre>
 [
     {
         "name": "Event01",
@@ -137,25 +115,13 @@
         ]
     }
 ]
-              </pre>
-            </doc>
-          </representation>
-        </response>
-      </method>
+      </pre>
+    </doc>
+  </representation>
 
-      <resource path="{event_id}">
-        <doc title="Event Entity">A single sale Event instance.</doc>
-        <param name="event_id" style="template" type="xsd:string">
-          <doc>The unique Event identifier.</doc>
-        </param>
-
-        <method name="GET">
-          <request>
-          </request>
-          <response status="200">
-            <representation mediaType="application/json">
-              <doc title="Full Event Entity">
-                <pre>
+  <representation mediaType="application/json" id="event_entity">
+    <doc title="Event Entity (full)">
+      <pre>
 {
     "name": "Event02",
     "description": "You and your girl can amp up your accessory collections with fun and stretchy LED watches by Popochos. Featuring their signature oblong LED screen, these cool digital timepieces will match any outfit, with easy snap-on covers that change your look in an instant. Choose from a wide range of covers with animal prints for the wild child of the family, or luscious lips for the sweet and sassy!",
@@ -190,22 +156,13 @@
         }
     ]
 }
-                </pre>
-              </doc>
-            </representation>
-          </response>
-        </method>
+      </pre>
+    </doc>
+  </representation>
 
-        <resource path="product">
-          <doc title="Event Product Collection">Products that are part of an Event.</doc>
-
-            <method name="GET">
-            <request>
-            </request>
-            <response status="200">
-              <representation mediaType="application/json">
-                <doc title="Product Collection">
-                  <pre>
+  <representation mediaType="application/json" id="product_collection">
+    <doc title="Product Collection">
+      <pre>
 [
     {
         "name": "Winter Stroller Cover Blue",
@@ -358,43 +315,19 @@
         ]
     }
 ]
-                  </pre>
-                </doc>
-              </representation>
-            </response>
-          </method>
-        </resource>
-      </resource>
-    </resource>
+      </pre>
+    </doc>
+  </representation>
 
-    <!-- Resource: Product -->
-    <resource path="product">
-      <doc title="Product">
-        A Product is a single item that is available for sale.
-      </doc>
-
-      <resource path="{product_id}">
-        <doc title="Product Entity">A single Product instance.</doc>
-        <param name="product_id" style="template" type="xsd:string">
-          <doc>The unique Product identifier.</doc>
-        </param>
-
-        <method name="GET">
-          <request>
-          </request>
-          <response status="200">
-            <representation mediaType="application/json">
-              <doc title="Full Product Entity">
-                <pre>
+  <representation mediaType="application/json" id="product_entity">
+    <doc title="Product Entity (full)">
+      <pre>
 {
-    "name": "Blue Umbrella Blowout",
-    "description": "The product long description",
+    "name": "Open Ultra Fold",
+    "description": "The product short description",
     "short_description": "The product short description",
     "shipping_returns": "...",
-    "department": [
-        "girls",
-        "accessories"
-    ],
+    "department": [],
     "age": [
         "0_6m",
         "6_24m",
@@ -411,26 +344,23 @@
             "Green"
         ]
     },
-    "vendor_style": "dotcom",
-    "sku": "SKU-334-2423501",
+    "vendor_style": null,
+    "sku": "SKU-33544-4324",
     "weight": "1.0000",
     "price": {
         "price": "10.0000",
-        "orig": "12.0000"
+        "orig": null
     },
     "hot": false,
     "featured": false,
     "image": [
-        "http://www.totsy.com/media/catalog/product/m/e/medium_1.gif",
-        "http://www.totsy.com/media/catalog/product/t/h/thumbnail_1.gif",
-        "http://www.totsy.com/media/catalog/product/s/m/small_1.gif",
-        "http://www.totsy.com/media/catalog/product/l/a/large_1.gif"
+        "http://www.totsy.com/media/catalog/product/o/p/open-ultra-fold-lady-umbrella-with-hard-case.jpg"
     ],
     "type": "configurable",
     "links": [
         {
             "rel": "self",
-            "href": "https://api.totsy.com/product/1098"
+            "href": "https://api.totsy.com/product/1099"
         },
         {
             "rel": "http://rel.totsy.com/entity/event",
@@ -438,101 +368,17 @@
         },
         {
             "rel": "alternate",
-            "href": "http://www.totsy.com/stroller-sale/blue-umbrella-blowout.html"
+            "href": "http://www.totsy.com/stroller-sale/open-ultra-fold.html"
         }
     ]
 }
-                </pre>
-              </doc>
-            </representation>
-          </response>
-        </method>
-      </resource>
-    </resource>
+      </pre>
+    </doc>
+  </representation>
 
-    <!-- Resource: User Authorization -->
-    <resource path="auth">
-      <doc title="User Authorization">
-        A user authorization is the analog to logging into the system on behalf
-        of an existing system User in order to perform sensitive operations on
-        their behalf.
-      </doc>
-
-      <method name="POST">
-        <doc title="Login">
-          Login to the system on behalf of an existing system User or Facebook user.
-          Upon successful login, an HTTP cookie will be supplied in the response
-          to allow further requests on behalf of the logged-in user.
-        </doc>
-        <request>
-          <representation mediaType="application/json">
-            <doc title="Login Request (system user)">
-              <pre>
-{
-    "email": "...",
-    "password": "..."
-}
-              </pre>
-            </doc>
-          </representation>
-          <representation mediaType="application/json">
-            <doc title="Login Request (Facebook user)">
-              <pre>
-{
-    "facebook_access_token": "AAAB2T8fT3t4BADSajxA8jo3bIBwQNDEHcUIBJOnaTeCZCZAtZBL9YRj6yQP6fEks22RXFrjHcVFzpYJLJDQVoAjfISbOnRtz2j8l8rA2gZDZD"
-}
-              </pre>
-            </doc>
-          </representation>
-        </request>
-
-        <response status="200">
-          <representation mediaType="application/json">
-            <doc title="User Authorization Entity">
-              <pre>
-{
-    "links": [
-        {
-            "rel": "http://rel.totsy.com/entity/user",
-            "href": "https://api.totsy.com/user/35235235"
-        }
-    ]
-}
-              </pre>
-            </doc>
-          </representation>
-        </response>
-        <response status="403">
-          <doc title="Authorization Denied: Invalid credentials provided." />
-        </response>
-      </method>
-
-      <method name="DELETE">
-        <doc title="Logout">
-          Destroy an existing user session and log the system User out of the system.
-        </doc>
-        <request></request>
-        <response status="200"></response>
-      </method>
-    </resource>
-
-    <!-- Resource: User -->
-    <resource path="user">
-      <doc title="User">
-        A system User represents an account that enables the holder to perform
-        certain activities, including purchasing Products.
-      </doc>
-
-      <method name="POST">
-        <doc title="Create New User">
-            Add a new User to the system.
-            NOTE: The <code>credit</code> property will be ignored when creating or updating users.
-        </doc>
-
-        <request>
-          <representation mediaType="application/json">
-            <doc title="Partial User Entity">
-              <pre>
+  <representation mediaType="application/json" id="user_partial">
+    <doc title="User Entity (partial)">
+      <pre>
 {
     "email": "tbhuvanendran@totsy.com",
     "firstname": "Tharsan",
@@ -540,14 +386,13 @@
     "password": "123456789",
     "confirmation": "123456789"
 }
-              </pre>
-            </doc>
-          </representation>
-        </request>
-        <response status="201">
-          <representation mediaType="application/json">
-            <doc title="Full User Entity">
-              <pre>
+      </pre>
+    </doc>
+  </representation>
+
+  <representation mediaType="application/json" id="user_full">
+    <doc title="User Entity (full)">
+      <pre>
 {
     "email": "tbhuvanendran@totsy.com",
     "firstname": "Tharsan",
@@ -574,145 +419,13 @@
         }
     ]
 }
-              </pre>
-            </doc>
-          </representation>
-        </response>
-      </method>
+      </pre>
+    </doc>
+  </representation>
 
-      <resource path="{user_id}">
-        <doc title="User Entity">A single system User instance.</doc>
-        <param name="user_id" style="template" type="xsd:string">
-          <doc>The unique User identifier.</doc>
-        </param>
-
-        <param name="Cookie" type="xsd:string" style="header" required="true">
-          <doc title="User Authorization Token">
-            The HTTP cookie provided by the server when logging a system User
-            into the system.
-          </doc>
-        </param>
-
-        <method name="GET">
-          <doc title="Retrieve User">
-            Retrieve a single User entity.
-          </doc>
-          <request>
-          </request>
-          <response status="200">
-            <representation mediaType="application/json">
-              <doc title="Full User Entity">
-                <pre>
-{
-    "email": "tbhuvanendran@totsy.com",
-    "firstname": "Tharsan",
-    "lastname": "Bhuvanendran",
-    "credit": 50,
-    "invitation_url": "https://api.totsy.com/invite/tbhuvanendran_283821",
-    "facebook_uid": "29388811111",
-    "links": [
-        {
-            "rel": "self",
-            "href": "https://api.totsy.com/user/1139"
-        },
-        {
-            "rel": "http://rel.totsy.com/collection/address",
-            "href": "https://api.totsy.com/user/1139/address"
-        },
-        {
-            "rel": "http://rel.totsy.com/collection/order",
-            "href": "https://api.totsy.com/user/1139/order"
-        },
-        {
-            "rel": "http://rel.totsy.com/collection/creditcard",
-            "href": "https://api.totsy.com/user/1139/creditcard"
-        }
-    ]
-}
-                </pre>
-              </doc>
-            </representation>
-          </response>
-        </method>
-
-        <method name="PUT">
-          <doc title="Update User">
-            Update the record of an existing system User.
-            NOTE: The <code>credit</code> property will be ignored when creating or updating users.
-          </doc>
-
-          <request>
-            <representation mediaType="application/json">
-              <doc title="Partial User Entity">
-                <pre>
-{
-    "email": "tbhuvanendran@totsy.com",
-    "firstname": "Tharsan",
-    "lastname": "Bhuvanendran",
-    "password": "monkeywrench",
-    "confirmation": "monkeywrench"
-}
-                </pre>
-              </doc>
-            </representation>
-          </request>
-          <response status="200">
-            <representation mediaType="application/json">
-              <doc title="Full User Entity">
-                <pre>
-{
-    "email": "tbhuvanendran@totsy.com",
-    "firstname": "Tharsan",
-    "lastname": "Bhuvanendran",
-    "credit": 0,
-    "invitation_url": "https://api.totsy.com/invite/tbhuvanendran_283821",
-    "facebook_uid": "29388811111",
-    "links": [
-        {
-            "rel": "self",
-            "href": "https://api.totsy.com/user/1139"
-        },
-        {
-            "rel": "http://rel.totsy.com/collection/address",
-            "href": "https://api.totsy.com/user/1139/address"
-        },
-        {
-            "rel": "http://rel.totsy.com/collection/order",
-            "href": "https://api.totsy.com/user/1139/order"
-        },
-        {
-            "rel": "http://rel.totsy.com/collection/creditcard",
-            "href": "https://api.totsy.com/user/1139/creditcard"
-        }
-    ]
-}
-                </pre>
-              </doc>
-            </representation>
-          </response>
-        </method>
-
-        <method name="DELETE">
-          <doc title="Delete User">Remove the record of an existing system User.</doc>
-          <request></request>
-          <response status="200"></response>
-        </method>
-
-        <resource path="address">
-          <doc title="User Addresses">
-            The collection of all Address instances associated with a system User.
-          </doc>
-
-          <method name="GET">
-            <doc title="Retrieve User Addresses">
-              Retrieve all Addresses associated with a system User.
-            </doc>
-            <request>
-            </request>
-            <response status="200">
-              <representation mediaType="application/json">
-                <doc title="Address Collection">
-                  <pre>
+  <representation mediaType="application/json" id="address_collection">
+    <doc title="Address Collection">
+      <pre>
 [
     {
         "firstname": "Test First 2",
@@ -763,21 +476,13 @@
         ]
     }
 ]
-                  </pre>
-                </doc>
-              </representation>
-            </response>
-          </method>
+      </pre>
+    </doc>
+  </representation>
 
-          <method name="POST">
-            <doc title="Add New User Address">
-              Add a new Address to an existing system User.
-           </doc>
-
-            <request>
-              <representation mediaType="application/json">
-                <doc title="Partial Address Entity">
-                  <pre>
+  <representation mediaType="application/json" id="address_partial">
+    <doc title="Address Entity (partial)">
+      <pre>
 {
     "firstname": "Maya",
     "lastname": "Troublestone",
@@ -792,31 +497,30 @@
     "default_billing": false,
     "default_shipping": true
 }
-                  </pre>
-                </doc>
-              </representation>
-            </request>
-            <response status="201">
-              <representation mediaType="application/json">
-                <doc title="Full Address Entity">
-                  <pre>
+      </pre>
+    </doc>
+  </representation>
+
+  <representation mediaType="application/json" id="address_full">
+    <doc title="Address Entity (full)">
+      <pre>
 {
-    "firstname": "Maya",
-    "lastname": "Troublestone",
-    "company": null,
-    "street": [ "482 5th Ave.", "Apt. 101" ],
-    "city": "New York",
-    "state": "New York",
-    "zip": "10078",
+    "firstname": "Stephen",
+    "lastname": "Hawking",
+    "company": "Fake Enterprise",
+    "street": [ "123 Fake Street", "Apt. 108" ],
+    "city": "Springfield",
+    "state": "Ohio",
+    "zip": "12345",
     "country": "US",
-    "telephone": "2128482766",
-    "fax": null,
+    "telephone": "2121234539",
+    "fax": "2129973472",
     "default_billing": false,
-    "default_shipping": true,
+    "default_shipping": false,
     "links": [
         {
             "rel": "self",
-            "href": "https://api.totsy.com/address/1244"
+            "href": "https://api.totsy.com/address/1243"
         },
         {
             "rel": "http://rel.totsy.com/entity/user",
@@ -824,26 +528,13 @@
         }
     ]
 }
-                  </pre>
-                </doc>
-              </representation>
-            </response>
-          </method>
-        </resource>
+      </pre>
+    </doc>
+  </representation>
 
-        <resource path="order">
-          <doc title="User Orders">
-            The collection of all orders that a user has ever placed.
-          </doc>
-
-          <method name="GET">
-            <doc title="Retrieve User Orders">
-              Retrieve the collection of all orders that a user has ever placed.
-            </doc>
-            <response status="200">
-              <representation mediaType="application/json">
-                <doc title="Order Collection">
-                  <pre>
+  <representation mediaType="application/json" id="order_collection">
+    <doc title="Order Collection">
+      <pre>
 [
     {
         "number": "1000283",
@@ -976,28 +667,13 @@
         ]
     }
 ]
-                  </pre>
-                </doc>
-              </representation>
-            </response>
-          </method>
+      </pre>
+    </doc>
+  </representation>
 
-          <method name="POST">
-            <doc title="Add New Order">
-              Submit a new Order for this user. An order is intially created
-              with one or more product items, and is assigned an expiration date.
-              Then an order can be continually updated with more items, which
-              updates the expiration date. Once the expiration date passes,
-              the incomplete order is destroyed and will cease to exist.<br/>
-              Finally, once both payment and addresses information is submitted,
-              the order is considered complete, at which point is no longer
-              contains an expiry date.
-            </doc>
-
-            <request>
-              <representation mediaType="application/json">
-                <doc title="Partial Order Entity">
-                  <pre>
+  <representation mediaType="application/json" id="order_partial">
+    <doc title="Order Entity (partial)">
+      <pre>
 {
     "coupon_code": "DISCOUNT",
     "use_credit": 1,
@@ -1061,15 +737,13 @@
         ]
     }
 }
-                  </pre>
-                </doc>
-              </representation>
-            </request>
-            <response status="202">
-              <doc>The order items have been accepted the order is pending.</doc>
-              <representation mediaType="application/json">
-                <doc title="Full Order Entity (Pending)">
-                  <pre>
+      </pre>
+    </doc>
+  </representation>
+
+  <representation mediaType="application/json" id="order_pending">
+    <doc title="Order Entity (pending)">
+      <pre>
 {
     "expires" : 893,
     "shipping_amount" : 7.95,
@@ -1114,16 +788,13 @@
         }
     ]
 }
-                  </pre>
-                </doc>
-              </representation>
-            </response>
-            <response status="201">
-              <doc>The order is complete and will enter fulfillment.</doc>
-              <representation mediaType="application/json">
-                <doc title="Full Order Entity (Placed)">
-                  <pre>
+      </pre>
+    </doc>
+  </representation>
 
+  <representation mediaType="application/json" id="order_full">
+    <doc title="Order Entity (full)">
+      <pre>
 {
     "number": "1000283",
     "status": "pending",
@@ -1189,34 +860,13 @@
         }
     ]
 }
-                  </pre>
-                </doc>
-              </representation>
-            </response>
-            <response status="409">
-              <doc>
-                When attempting to update a temporary Order, there is
-                insufficient stock quantity available to fulfill the order.
-              </doc>
-            </response>
-          </method>
-        </resource>
+      </pre>
+    </doc>
+  </representation>
 
-        <resource path="creditcard">
-          <doc title="User Credit Cards">
-            The collection of all Credit Cards saved for a system User.
-          </doc>
-
-          <method name="GET">
-            <doc title="Retrieve User Credit Cards">
-              Retrieve a collection of all user Credit Cards.
-            </doc>
-            <request>
-            </request>
-            <response status="200">
-              <representation mediaType="application/json">
-                <doc title="Credit Card Collection">
-                  <pre>
+  <representation mediaType="application/json" id="creditcard_collection">
+    <doc title="Credit Card Collection">
+      <pre>
 [
     {
         "type": "VI",
@@ -1251,20 +901,13 @@
         ]
     }
 ]
-                  </pre>
-                </doc>
-              </representation>
-            </response>
-          </method>
+      </pre>
+    </doc>
+  </representation>
 
-          <method name="POST">
-            <doc title="Create New User Credit Card">
-              Add a new User Credit Card to the system.
-            </doc>
-            <request>
-              <representation mediaType="application/json">
-                <doc title="Partial Credit Card Entity">
-                  <pre>
+  <representation mediaType="application/json" id="creditcard_partial">
+    <doc title="Credit Card Entity (partial)">
+      <pre>
 {
     "type": "VI",
     "cc_number": "4111111111111111",
@@ -1289,14 +932,13 @@
         }
     ]
 }
-                  </pre>
-                </doc>
-              </representation>
-            </request>
-            <response status="201">
-              <representation mediaType="application/json">
-                <doc title="Full Credit Card Entity">
-                  <pre>
+      </pre>
+    </doc>
+  </representation>
+
+  <representation mediaType="application/json" id="creditcard_full">
+    <doc title="Credit Card Entity (full)">
+      <pre>
 {
     "type": "MC",
     "cc_last4": "4444",
@@ -1313,9 +955,318 @@
         }
     ]
 }
-                  </pre>
-                </doc>
-              </representation>
+      </pre>
+    </doc>
+  </representation>
+
+  <resources base="https://api.totsy.com/">
+
+    <!-- Resource: Event -->
+    <resource path="event">
+      <doc title="Event">
+        An Event is a time-limited sale of zero or more Product items.
+      </doc>
+
+      <method name="GET">
+        <doc title="Retrieve All Events">
+          Retrieve a collection of all active/current Event instances.
+        </doc>
+
+        <request>
+          <param name="when" style="query" type="xsd:string" default="current,upcoming" repeating="true">
+            <doc title="When">A comma-separated list of time period names to filter events on.</doc>
+            <option value="current" />
+            <option value="upcoming" />
+          </param>
+        </request>
+
+        <response status="200">
+          <representation href="#event_collection" />
+        </response>
+      </method>
+
+      <resource path="{event_id}">
+        <doc title="Event Entity">A single sale Event instance.</doc>
+        <param name="event_id" style="template" type="xsd:string">
+          <doc>The unique Event identifier.</doc>
+        </param>
+
+        <method name="GET">
+          <request>
+          </request>
+          <response status="200">
+            <representation href="#event_entity" />
+          </response>
+        </method>
+
+        <resource path="product">
+          <doc title="Event Product Collection">Products that are part of an Event.</doc>
+
+            <method name="GET">
+            <request>
+            </request>
+            <response status="200">
+              <representation href="#product_collection" />
+            </response>
+          </method>
+        </resource>
+      </resource>
+    </resource>
+
+    <!-- Resource: Product -->
+    <resource path="product">
+      <doc title="Product">
+        A Product is a single item that is available for sale.
+      </doc>
+
+      <resource path="{product_id}">
+        <doc title="Product Entity">A single Product instance.</doc>
+        <param name="product_id" style="template" type="xsd:string">
+          <doc>The unique Product identifier.</doc>
+        </param>
+
+        <method name="GET">
+          <request>
+          </request>
+          <response status="200">
+            <representation href="#product_entity" />
+          </response>
+        </method>
+      </resource>
+    </resource>
+
+    <!-- Resource: User Authorization -->
+    <resource path="auth">
+      <doc title="User Authorization">
+        A user authorization is the analog to logging into the system on behalf
+        of an existing system User in order to perform sensitive operations on
+        their behalf.
+      </doc>
+
+      <method name="POST">
+        <doc title="Login">
+          Login to the system on behalf of an existing system User or Facebook user.
+          Upon successful login, an HTTP cookie will be supplied in the response
+          to allow further requests on behalf of the logged-in user.
+        </doc>
+        <request>
+          <representation mediaType="application/json">
+            <doc title="Login Request (system user)">
+              <pre>
+{
+    "email": "...",
+    "password": "..."
+}
+              </pre>
+            </doc>
+          </representation>
+          <representation mediaType="application/json">
+            <doc title="Login Request (Facebook user)">
+              <pre>
+{
+    "facebook_access_token": "AAAB2T8fT3t4BADSajxA8jo3bIBwQNDEHcUIBJOnaTeCZCZAtZBL9YRj6yQP6fEks22RXFrjHcVFzpYJLJDQVoAjfISbOnRtz2j8l8rA2gZDZD"
+}
+              </pre>
+            </doc>
+          </representation>
+        </request>
+
+        <response status="200">
+          <representation mediaType="application/json">
+            <doc title="User Authorization Entity">
+              <pre>
+{
+    "links": [
+        {
+            "rel": "http://rel.totsy.com/entity/user",
+            "href": "https://api.totsy.com/user/35235235"
+        }
+    ]
+}
+              </pre>
+            </doc>
+          </representation>
+        </response>
+        <response status="403">
+          <doc title="Authorization Denied: Invalid credentials provided." />
+        </response>
+      </method>
+
+      <method name="DELETE">
+        <doc title="Logout">
+          Destroy an existing user session and log the system User out of the system.
+        </doc>
+        <request></request>
+        <response status="204"></response>
+      </method>
+    </resource>
+
+    <!-- Resource: User -->
+    <resource path="user">
+      <doc title="User">
+        A system User represents an account that enables the holder to perform
+        certain activities, including purchasing Products.
+      </doc>
+
+      <method name="POST">
+        <doc title="Create New User">
+            Add a new User to the system.
+            NOTE: The <code>credit</code> property will be ignored when creating or updating users.
+        </doc>
+
+        <request>
+          <representation href="#user_partial" />
+        </request>
+        <response status="201">
+          <representation href="#user_full" />
+        </response>
+      </method>
+
+      <resource path="{user_id}">
+        <doc title="User Entity">A single system User instance.</doc>
+        <param name="user_id" style="template" type="xsd:string">
+          <doc>The unique User identifier.</doc>
+        </param>
+
+        <param name="Cookie" type="xsd:string" style="header" required="true">
+          <doc title="User Authorization Token">
+            The HTTP cookie provided by the server when logging a system User
+            into the system.
+          </doc>
+        </param>
+
+        <method name="GET">
+          <doc title="Retrieve User">
+            Retrieve a single User entity.
+          </doc>
+          <request>
+          </request>
+          <response status="200">
+            <representation href="#user_full" />
+          </response>
+        </method>
+
+        <method name="PUT">
+          <doc title="Update User">
+            Update the record of an existing system User.
+            NOTE: The <code>credit</code> property will be ignored when creating or updating users.
+          </doc>
+
+          <request>
+            <representation href="#user_partial" />
+          </request>
+          <response status="200">
+            <representation href="#user_full" />
+          </response>
+        </method>
+
+        <method name="DELETE">
+          <doc title="Delete User">Remove the record of an existing system User.</doc>
+          <request></request>
+          <response status="204"></response>
+        </method>
+
+        <resource path="address">
+          <doc title="User Addresses">
+            The collection of all Address instances associated with a system User.
+          </doc>
+
+          <method name="GET">
+            <doc title="Retrieve User Addresses">
+              Retrieve all Addresses associated with a system User.
+            </doc>
+            <request>
+            </request>
+            <response status="200">
+              <representation href="#address_collection" />
+            </response>
+          </method>
+
+          <method name="POST">
+            <doc title="Add New User Address">
+              Add a new Address to an existing system User.
+           </doc>
+
+            <request>
+              <representation href="#address_partial" />
+            </request>
+            <response status="201">
+              <representation href="#address_full" />
+            </response>
+          </method>
+        </resource>
+
+        <resource path="order">
+          <doc title="User Orders">
+            The collection of all orders that a user has ever placed.
+          </doc>
+
+          <method name="GET">
+            <doc title="Retrieve User Orders">
+              Retrieve the collection of all orders that a user has ever placed.
+            </doc>
+            <response status="200">
+              <representation href="#order_collection" />
+            </response>
+          </method>
+
+          <method name="POST">
+            <doc title="Add New Order">
+              Submit a new Order for this user. An order is intially created
+              with one or more product items, and is assigned an expiration date.
+              Then an order can be continually updated with more items, which
+              updates the expiration date. Once the expiration date passes,
+              the incomplete order is destroyed and will cease to exist.<br/>
+              Finally, once both payment and addresses information is submitted,
+              the order is considered complete, at which point is no longer
+              contains an expiry date.
+            </doc>
+
+            <request>
+              <representation href="#order_partial" />
+            </request>
+            <response status="202">
+              <doc>The order items have been accepted the order is pending.</doc>
+              <representation href="#order_pending" />
+            </response>
+            <response status="201">
+              <doc>The order is complete and will enter fulfillment.</doc>
+              <representation href="#order_full" />
+            </response>
+            <response status="409">
+              <doc>
+                When attempting to update a temporary Order, there is
+                insufficient stock quantity available to fulfill the order.
+              </doc>
+            </response>
+          </method>
+        </resource>
+
+        <resource path="creditcard">
+          <doc title="User Credit Cards">
+            The collection of all Credit Cards saved for a system User.
+          </doc>
+
+          <method name="GET">
+            <doc title="Retrieve User Credit Cards">
+              Retrieve a collection of all user Credit Cards.
+            </doc>
+            <request>
+            </request>
+            <response status="200">
+              <representation href="#creditcard_collection" />
+            </response>
+          </method>
+
+          <method name="POST">
+            <doc title="Create New User Credit Card">
+              Add a new User Credit Card to the system.
+            </doc>
+            <request>
+              <representation href="#creditcard_partial" />
+            </request>
+            <response status="201">
+              <representation href="#creditcard_full" />
             </response>
           </method>
         </resource>
@@ -1345,101 +1296,24 @@
         <method name="DELETE">
           <doc title="Delete Address">Delete an existing Address.</doc>
           <request></request>
-          <response></response>
+          <response status="204"></response>
         </method>
 
         <method name="GET">
           <doc title="Retrieve Address">Retrieve a single Address instance.</doc>
           <request></request>
           <response status="200">
-            <representation mediaType="application/json">
-              <doc title="Full Address Entity">
-                <pre>
-{
-    "firstname": "Stephen",
-    "lastname": "Hawking",
-    "company": "Fake Enterprise",
-    "street": [ "123 Fake Street", "Apt. 108" ],
-    "city": "Springfield",
-    "state": "Ohio",
-    "zip": "12345",
-    "country": "US",
-    "telephone": "2121234539",
-    "fax": "2129973472",
-    "default_billing": false,
-    "default_shipping": false,
-    "links": [
-        {
-            "rel": "self",
-            "href": "https://api.totsy.com/address/1243"
-        },
-        {
-            "rel": "http://rel.totsy.com/entity/user",
-            "href": "https://api.totsy.com/user/1153"
-        }
-    ]
-}
-                </pre>
-              </doc>
-            </representation>
+            <representation href="#address_full" />
           </response>
         </method>
   
         <method name="PUT">
           <doc title="Update Address">Update the record of an existing Address instance.</doc>
           <request>
-            <representation mediaType="application/json">
-              <doc title="Partial Address Entity">
-                <pre>
-{
-    "firstname": "Stephen",
-    "lastname": "Hawking",
-    "company": "Fake Enterprise",
-    "street": [ "123 Fake Street", "Apt. 108" ],
-    "city": "Springfield",
-    "state": "Ohio",
-    "zip": "12345",
-    "country": "US",
-    "telephone": "2121234539",
-    "fax": "2129973472",
-    "default_billing": false,
-    "default_shipping": false
-}
-                </pre>
-              </doc>
-            </representation>
+            <representation href="#address_partial" />
           </request>
           <response status="200">
-            <representation mediaType="application/json">
-              <doc title="Full Address Entity">
-                <pre>
-{
-    "firstname": "Stephen",
-    "lastname": "Hawking",
-    "company": "Fake Enterprise",
-    "street": [ "123 Fake Street", "Apt. 108" ],
-    "city": "Springfield",
-    "state": "Ohio",
-    "zip": "12345",
-    "country": "US",
-    "telephone": "2121234539",
-    "fax": "2129973472",
-    "default_billing": false,
-    "default_shipping": false,
-    "links": [
-        {
-            "rel": "self",
-            "href": "https://api.totsy.com/address/1243"
-        },
-        {
-            "rel": "http://rel.totsy.com/entity/user",
-            "href": "https://api.totsy.com/user/1153"
-        }
-    ]
-}
-                </pre>
-              </doc>
-            </representation>
+            <representation href="#address_full" />
           </response>
         </method>
       </resource>
@@ -1467,7 +1341,7 @@
         <method name="DELETE">
           <doc title="Delete Order">Delete an existing Order.</doc>
           <request></request>
-          <response status="200"></response>
+          <response status="204"></response>
         </method>
 
         <method name="GET">
@@ -1475,77 +1349,7 @@
             Retrieve a single Order entity instance.
           </doc>
           <response status="200">
-            <representation mediaType="application/json">
-              <doc title="Full Order Entity">
-                <pre>
-{
-    "number": "1000283",
-    "status": "pending",
-    "created": "2012-03-27 16:07:25",
-    "updated": "2012-03-27 16:07:27",
-    "coupon_code": null,
-    "total_qty": "1.0000",
-    "total_weight": "2.0000",
-    "shipping": "0.0000",
-    "tax": "1.6000",
-    "discount": "0.0000",
-    "credit_redeemed": "0.0000",
-    "subtotal": "18.0000",
-    "grand_total": "19.6000",
-    "products": [
-        {
-            "name": "Bullfinches Long Sleeve Ruched Neck Tee Light Blue",
-            "price": "18.0000",
-            "qty": "1.0000",
-            "weight": "2.0000",
-            "links": [
-                {
-                    "rel": "http://rel.totsy.com/entity/product",
-                    "href": "https://api.totsy.com/product/383"
-                }
-            ]
-        }
-    ],
-    "payment": {
-        "cc_type": "VI",
-        "cc_last4": "1111",
-        "cc_exp_month": "6",
-        "cc_exp_year": "2016"
-    },
-    "addresses": [
-        {
-            "type": "billing",
-            "links": [
-                {
-                    "rel": "http://rel.totsy.com/entity/address",
-                    "href": "https://api.totsy.com/address/429"
-                }
-            ]
-        },
-        {
-            "type": "shipping",
-            "links": [
-                {
-                    "rel": "http://rel.totsy.com/entity/address",
-                    "href": "https://api.totsy.com/address/430"
-                }
-            ]
-        }
-    ],
-    "links": [
-        {
-            "rel": "self",
-            "href": "https://api.totsy.com/order/215"
-        },
-        {
-            "rel": "http://rel.totsy.com/entity/user",
-            "href": "https://api.totsy.com/user/1131"
-        }
-    ]
-}
-                </pre>
-              </doc>
-            </representation>
+            <representation href="#order_full" />
           </response>
         </method>
       </resource>
@@ -1576,7 +1380,7 @@
         <method name="DELETE">
           <doc title="Delete Credit Card">Delete an existing Credit Card.</doc>
           <request></request>
-          <response></response>
+          <response status="204"></response>
         </method>
 
         <method name="GET">
@@ -1585,28 +1389,7 @@
           </doc>
           <request></request>
           <response status="200">
-            <representation mediaType="application/json">
-              <doc title="Full Credit Card Entity">
-                <pre>
-{
-    "type": "MC",
-    "cc_last4": "4444",
-    "cc_exp_year": "2015",
-    "cc_exp_month": "1",
-    "links": [
-        {
-            "rel": "self",
-            "href": "https://api.totsy.com/creditcard/257794"
-        },
-        {
-            "rel": "http://rel.totsy.com/entity/user",
-            "href": "https://api.totsy.com/user/4944189"
-        }
-    ]
-}
-                </pre>
-              </doc>
-            </representation>
+            <representation href="#creditcard_full" />
           </response>
         </method>
       </resource>

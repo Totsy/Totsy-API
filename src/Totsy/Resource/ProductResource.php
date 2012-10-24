@@ -77,6 +77,7 @@ class ProductResource extends AbstractResource
     public function getProductEntity($id)
     {
         if ($response = $this->_inspectCache()) {
+            $response->setHeaders(array('Cache-Control' => 'max-age=3600'));
             return $response;
         }
 
@@ -88,11 +89,9 @@ class ProductResource extends AbstractResource
         }
 
         $result = $this->getItem($id);
-        if ($response = $this->_addCache($result, $product->getCacheTags(), 3600)) {
-            return $response;
-        }
+        $this->_addCache($result, $product->getCacheTags());
 
-        return $result;
+        return new Response(200, $result, array('Cache-Control' => 'max-age=3600'));
     }
 
     /**
@@ -106,6 +105,7 @@ class ProductResource extends AbstractResource
     public function getEventProductCollection($id)
     {
         if ($response = $this->_inspectCache()) {
+            $response->setHeaders(array('Cache-Control' => 'max-age=3600'));
             return $response;
         }
 
@@ -140,7 +140,7 @@ class ProductResource extends AbstractResource
 
         $results = array();
         $cacheTags = $event->getCacheTags() ?: array();
-        foreach ($products as $i => $product) {
+        foreach ($products as $product) {
             if (!$product->isSalable()) {
                 continue;
             }
@@ -158,11 +158,9 @@ class ProductResource extends AbstractResource
         $result = json_encode($results);
         $cacheTags = array_unique($cacheTags);
         $cacheTags = array_map('strtoupper', $cacheTags);
-        if ($response = $this->_addCache($result, $cacheTags, 3600)) {
-            return $response;
-        }
+        $this->_addCache($result, $cacheTags);
 
-        return $result;
+        return new Response(200, $result, array('Cache-Control' => 'max-age=3600'));
     }
 
     /**

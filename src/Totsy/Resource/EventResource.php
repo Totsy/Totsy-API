@@ -14,6 +14,7 @@ use Sonno\Annotation\GET,
     Sonno\Annotation\Produces,
     Sonno\Annotation\Context,
     Sonno\Annotation\PathParam,
+    Sonno\Http\Response\Response,
     Sonno\Application\WebApplicationException;
 
 /**
@@ -56,6 +57,7 @@ class EventResource extends AbstractResource
     public function getEventCollection()
     {
         if ($response = $this->_inspectCache()) {
+            $response->setHeaders(array('Cache-Control' => 'max-age=3600'));
             return $response;
         }
 
@@ -96,12 +98,9 @@ class EventResource extends AbstractResource
         }
 
         $result = json_encode($results);
-        $cacheTags = \Harapartners_Categoryevent_Model_Cache_Index::CACHE_TAG;
-        if ($response = $this->_addCache($result, $cacheTags, 3600)) {
-            return $response;
-        }
+        $this->_addCache($result, \Harapartners_Categoryevent_Model_Cache_Index::CACHE_TAG);
 
-        return $result;
+        return new Response(200, $result, array('Cache-Control' => 'max-age=3600'));
     }
 
     /**
@@ -115,6 +114,7 @@ class EventResource extends AbstractResource
     public function getEventEntity($id)
     {
         if ($response = $this->_inspectCache()) {
+            $response->setHeaders(array('Cache-Control' => 'max-age=3600'));
             return $response;
         }
 
@@ -125,11 +125,9 @@ class EventResource extends AbstractResource
         }
 
         $result = json_encode($this->_formatItem($item));
-        if ($response = $this->_addCache($result, $item->getCacheTags(), 3600)) {
-            return $response;
-        }
+        $this->_addCache($result, $item->getCacheTags());
 
-        return $result;
+        return new Response(200, $result, array('Cache-Control' => 'max-age=3600'));
     }
 
     /**

@@ -19,10 +19,6 @@ use Sonno\Annotation\GET,
 
     Totsy\Exception\WebApplicationException,
 
-    Doctrine\Common\Cache\CacheProvider,
-    Doctrine\Common\Cache\ApcCache,
-    Doctrine\Common\Cache\MemcacheCache,
-
     Monolog\Logger,
     Monolog\Handler\StreamHandler,
     Monolog\Handler\NativeMailerHandler,
@@ -296,7 +292,7 @@ abstract class AbstractResource
      * Check the local cache for a copy of a response body that can fulfill the
      * current request.
      *
-     * @return mixed
+     * @return \Sonno\Http\Response\Response|bool
      */
     protected function _inspectCache()
     {
@@ -321,11 +317,7 @@ abstract class AbstractResource
                 return $result;
             }
 
-            return new Response(
-                200,
-                $cache->load($cacheKey),
-                array('Cache-Control' => 'max-age=' . ($metadata['expire'] - time()))
-            );
+            return new Response(200, $cache->load($cacheKey));
         }
 
         return false;
@@ -334,9 +326,11 @@ abstract class AbstractResource
     /**
      * Add a new entry to the local cache store.
      *
-     * @param mixed $value The object to store.
+     * @param mixed    $value    The object to store.
+     * @param array    $tags     The collection of tags to attach to the cache entry.
+     * @param int|bool $lifetime The lifetime of the cache entry, in seconds.
      *
-     * @return \Sonno\Http\Response\Response|false
+     * @return bool TRUE when a cache entry was saved successfully.
      */
     protected function _addCache($value, $tags = array(), $lifetime = false)
     {
@@ -351,13 +345,9 @@ abstract class AbstractResource
         // add a generic tag for this application
         $tags[] = 'RESTAPI';
 
-        if ('dev' != API_ENV && !$cache->test($cacheKey)) {
+        if ('dev' != API_ENV && null === $this->_request->getQueryParam('skipCache')) {
             $cache->save($value, $cacheKey, $tags, $lifetime);
-            return new Response(
-                200,
-                $value,
-                array('Cache-Control' => "max-age=$lifetime")
-            );
+            return true;
         }
 
         return false;

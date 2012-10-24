@@ -85,10 +85,10 @@ class EventResource extends AbstractResource
         $now = \Mage::getModel('core/date')->timestamp();
         $results = array();
         foreach ($queue as $categoryInfo) {
-            $category = \Mage::getModel('catalog/category')
-                ->load($categoryInfo['entity_id']);
             if ('upcoming' == $when ||
-                (strtotime($categoryInfo['event_end_date']) > $now && count($category->getProductCollection()) > 0)
+                (strtotime($categoryInfo['event_end_date']) > $now &&
+                    $this->_countCategoryProducts($categoryInfo['entity_id'])
+                )
             ) {
                 $formattedEvent = $this->_formatItem($categoryInfo);
                 $results[] = $formattedEvent;
@@ -194,5 +194,23 @@ class EventResource extends AbstractResource
         );
 
         return parent::_formatItem($data, $fields, $links);
+    }
+
+    /**
+     * Get the number of products associated with a category/event.
+     *
+     * @param int $categoryId
+     *
+     * @return int
+     */
+    protected  function _countCategoryProducts($categoryId)
+    {
+        /** @var $read \Varien_Db_Adapter_Interface */
+        $read   = \Mage::getSingleton('core/resource')->getConnection('core_read');
+        $select = $read->select()
+            ->from('catalog_category_product', 'count(*)')
+            ->where('category_id = ?', $categoryId);
+
+        return $read->fetchOne($select);
     }
 }

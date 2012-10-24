@@ -259,6 +259,9 @@
                         margin-left: 12px;
                         color: #999;
                     }
+                    h3 .media-type {
+                        color: #999;
+                    }
                     h4 {
                         margin: 0em;
                         padding: 0em;
@@ -310,6 +313,10 @@
                     .optional {
                         font-weight: normal;
                         opacity: 0.75;
+                    }
+                    .media-type {
+                        padding-left: 10px;
+                        font-size: smaller;
                     }
                 </style>
             </head>
@@ -546,23 +553,6 @@
                     <xsl:call-template name="representation-name"/>
                 </h3>
                 <xsl:apply-templates select="wadl:doc"/>
-                <xsl:if test="@element or wadl:param">
-                    <div class="representation">
-                        <xsl:if test="@element">
-                            <h6>XML Schema</h6>
-                            <xsl:call-template name="get-element">
-                                <xsl:with-param name="context" select="."/>
-                                <xsl:with-param name="qname" select="@element"/>
-                            </xsl:call-template>
-                        </xsl:if>        
-                        <xsl:apply-templates select="." mode="param-group">
-                            <xsl:with-param name="style">plain</xsl:with-param>
-                        </xsl:apply-templates>
-                        <xsl:apply-templates select="." mode="param-group">
-                            <xsl:with-param name="style">header</xsl:with-param>
-                        </xsl:apply-templates>                         
-                    </div>
-                </xsl:if>                
             </xsl:otherwise>
         </xsl:choose>        
     </xsl:template>
@@ -738,36 +728,17 @@
         <xsl:text>} </xsl:text> 
         <xsl:value-of select="substring-after($qname, ':')"/>
     </xsl:template>
-        
-    
+
     <xsl:template name="representation-name">
         <xsl:variable name="expanded-name">
             <xsl:call-template name="expand-qname">
                 <xsl:with-param select="@element" name="qname"/>
             </xsl:call-template>
         </xsl:variable>
-        <xsl:choose>
-            <xsl:when test="wadl:doc[@title]">
-                <xsl:value-of select="wadl:doc[@title][1]/@title"/>
-                <xsl:if test="@status or @mediaType or @element"> (</xsl:if>
-                <xsl:if test="@status">Status Code </xsl:if><xsl:value-of select="@status"/>
-                <xsl:if test="@status and @mediaType"> - </xsl:if>
-                <xsl:value-of select="@mediaType"/>
-                <xsl:if test="(@status or @mediaType) and @element"> - </xsl:if>
-                <xsl:if test="@element">
-                    <abbr title="{$expanded-name}"><xsl:value-of select="@element"/></abbr>
-                </xsl:if>
-                <xsl:if test="@status or @mediaType or @element">)</xsl:if>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:if test="@status">Status Code </xsl:if><xsl:value-of select="@status"/>
-                <xsl:if test="@status and @mediaType"> - </xsl:if>
-                <xsl:value-of select="@mediaType"/>
-                <xsl:if test="@element"> (</xsl:if>
-                <abbr title="{$expanded-name}"><xsl:value-of select="@element"/></abbr>
-                <xsl:if test="@element">)</xsl:if>
-            </xsl:otherwise>
-        </xsl:choose>
+        <xsl:value-of select="wadl:doc[@title][1]/@title"/>
+        <span class="media-type">
+            <xsl:value-of select="@mediaType"/>
+        </span>
     </xsl:template>                
         
     <!-- entity-encode markup for display -->

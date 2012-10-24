@@ -236,9 +236,10 @@ class ProductResource extends AbstractResource
             foreach ($allProducts as $product) {
                 if ($product->isSalable()) {
                     foreach ($productAttrs as $attr) {
-                        if (!in_array($attr['attribute_code'], $formattedData['attributes'][$attr['label']])) {
-                            $formattedData['attributes'][$attr['label']][] =
-                                $product->getAttributeText($attr['attribute_code']);
+                        $attrLabel = $attr['label'];
+                        $attrVal   = $product->getAttributeText($attr['attribute_code']);
+                        if (!in_array($attrVal, $formattedData['attributes'][$attrLabel])) {
+                            $formattedData['attributes'][$attrLabel][] = $attrVal;
                         }
                     }
                 }

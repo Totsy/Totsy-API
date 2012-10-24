@@ -1096,8 +1096,8 @@
         <doc title="Logout">
           Destroy an existing user session and log the system User out of the system.
         </doc>
-        <request></request>
-        <response status="204"></response>
+        <request />
+        <response status="204" />
       </method>
     </resource>
 
@@ -1162,8 +1162,8 @@
 
         <method name="DELETE">
           <doc title="Delete User">Remove the record of an existing system User.</doc>
-          <request></request>
-          <response status="204"></response>
+          <request />
+          <response status="204" />
         </method>
 
         <resource path="address">
@@ -1295,13 +1295,13 @@
 
         <method name="DELETE">
           <doc title="Delete Address">Delete an existing Address.</doc>
-          <request></request>
-          <response status="204"></response>
+          <request />
+          <response status="204" />
         </method>
 
         <method name="GET">
           <doc title="Retrieve Address">Retrieve a single Address instance.</doc>
-          <request></request>
+          <request />
           <response status="200">
             <representation href="#address_full" />
           </response>
@@ -1340,8 +1340,8 @@
 
         <method name="DELETE">
           <doc title="Delete Order">Delete an existing Order.</doc>
-          <request></request>
-          <response status="204"></response>
+          <request />
+          <response status="204" />
         </method>
 
         <method name="GET">
@@ -1379,15 +1379,15 @@
 
         <method name="DELETE">
           <doc title="Delete Credit Card">Delete an existing Credit Card.</doc>
-          <request></request>
-          <response status="204"></response>
+          <request />
+          <response status="204" />
         </method>
 
         <method name="GET">
           <doc title="Retrieve Credit Card Entity">
             Retrieve a single Credit Card Entity instance.
           </doc>
-          <request></request>
+          <request />
           <response status="200">
             <representation href="#creditcard_full" />
           </response>

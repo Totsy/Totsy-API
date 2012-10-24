@@ -29,3 +29,4 @@ To-Do (Future)
 --------------
 
 * Add a suite of integration tests using [Guzzle](http://guzzlephp.org) and unit tests using the EcomDev_PHPUnit module.
+* Add analytics.

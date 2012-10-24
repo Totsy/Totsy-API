@@ -139,8 +139,9 @@ class ProductResource extends AbstractResource
         }
 
         $results = array();
-        foreach ($products as $product) {
-            if (!$product->isAvailable()) {
+        $cacheTags = $event->getCacheTags() ?: array();
+        foreach ($products as $i => $product) {
+            if (!$product->isSalable()) {
                 continue;
             }
 
@@ -150,11 +151,14 @@ class ProductResource extends AbstractResource
             $gallery = $attributes['media_gallery'];
             $gallery->getBackend()->afterLoad($product);
 
+            $cacheTags = array_merge($cacheTags, $product->getCacheTags());
             $results[] = $this->_formatItem($product, $this->_fields, $this->_links);
         }
 
         $result = json_encode($results);
-        if ($response = $this->_addCache($result, $event->getCacheTags(), 3600)) {
+        $cacheTags = array_unique($cacheTags);
+        $cacheTags = array_map('strtoupper', $cacheTags);
+        if ($response = $this->_addCache($result, $cacheTags, 3600)) {
             return $response;
         }
 
@@ -226,8 +230,17 @@ class ProductResource extends AbstractResource
 
             foreach ($productAttrs as $attr) {
                 $formattedData['attributes'][$attr['label']] = array();
-                foreach ($attr['values'] as $attrVal) {
-                    $formattedData['attributes'][$attr['label']][] = $attrVal['label'];
+            }
+
+            $allProducts = $item->getTypeInstance(true)->getUsedProducts(null, $item);
+            foreach ($allProducts as $product) {
+                if ($product->isSalable()) {
+                    foreach ($productAttrs as $attr) {
+                        if (!in_array($attr['attribute_code'], $formattedData['attributes'][$attr['label']])) {
+                            $formattedData['attributes'][$attr['label']][] =
+                                $product->getAttributeText($attr['attribute_code']);
+                        }
+                    }
                 }
             }
         } else if ('simple' == $item->getTypeId()) {

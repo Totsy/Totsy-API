@@ -131,6 +131,6 @@ class AuthResource extends AbstractResource
     {
         $this->_model->logout();
 
-        return new Response(204);
+        return new Response(200);
     }
 }

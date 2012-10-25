@@ -205,7 +205,7 @@ class CreditCardResource extends AbstractResource
             throw new WebApplicationException(500, $e->getMessage());
         }
 
-        return new Response(204);
+        return new Response(200);
     }
 
     /**

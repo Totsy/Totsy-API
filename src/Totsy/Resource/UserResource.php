@@ -118,28 +118,6 @@ class UserResource extends AbstractResource
     }
 
     /**
-     * Remove the record of an existing system User.
-     *
-     * @DELETE
-     * @Path("/user/{id}")
-     * @Produces({"*\/*"})
-     * @PathParam("id")
-     */
-    public function deleteUserEntity($id)
-    {
-        $user = self::authorizeUser($id);
-
-        try {
-            $user->delete();
-        } catch(\Exception $e) {
-            $this->_logger->err($e->getMessage(), $e->getTrace());
-            throw new WebApplicationException(500, $e->getMessage());
-        }
-
-        return new Response(200);
-    }
-
-    /**
      * @param $item \Mage_Core_Model_Abstract
      * @param $fields array|null
      * @param $links array|null

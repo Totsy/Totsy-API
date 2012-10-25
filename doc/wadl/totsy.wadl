@@ -1160,12 +1160,6 @@
           </response>
         </method>
 
-        <method name="DELETE">
-          <doc title="Delete User">Remove the record of an existing system User.</doc>
-          <request />
-          <response status="204" />
-        </method>
-
         <resource path="address">
           <doc title="User Addresses">
             The collection of all Address instances associated with a system User.

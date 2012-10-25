@@ -179,7 +179,7 @@ class AddressResource extends AbstractResource
             throw new WebApplicationException(500, $e);
         }
 
-        return new Response(200);
+        return new Response(204);
     }
 
     /**
@@ -190,6 +190,12 @@ class AddressResource extends AbstractResource
      */
     protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
+        // ensure this address is not part of an existing payment profile (credit card)
+        $profile = Mage::getModel('paymentfactory/profile')->load($item->getId(), 'address_id');
+        if ($profile && $profile->getId()) {
+            return false;
+        }
+
         $userData = $this->_user->getData();
 
         $item->setData('street', explode(PHP_EOL, $item->getData('street')));

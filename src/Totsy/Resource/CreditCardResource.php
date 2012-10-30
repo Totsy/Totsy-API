@@ -224,8 +224,12 @@ class CreditCardResource extends AbstractResource
             $resource->setRequest($this->_request);
             $resource->setUriInfo($this->_uriInfo);
 
-            $address = json_decode($resource->getEntity($addressId), true);
+            $address = Mage::getModel('customer/address')->load($addressId);
+            $address = json_decode($resource->formatItem($address), true);
+
             unset($address['links']);
+            unset($address['default_billing']);
+            unset($address['default_shipping']);
 
             $item->setData('address', $address);
         }

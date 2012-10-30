@@ -182,6 +182,14 @@ class AddressResource extends AbstractResource
         return new Response(200);
     }
 
+    public function formatItem(\Mage_Customer_Model_Address $address)
+    {
+        $address->setData('force_render', true);
+        $this->_user = UserResource::authorizeUser($address->getCustomerId());
+
+        return json_encode($this->_formatItem($address, $this->_fields, $this->_links));
+    }
+
     /**
      * @param $item Mage_Core_Model_Abstract
      * @param $fields array|null
@@ -191,9 +199,11 @@ class AddressResource extends AbstractResource
     protected function _formatItem($item, $fields = NULL, $links = NULL)
     {
         // ensure this address is not part of an existing payment profile (credit card)
-        $profile = Mage::getModel('paymentfactory/profile')->load($item->getId(), 'address_id');
-        if ($profile && $profile->getId()) {
-            return false;
+        if (!$item->hasData('force_render')) {
+            $profile = Mage::getModel('paymentfactory/profile')->load($item->getId(), 'address_id');
+            if ($profile && $profile->getId()) {
+                return false;
+            }
         }
 
         $userData = $this->_user->getData();

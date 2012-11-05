@@ -19,6 +19,8 @@ use Sonno\Annotation\GET,
 
     Totsy\Exception\WebApplicationException,
 
+    Symfony\Component\Yaml\Yaml,
+
     Monolog\Logger,
     Monolog\Handler\StreamHandler,
     Monolog\Handler\NativeMailerHandler,
@@ -394,8 +396,8 @@ abstract class AbstractResource
      */
     protected function _initLogger($configFile = '../etc/logger.yaml')
     {
-        if (extension_loaded('yaml') && file_exists($configFile)) {
-            $config = yaml_parse_file($configFile);
+        if (file_exists($configFile)) {
+            $config = Yaml::parse($configFile);
 
             $this->_logger = new Logger('restapi');
 

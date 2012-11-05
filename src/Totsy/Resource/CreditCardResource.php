@@ -70,13 +70,9 @@ class CreditCardResource extends AbstractResource
     {
         $this->_user = UserResource::authorizeUser($id);
 
-        $creditCards = $this->_model->loadByCustomerId($id);
-        $results = array();
-        foreach ($creditCards as $card) {
-            $results[] = $this->_formatItem($card);
-        }
-
-        return json_encode($results);
+        return $this->getCollection(
+            array('customer_id' => $id, 'saved_by_customer' => 1)
+        );
     }
 
     /**

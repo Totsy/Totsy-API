@@ -279,6 +279,8 @@ abstract class AbstractResource
 
         try {
             $obj->save();
+        } catch(\Mage_Customer_Exception $mcException) {
+            throw new WebApplicationException(400, $mcException->getMessage());
         } catch(\Mage_Core_Exception $mageException) {
             $this->_logger->err($mageException->getMessage());
             throw new WebApplicationException(400, $mageException->getMessage());

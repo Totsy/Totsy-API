@@ -89,7 +89,7 @@ class ProductResource extends AbstractResource
         }
 
         $result = $this->getItem($id);
-        $this->_addCache($result, $product->getCacheTags());
+        $this->_addCache($result, $product->getCacheIdTags());
 
         return new Response(200, $result, array('Cache-Control' => 'max-age=3600'));
     }
@@ -139,8 +139,16 @@ class ProductResource extends AbstractResource
         }
 
         $results = array();
-        $cacheTags = $event->getCacheTags() ?: array();
+        $cache = Mage::app()->getCacheInstance();
+        $cacheTags = $event->getCacheIdTags() ?: array();
         foreach ($products as $product) {
+            // first look for a cached version of this lone item
+            $cacheKey = 'RESTAPI_PRODUCT_ITEM_' . $product->getId();
+            if ($formattedItem = $cache->load($cacheKey)) {
+                $results[] = json_decode($formattedItem);
+                continue;
+            }
+
             if (!$product->isSalable()) {
                 continue;
             }
@@ -151,8 +159,12 @@ class ProductResource extends AbstractResource
             $gallery = $attributes['media_gallery'];
             $gallery->getBackend()->afterLoad($product);
 
-            $cacheTags = array_merge($cacheTags, $product->getCacheTags());
-            $results[] = $this->_formatItem($product, $this->_fields, $this->_links);
+            $cacheTags = array_merge($cacheTags, $product->getCacheIdTags());
+
+            $formattedItem = $this->_formatItem($product, $this->_fields, $this->_links);;
+            $results[] = $formattedItem;
+
+            $cache->save(json_encode($formattedItem), $cacheKey, $product->getCacheIdTags());
         }
 
         $result = json_encode($results);

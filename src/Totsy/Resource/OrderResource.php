@@ -193,6 +193,9 @@ class OrderResource extends AbstractResource
                     json_encode($response),
                     array('Location' => $response['links'][0]['href'])
                 );
+            } catch(\Mage_Core_Exception $e) {
+                $this->_logger->info($e->getMessage(), $e->getTrace());
+                throw new WebApplicationException(400, $e->getMessage());
             } catch (\Exception $e) {
                 $this->_logger->err($e->getMessage(), $e->getTrace());
                 throw new WebApplicationException(500, $e->getMessage());

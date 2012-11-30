@@ -32,9 +32,9 @@ class WebApplicationException
         $headers = array();
 
         if (is_string($message)) {
-            $headers['X-API-Error'] = $message;
+            $headers['X-API-Error'] = preg_replace("/\r\n/", ' ', $message);
         } else if ($message instanceof \Exception) {
-            $headers['X-API-Error'] = $message->getMessage();
+            $headers['X-API-Error'] = preg_replace("/\r\n/", ' ', $message->getMessage());
         }
 
         $this->_response = new Response($status, '', $headers);

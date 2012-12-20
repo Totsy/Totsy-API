@@ -69,14 +69,12 @@ class AuthResource extends AbstractResource
 
                 $customer = \Mage::getModel('customer/customer')->getCollection()
                     ->addAttributeToFilter('facebook_uid', $fbUser['id'])
-                    ->addAttributeToFilter('store_id', \Mage::app()->getStore()->getId())
                     ->getFirstItem();
 
                 // fallback to searching by e-mail
                 if (!$customer || !$customer->getId()) {
                     $customer = \Mage::getModel('customer/customer')->getCollection()
                         ->addAttributeToFilter('email', $fbUser['email'])
-                        ->addAttributeToFilter('store_id', \Mage::app()->getStore()->getId())
                         ->getFirstItem();
                 }
 

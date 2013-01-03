@@ -63,6 +63,11 @@ class OrderResource extends AbstractResource
     );
 
     /**
+     * @var \Mage_Customer_Model_Customer
+     */
+    protected $_user;
+
+    /**
      * Retrieve the set of orders stored for a specific User.
      *
      * @GET
@@ -97,7 +102,7 @@ class OrderResource extends AbstractResource
      */
     public function createOrderEntity($id)
     {
-        UserResource::authorizeUser($id);
+        $this->_user = UserResource::authorizeUser($id);
 
         $requestData = json_decode($this->_request->getRequestBody(), true);
         if (is_null($requestData)) {
@@ -107,7 +112,10 @@ class OrderResource extends AbstractResource
             );
         }
 
-        $cart = Mage::getModel('checkout/cart');
+        $session  = Mage::getSingleton('checkout/session');
+        $cart     = Mage::getModel('checkout/cart');
+        $checkout = Mage::getSingleton('hpcheckout/checkout');
+
         $quote = $cart->getQuote();
 
         $this->_populateModelInstance($cart);
@@ -118,21 +126,25 @@ class OrderResource extends AbstractResource
             if (!$quote->isVirtual()) {
                 $errors = $quote->getShippingAddress()->validate();
                 if (is_array($errors)) {
-                    throw new WebApplicationException(400, 'A valid shipping address must be specified.');
+                    throw new WebApplicationException(
+                        400,
+                        'A valid shipping address must be specified.'
+                    );
                 }
             }
 
             if (!$quote->getGrandTotal()) {
                 $errors = $quote->getBillingAddress()->validate();
                 if (is_array($errors)) {
-                    throw new WebApplicationException(400, 'A valid billing address must be specified.');
+                    throw new WebApplicationException(
+                        400,
+                        'A valid billing address must be specified.'
+                    );
                 }
             }
 
             // create the new order!
             try {
-                $payment = $quote->getPayment();
-
                 // when there is no balance to collect on the order, use
                 // payment method 'free'
                 $requestData['payment']['method'] = $quote->getGrandTotal()
@@ -142,51 +154,42 @@ class OrderResource extends AbstractResource
                 // parse a saved credit card from the links collection
                 if (isset($requestData['payment']['links'])) {
                     $ccUrl = $requestData['payment']['links'][0]['href'];
-                    unset($requestData['payment']['links']);
-
-                    $offset = strrpos($ccUrl, '/');
-                    if ($offset === FALSE) {
-                        throw new WebApplicationException(
-                            400,
-                            "Invalid Credit Card URI $ccUrl"
-                        );
-                    }
-
-                    $ccId = substr($ccUrl, $offset + 1);
+                    $ccId = $this->_getEntityIdFromUrl($ccUrl);
                     $cc = Mage::getModel('paymentfactory/profile')->load($ccId);
                     if (!$cc->getId()) {
                         throw new WebApplicationException(
-                            409,
-                            "Invalid Credit Card URI $ccUrl"
+                            400,
+                            "Invalid Resource URL $ccUrl"
                         );
                     }
 
                     $subId = $cc->getEncryptedSubscriptionId();
                     $requestData['payment']['cybersource_subid'] = $subId;
-
-                    $cardAddress = Mage::getModel('customer/address')
-                        ->load($cc->getAddressId());
-                    $quoteAddress = Mage::getModel('sales/quote_address')
-                        ->importCustomerAddress($cardAddress);
-                    $quote->setBillingAddress($quoteAddress);
                 }
 
-                $payment->importData($requestData['payment'])->save();
+                $session->setPaymentData($requestData['payment']);
 
-                $quoteService = Mage::getModel('sales/service_quote', $quote);
-                $quoteService->submitAll();
-                $order = $quoteService->getOrder();
+                $checkout->savePayment($requestData['payment']);
+                $checkout->saveOrder();
 
-                $response = $this->_formatItem($order);
+                $this->_logger->info("core/session data", Mage::getSingleton('core/session')->getData());
+                $this->_logger->info("checkout/session data", Mage::getSingleton('checkout/session')->getData());
+
+                if ($orderIds = Mage::getSingleton('core/session')->getOrderIds()) {
+                    $this->_logger->info("Created split orders", $orderIds);
+                    $orderIdValues = array_keys($orderIds);
+                    $order = Mage::getModel('sales/order')->load($orderIdValues[0]);
+                } else {
+                    $this->_logger->info("Created single order: " . var_export($session->getLastOrderId(), true));
+                    $order = Mage::getModel('sales/order')->load($session->getLastOrderId());
+                }
 
                 // destroy this cart object and reset the local checkout session
                 $quote->setIsActive(false);
                 $quote->delete();
                 Mage::getModel('checkout/session')->clear();
 
-                if ($order->getCanSendNewEmailFlag()) {
-                    $order->sendNewOrderEmail();
-                }
+                $response = $this->_formatItem($order);
 
                 return new Response(
                     201,
@@ -435,7 +438,7 @@ class OrderResource extends AbstractResource
      * Populate a Magento model object with an array of data, and persist the
      * updated object.
      *
-     * @param $obj Mage_Core_Model_Abstract
+     * @param $obj \Mage_Core_Model_Abstract
      * @param $data array The data to populate, or NULL which will use the
      *                    incoming request data.
      * @return bool
@@ -454,7 +457,7 @@ class OrderResource extends AbstractResource
         }
 
         $this->_updateProducts($obj, $data);
-        $this->_updateAddress($obj, $data);
+        $this->_updateAddresses($data);
 
         $quote = $obj->getQuote();
 
@@ -497,16 +500,17 @@ class OrderResource extends AbstractResource
     /**
      * Update an existing cart object with address information.
      *
-     * @param Mage_Checkout_Model_Cart $obj
-     * @param $data Request data containing address information.
+     * @param \Mage_Checkout_Model_Cart $obj
+     * @param array $data Request data containing address information.
      *
      * @return void
      */
-    protected function _updateAddress($obj, $data)
+    protected function _updateAddresses($data)
     {
-        if (isset($data['addresses']) && is_array($data['addresses'])) {
-            $quote = $obj->getQuote();
+        /** @var $checkout \Harapartners_HpCheckout_Model_Checkout */
+        $checkout = Mage::getSingleton('hpcheckout/checkout');
 
+        if (isset($data['addresses']) && is_array($data['addresses'])) {
             // setup the Billing & Shipping address for this order
             foreach ($data['addresses'] as $type => $addressInfo) {
                 $address = Mage::getModel('customer/address');
@@ -514,44 +518,28 @@ class OrderResource extends AbstractResource
                 if (isset($addressInfo['links'])) {
                     // fetch existing address
                     $addressUrl = $addressInfo['links'][0]['href'];
-                    if (($offset = strrpos($addressUrl, '/')) !== FALSE) {
-                        $addressId = substr($addressUrl, $offset + 1);
-                        $address->load($addressId);
-                        if (!$address->getId()) {
-                            throw new WebApplicationException(
-                                400,
-                                "Invalid Address URI $addressUrl"
-                            );
-                        }
+                    $addressId = $this->_getEntityIdFromUrl($addressUrl);
+                    $address->load($addressId);
+                    if (!$address->getId()) {
+                        throw new WebApplicationException(
+                            400,
+                            "Invalid Resource URL $addressUrl"
+                        );
                     }
+
+                    $addressData = $address->getData();
+                    $addressData['street'] = preg_split("/\n/", $addressData['street']);
                 } else {
-                    // create new address using address info
-                    $address->addData($addressInfo);
+                    $addressData = $addressInfo;
                 }
 
-                $quoteAddress = Mage::getModel('sales/quote_address');
-                $quoteAddress->importCustomerAddress($address);
+                $addressData['email'] = $this->_user->getEmail();
+
                 if ('shipping' == $type) {
-                    $quote->setShippingAddress($quoteAddress);
-                    $shippingAddress = $quote->getShippingAddress()
-                        ->setCollectShippingRates(true)
-                        ->collectShippingRates();
-
-                    $shippingRates = $shippingAddress->getAllShippingRates();
-
-                    // select the first shipping rate by default
-                    $selectedRate = current($shippingRates);
-                    $shippingAddress->setShippingMethod($selectedRate->getCode());
-
-                    if ($quote->isVirtual()) {
-                        $shippingAddress->setPaymentMethod('paymentfactory_tokenize');
-                    }
+                    $checkout->saveShippingMethod('flexible_flexible');
+                    $checkout->saveShipping($addressData);
                 } else if ('billing' == $type) {
-                    $quote->setBillingAddress($quoteAddress);
-
-                    if (!$quote->isVirtual()) {
-                        $quote->getBillingAddress()->setPaymentMethod('paymentfactory_tokenize');
-                    }
+                    $checkout->saveBilling($addressData);
                 }
             }
         }
@@ -560,8 +548,8 @@ class OrderResource extends AbstractResource
     /**
      * Update an existing cart object with products.
      *
-     * @param Mage_Checkout_Model_Cart $obj
-     * @param $data Request data containing products.
+     * @param \Mage_Checkout_Model_Cart $obj
+     * @param array $data data containing products.
      *
      * @return void
      */
@@ -573,27 +561,12 @@ class OrderResource extends AbstractResource
             foreach ($data['products'] as $requestProduct) {
                 // locate the Product ID in the Product URL
                 $productUrl = $requestProduct['links'][0]['href'];
-                $productIdOffset = strrpos($productUrl, '/');
-
-                // referenced product not found
-                if ($productIdOffset === false) {
+                $productId = $this->_getEntityIdFromUrl($productUrl);
+                $product = Mage::getModel('catalog/product')->load($productId);
+                if (!$product || !$product->getId()) {
                     throw new WebApplicationException(
                         400,
-                        "There is no Product Resource at URL $productUrl"
-                    );
-                }
-
-                // fetch the Mage_Catalog_Model_Product instance for the
-                // referenced product
-                $productId = substr($productUrl, $productIdOffset + 1);
-                $product = Mage::getModel('catalog/product');
-                $product->load($productId);
-
-                // referenced product not found
-                if ($product->isObjectNew()) {
-                    throw new WebApplicationException(
-                        400,
-                        "There is no Product Resource at URL $productUrl"
+                        "Invalid Resource URL $productUrl"
                     );
                 }
 
@@ -688,17 +661,11 @@ class OrderResource extends AbstractResource
                         $item = $obj->addProduct($product, $productParams);
                         $cartUpdated = true;
                     } catch (\Mage_Core_Exception $e) {
-                        throw new WebApplicationException(
-                            400,
-                            "Could not add Product $productUrl -- " . $e->getMessage()
-                        );
+                        throw new WebApplicationException(400, $e->getMessage());
                     }
 
                     if (is_string($item)) {
-                        throw new WebApplicationException(
-                            400,
-                            "Could not add Product $productUrl -- $item"
-                        );
+                        throw new WebApplicationException(400, $item);
                     }
                 }
             }

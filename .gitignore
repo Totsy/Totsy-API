@@ -1,4 +1,5 @@
-.idea
+.idea/
 etc/
 log/
 vendor/
+composer.lock

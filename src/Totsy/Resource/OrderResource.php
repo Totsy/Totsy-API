@@ -477,7 +477,7 @@ class OrderResource extends AbstractResource
 
         try {
             if ($shippingAddress = $quote->getShippingAddress()) {
-                $shippingAddress->collectTotals();
+                $shippingAddress->collectTotals()->save();
             }
 
             $quote->collectTotals()->save();
@@ -536,8 +536,8 @@ class OrderResource extends AbstractResource
                 $addressData['email'] = $this->_user->getEmail();
 
                 if ('shipping' == $type) {
-                    $checkout->saveShippingMethod('flexible_flexible');
                     $checkout->saveShipping($addressData);
+                    $checkout->saveShippingMethod('flexible_flexible');
                 } else if ('billing' == $type) {
                     $checkout->saveBilling($addressData);
                 }

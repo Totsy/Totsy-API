@@ -181,9 +181,8 @@ class OrderResource extends AbstractResource
                     $order = Mage::getModel('sales/order')->load($session->getLastOrderId());
                 }
 
-                // destroy this cart object and reset the local checkout session
-                $quote->setIsActive(false);
-                $quote->delete();
+                // reset the local checkout session
+                $session->unsetAll();
 
                 $response = $this->_formatItem($order);
 

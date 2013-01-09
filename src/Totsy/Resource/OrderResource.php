@@ -172,9 +172,6 @@ class OrderResource extends AbstractResource
                 $checkout->savePayment($requestData['payment']);
                 $checkout->saveOrder();
 
-                $this->_logger->info("core/session data", Mage::getSingleton('core/session')->getData());
-                $this->_logger->info("checkout/session data", Mage::getSingleton('checkout/session')->getData());
-
                 if ($orderIds = Mage::getSingleton('core/session')->getOrderIds()) {
                     $this->_logger->info("Created split orders", $orderIds);
                     $orderIdValues = array_keys($orderIds);
@@ -187,7 +184,6 @@ class OrderResource extends AbstractResource
                 // destroy this cart object and reset the local checkout session
                 $quote->setIsActive(false);
                 $quote->delete();
-                Mage::getModel('checkout/session')->clear();
 
                 $response = $this->_formatItem($order);
 
@@ -476,10 +472,6 @@ class OrderResource extends AbstractResource
         }
 
         try {
-            if ($shippingAddress = $quote->getShippingAddress()) {
-                $shippingAddress->collectTotals()->save();
-            }
-
             $quote->collectTotals()->save();
             $obj->save();
         } catch(\Mage_Core_Exception $e) {
@@ -537,6 +529,13 @@ class OrderResource extends AbstractResource
 
                 if ('shipping' == $type) {
                     $checkout->saveShipping($addressData);
+                    if ($shippingAddress = $checkout->getQuote()->getShippingAddress()) {
+                        $shippingAddress->setCollectShippingRates(true)
+                            ->collectShippingRates()
+                            ->collectTotals()
+                            ->save();
+                    }
+
                     $checkout->saveShippingMethod('flexible_flexible');
                 } else if ('billing' == $type) {
                     $checkout->saveBilling($addressData);

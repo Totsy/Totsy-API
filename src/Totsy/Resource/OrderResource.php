@@ -635,6 +635,10 @@ class OrderResource extends AbstractResource
                                 409,
                                 "The quantity for a virtual product item cannot be modified."
                             );
+                        } else {
+                            // pretend we didn't actually find the quote item,
+                            // so a new one is added (for virtual items)
+                            $productQuoteItemId = false;
                         }
                     } else {
                         $quoteItems = $obj->getQuote()->getItemsCollection();

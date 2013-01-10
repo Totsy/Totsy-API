@@ -99,12 +99,8 @@ class AuthResource extends AbstractResource
 
                         $customer->sendNewAccountEmail('confirmed');
                     } catch(\Mage_Core_Exception $e) {
-                        $this->_logger->err($e->getMessage());
-                        return new Response(
-                            500,
-                            null,
-                            $e->getMessage()
-                        );
+                        $this->_logger->err($e->getMessage(), $fbUser);
+                        throw new WebApplicationException(500, $e->getMessage());
                     }
                 }
 

@@ -22,6 +22,8 @@ require_once __DIR__ . '/../src/autoload.php';
 define('API_ENV', getenv('API_ENV') ? getenv('API_ENV') : 'dev');
 define('APC_CONFIG_KEY', 'api_config');
 
+ini_set('display_errors', ('dev' == API_ENV));
+
 /**
  * Setup default headers for CORS (Cross-Origin Resource Sharing) support, and
  * API environment information.

@@ -133,16 +133,6 @@ class OrderResource extends AbstractResource
                 }
             }
 
-            if (!$quote->getGrandTotal()) {
-                $errors = $quote->getBillingAddress()->validate();
-                if (is_array($errors)) {
-                    throw new WebApplicationException(
-                        400,
-                        'A valid billing address must be specified.'
-                    );
-                }
-            }
-
             // create the new order!
             try {
                 // when there is no balance to collect on the order, use
@@ -165,6 +155,23 @@ class OrderResource extends AbstractResource
 
                     $subId = $cc->getEncryptedSubscriptionId();
                     $requestData['payment']['cybersource_subid'] = $subId;
+
+                    // copy the address from the credit card to the billing
+                    // address of this quote
+                    $billingAddress = Mage::getModel('customer/address')->load(
+                        $cc->getAddressId()
+                    );
+                    $quote->getBillingAddress()->addData($billingAddress->getData());
+                }
+
+                if ($quote->getGrandTotal()) {
+                    $errors = $quote->getBillingAddress()->validate();
+                    if (is_array($errors)) {
+                        throw new WebApplicationException(
+                            400,
+                            'A valid billing address must be specified.'
+                        );
+                    }
                 }
 
                 $session->setPaymentData($requestData['payment']);
@@ -173,11 +180,9 @@ class OrderResource extends AbstractResource
                 $checkout->saveOrder();
 
                 if ($orderIds = Mage::getSingleton('core/session')->getOrderIds()) {
-                    $this->_logger->info("Created split orders", $orderIds);
                     $orderIdValues = array_keys($orderIds);
                     $order = Mage::getModel('sales/order')->load($orderIdValues[0]);
                 } else {
-                    $this->_logger->info("Created single order: " . var_export($session->getLastOrderId(), true));
                     $order = Mage::getModel('sales/order')->load($session->getLastOrderId());
                 }
 

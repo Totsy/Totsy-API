@@ -133,69 +133,51 @@ class OrderResource extends AbstractResource
                 }
             }
 
-            // create the new order!
-            try {
-                // when there is no balance to collect on the order, use
-                // payment method 'free'
-                $requestData['payment']['method'] = $quote->getGrandTotal()
-                    ? 'paymentfactory_tokenize'
-                    : 'free';
+            // when there is no balance to collect on the order, use
+            // payment method 'free'
+            $requestData['payment']['method'] = $quote->getGrandTotal()
+                ? 'paymentfactory_tokenize'
+                : 'free';
 
-                // parse a saved credit card from the links collection
-                if (isset($requestData['payment']['links'])) {
-                    $ccUrl = $requestData['payment']['links'][0]['href'];
-                    $ccId = $this->_getEntityIdFromUrl($ccUrl);
-                    $cc = Mage::getModel('paymentfactory/profile')->load($ccId);
-                    if (!$cc->getId()) {
-                        throw new WebApplicationException(
-                            400,
-                            "Invalid Resource URL $ccUrl"
-                        );
-                    }
-
-                    $subId = $cc->getEncryptedSubscriptionId();
-                    $requestData['payment']['cybersource_subid'] = $subId;
-
-                    // copy the address from the credit card to the billing
-                    // address of this quote
-                    $billingAddress = Mage::getModel('customer/address')->load(
-                        $cc->getAddressId()
+            // parse a saved credit card from the links collection
+            if (isset($requestData['payment']['links'])) {
+                $ccUrl = $requestData['payment']['links'][0]['href'];
+                $ccId = $this->_getEntityIdFromUrl($ccUrl);
+                $cc = Mage::getModel('paymentfactory/profile')->load($ccId);
+                if (!$cc->getId()) {
+                    throw new WebApplicationException(
+                        400,
+                        "Invalid Resource URL $ccUrl"
                     );
-                    $quote->getBillingAddress()->addData($billingAddress->getData());
                 }
 
-                if ($quote->getGrandTotal()) {
-                    $errors = $quote->getBillingAddress()->validate();
-                    if (is_array($errors)) {
-                        throw new WebApplicationException(
-                            400,
-                            'A valid billing address must be specified.'
-                        );
-                    }
-                }
+                $subId = $cc->getEncryptedSubscriptionId();
+                $requestData['payment']['cybersource_subid'] = $subId;
 
-                $session->setPaymentData($requestData['payment']);
-
-                $checkout->savePayment($requestData['payment']);
-                $checkout->saveOrder();
-
-                if ($orderIds = Mage::getSingleton('core/session')->getOrderIds()) {
-                    $orderIdValues = array_keys($orderIds);
-                    $order = Mage::getModel('sales/order')->load($orderIdValues[0]);
-                } else {
-                    $order = Mage::getModel('sales/order')->load($session->getLastOrderId());
-                }
-
-                // reset the local checkout session
-                $session->unsetAll();
-
-                $response = $this->_formatItem($order);
-
-                return new Response(
-                    201,
-                    json_encode($response),
-                    array('Location' => $response['links'][0]['href'])
+                // copy the address from the credit card to the billing
+                // address of this quote
+                $billingAddress = Mage::getModel('customer/address')->load(
+                    $cc->getAddressId()
                 );
+                $quote->getBillingAddress()->addData($billingAddress->getData());
+            }
+
+            if ($quote->getGrandTotal()) {
+                $errors = $quote->getBillingAddress()->validate();
+                if (is_array($errors)) {
+                    throw new WebApplicationException(
+                        400,
+                        'A valid billing address must be specified.'
+                    );
+                }
+            }
+
+            $session->setPaymentData($requestData['payment']);
+
+            $checkout->savePayment($requestData['payment']);
+
+            try {
+                $checkout->saveOrder();
             } catch(\Mage_Core_Exception $e) {
                 $this->_logger->info($e->getMessage(), $e->getTrace());
                 throw new WebApplicationException(400, $e->getMessage());
@@ -203,6 +185,24 @@ class OrderResource extends AbstractResource
                 $this->_logger->err($e->getMessage(), $e->getTrace());
                 throw new WebApplicationException(500, $e->getMessage());
             }
+
+            if ($orderIds = Mage::getSingleton('core/session')->getOrderIds()) {
+                $orderIdValues = array_keys($orderIds);
+                $order = Mage::getModel('sales/order')->load($orderIdValues[0]);
+            } else {
+                $order = Mage::getModel('sales/order')->load($session->getLastOrderId());
+            }
+
+            // reset the local checkout session
+            $session->unsetAll();
+
+            $response = $this->_formatItem($order);
+
+            return new Response(
+                201,
+                json_encode($response),
+                array('Location' => $response['links'][0]['href'])
+            );
         } else {
             return new Response(
                 202,

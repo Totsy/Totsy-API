@@ -87,9 +87,14 @@ class EventResource extends AbstractResource
         $now = \Mage::getModel('core/date')->timestamp();
         $results = array();
         foreach ($queue as $categoryInfo) {
-            if ('upcoming' == $when ||
+            if (!isset($categoryInfo['club_only_event'])) {
+                $categoryInfo['club_only_event'] = 0;
+            }
+
+            if (('upcoming' == $when && 1 != $categoryInfo['club_only_event']) ||
                 (strtotime($categoryInfo['event_end_date']) > $now &&
-                    $this->_countCategoryProducts($categoryInfo['entity_id'])
+                    $this->_countCategoryProducts($categoryInfo['entity_id']) &&
+                    1 != $categoryInfo['club_only_event']
                 )
             ) {
                 $formattedEvent = $this->_formatItem($categoryInfo);

@@ -476,6 +476,10 @@ class OrderResource extends AbstractResource
         }
 
         try {
+            if ($shippingAddress = $quote->getShippingAddress()) {
+                $shippingAddress->collectTotals();
+            }
+
             $quote->collectTotals()->save();
             $obj->save();
         } catch(\Mage_Core_Exception $e) {
@@ -661,9 +665,7 @@ class OrderResource extends AbstractResource
                 }
 
                 // add this product to the cart
-                if (false === $productQuoteItemId &&
-                    $productParams['qty'] > 0
-                ) {
+                if (false === $productQuoteItemId && $productParams['qty'] > 0) {
                     try {
                         $item = $obj->addProduct($product, $productParams);
                         $cartUpdated = true;

@@ -15,7 +15,9 @@ use Sonno\Annotation\GET,
     Sonno\Annotation\Context,
     Sonno\Annotation\PathParam,
     Sonno\Http\Response\Response,
-    Sonno\Application\WebApplicationException;
+    Totsy\Exception\WebApplicationException,
+
+    Mage;
 
 /**
  * An Event is a time-limited sale of zero or more Product items.
@@ -56,56 +58,76 @@ class EventResource extends AbstractResource
      */
     public function getEventCollection()
     {
-        if ($response = $this->_inspectCache()) {
-            $response->setHeaders(array('Cache-Control' => 'max-age=3600'));
-            return $response;
-        }
-
-        // look for a category event sort entry
-        // this is a cached version of all events, indexed by date
-        $sortEntry = \Mage::getModel('categoryevent/sortentry')
-            ->loadCurrent()
-            ->adjustQueuesForCurrentTime();
-
-        // fetch the event information for the desired event group
+        $slug = $this->_request->getQueryParam('slug');
         $when = $this->_request->getQueryParam('when');
-        switch ($when) {
-            case 'current':
-                $queue = json_decode($sortEntry->getLiveQueue(), true);
-                break;
-            case 'upcoming':
-                $queue = json_decode($sortEntry->getUpcomingQueue(), true);
-                break;
-            default:
-                throw new WebApplicationException(
-                    400,
-                    "Invalid value for 'when' parameter: $when"
-                );
-        }
 
-        // build the result, ignoring events without products or upcoming events
-        $now = \Mage::getModel('core/date')->timestamp();
-        $results = array();
-        foreach ($queue as $categoryInfo) {
-            if (!isset($categoryInfo['club_only_event'])) {
-                $categoryInfo['club_only_event'] = 0;
+        if ($slug) {
+            /** @var $rewrite \Mage_Core_Model_Url_Rewrite */
+            $rewrite = Mage::getModel('core/url_rewrite')
+                ->setStoreId(Mage::app()->getStore()->getId())
+                ->loadByRequestPath($slug);
+
+            $targetPath = explode('/', $rewrite->getTargetPath());
+
+            // wrap the result in an array to return a collection of entities
+            $result = json_decode($this->getItem($targetPath[4]), true);
+            $result = array($result);
+            $result = json_encode($result);
+
+            return new Response(200, $result);
+        } else if ($when) {
+            if ($response = $this->_inspectCache()) {
+                $response->setHeaders(array('Cache-Control' => 'max-age=3600'));
+                return $response;
             }
 
-            if (('upcoming' == $when && 1 != $categoryInfo['club_only_event']) ||
-                (strtotime($categoryInfo['event_end_date']) > $now &&
-                    $this->_countCategoryProducts($categoryInfo['entity_id']) &&
-                    1 != $categoryInfo['club_only_event']
-                )
-            ) {
-                $formattedEvent = $this->_formatItem($categoryInfo);
-                $results[] = $formattedEvent;
+            // look for a category event sort entry
+            // this is a cached version of all events, indexed by date
+            $sortEntry = \Mage::getModel('categoryevent/sortentry')
+                ->loadCurrent()
+                ->adjustQueuesForCurrentTime();
+
+            // fetch the event information for the desired event group
+            switch ($when) {
+                case 'current':
+                    $queue = json_decode($sortEntry->getLiveQueue(), true);
+                    break;
+                case 'upcoming':
+                    $queue = json_decode($sortEntry->getUpcomingQueue(), true);
+                    break;
+                default:
+                    throw new WebApplicationException(
+                        400,
+                        "Invalid value for 'when' parameter: $when"
+                    );
             }
+
+            // build the result, ignoring events without products or upcoming events
+            $now = \Mage::getModel('core/date')->timestamp();
+            $results = array();
+            foreach ($queue as $categoryInfo) {
+                if (!isset($categoryInfo['club_only_event'])) {
+                    $categoryInfo['club_only_event'] = 0;
+                }
+
+                if (('upcoming' == $when && 1 != $categoryInfo['club_only_event']) ||
+                    (strtotime($categoryInfo['event_end_date']) > $now &&
+                        $this->_countCategoryProducts($categoryInfo['entity_id']) &&
+                        1 != $categoryInfo['club_only_event']
+                    )
+                ) {
+                    $formattedEvent = $this->_formatItem($categoryInfo);
+                    $results[] = $formattedEvent;
+                }
+            }
+
+            $result = json_encode($results);
+            $this->_addCache($result, \Harapartners_Categoryevent_Model_Cache_Index::CACHE_TAG);
+
+            return new Response(200, $result, array('Cache-Control' => 'max-age=3600'));
+        } else {
+            throw new WebApplicationException(400, 'No query parameter supplied.');
         }
-
-        $result = json_encode($results);
-        $this->_addCache($result, \Harapartners_Categoryevent_Model_Cache_Index::CACHE_TAG);
-
-        return new Response(200, $result, array('Cache-Control' => 'max-age=3600'));
     }
 
     /**

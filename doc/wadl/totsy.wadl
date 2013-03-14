@@ -4,8 +4,8 @@
   xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
   <doc title="Totsy REST API Specification">
-    Version: 1.2<br/>
-    Last Modified: <time datetime="2012-10-19">Oct 19, 2012</time><br/>
+    Version: 1.3<br/>
+    Last Modified: <time datetime="2013-03-14">Mar 14, 2013</time><br/>
     Author: <a href="mailto:tbhuvanendran@totsy.com">Tharsan Bhuvanendran &lt;tbhuvanendran@totsy.com&gt;</a>
   </doc>
 
@@ -973,10 +973,13 @@
         </doc>
 
         <request>
-          <param name="when" style="query" type="xsd:string" default="current,upcoming" repeating="true">
+          <param name="when" style="query" type="xsd:string" default="current,upcoming">
             <doc title="When">A comma-separated list of time period names to filter events on.</doc>
             <option value="current" />
             <option value="upcoming" />
+          </param>
+          <param name="slug" style="query" type="xsd:string">
+            <doc title="Slug">The web site URL path</doc>
           </param>
         </request>
 
@@ -1019,6 +1022,16 @@
         A Product is a single item that is available for sale.
       </doc>
 
+      <method name="GET">
+        <request>
+          <param name="slug" style="query" type="xsd:string">
+            <doc title="Slug">The web site URL path</doc>
+          </param>
+        </request>
+        <response status="200">
+          <representation href="#product_collection" />
+        </response>
+      </method>
       <resource path="{product_id}">
         <doc title="Product Entity">A single Product instance.</doc>
         <param name="product_id" style="template" type="xsd:string">

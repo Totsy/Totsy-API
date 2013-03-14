@@ -14,7 +14,9 @@ use Sonno\Annotation\GET,
     Sonno\Annotation\Produces,
     Sonno\Annotation\Context,
     Sonno\Annotation\PathParam,
+    Sonno\Annotation\QueryParam,
     Sonno\Http\Response\Response,
+    Totsy\Exception\WebApplicationException,
 
     Mage;
 
@@ -65,6 +67,37 @@ class ProductResource extends AbstractResource
             'href' => '/event/{event_id}'
         )
     );
+
+    /**
+     * A collection of Products.
+     *
+     * @GET
+     * @Path("/product")
+     * @Produces({"application/json"})
+     */
+    public function getProductCollection()
+    {
+        // only respond to requests that query by slug
+        $slug = $this->_request->getQueryParam('slug');
+        if (empty($slug)) {
+            throw new WebApplicationException(400, "No 'slug' query parameter supplied.");
+        }
+
+        /** @var $rewrite \Mage_Core_Model_Url_Rewrite */
+        $rewrite = Mage::getModel('core/url_rewrite')
+            ->setStoreId(Mage::app()->getStore()->getId())
+            ->loadByRequestPath($slug);
+
+        $targetPath = explode('/', $rewrite->getTargetPath());
+        $this->_eventId = $targetPath[6];
+
+        // wrap the result in an array to return a collection of entities
+        $result = json_decode($this->getItem($targetPath[4]), true);
+        $result = array($result);
+        $result = json_encode($result);
+
+        return new Response(200, $result);
+     }
 
     /**
      * A single Product instance.

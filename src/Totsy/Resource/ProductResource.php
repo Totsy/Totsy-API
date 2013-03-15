@@ -88,6 +88,10 @@ class ProductResource extends AbstractResource
             ->setStoreId(Mage::app()->getStore()->getId())
             ->loadByRequestPath($slug);
 
+        if (!$rewrite || !$rewrite->getId()) {
+            return new Response(200, '[]');
+        }
+
         $targetPath = explode('/', $rewrite->getTargetPath());
         $this->_eventId = $targetPath[6];
 

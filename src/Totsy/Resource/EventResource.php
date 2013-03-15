@@ -67,6 +67,10 @@ class EventResource extends AbstractResource
                 ->setStoreId(Mage::app()->getStore()->getId())
                 ->loadByRequestPath($slug);
 
+            if (!$rewrite || !$rewrite->getId()) {
+                return new Response(200, '[]');
+            }
+
             $targetPath = explode('/', $rewrite->getTargetPath());
 
             // wrap the result in an array to return a collection of entities

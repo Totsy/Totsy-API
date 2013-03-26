@@ -95,6 +95,8 @@ class EventResource extends AbstractResource
             switch ($when) {
                 case 'current':
                     $queue = json_decode($sortEntry->getLiveQueue(), true);
+                    $toplive = json_decode($sortEntry->getTopLiveQueue(), true);
+                    $queue = array_merge($toplive, $queue);
                     break;
                 case 'upcoming':
                     $queue = json_decode($sortEntry->getUpcomingQueue(), true);

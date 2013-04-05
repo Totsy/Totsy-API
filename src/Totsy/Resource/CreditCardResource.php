@@ -9,6 +9,8 @@
 
 namespace Totsy\Resource;
 
+require_once \Mage::getBaseDir('code') . '/community/Litle/LitleSDK/LitleOnline.php';
+
 use Sonno\Annotation\GET,
     Sonno\Annotation\POST,
     Sonno\Annotation\PUT,
@@ -33,24 +35,24 @@ class CreditCardResource extends AbstractResource
     /**
      * The user that a credit card belongs to.
      *
-     * @var Mage_Customer_Model_Customer
+     * @var \Mage_Customer_Model_Customer
      */
     protected $_user;
 
-    protected $_modelGroupName = 'paymentfactory/profile';
+    protected $_modelGroupName = 'palorus/vault';
 
     protected $_fields = array(
-        'type'         => 'card_type',
-        'cc_last4'     => 'last4no',
-        'cc_exp_year'  => 'expire_year',
-        'cc_exp_month' => 'expire_month',
+        'type'         => 'type',
+        'cc_last4'     => 'last4',
+        'cc_exp_year'  => 'expiration_year',
+        'cc_exp_month' => 'expiration_month',
         'address',
     );
 
     protected $_links = array(
         array(
             'rel' => 'self',
-            'href' => '/creditcard/{entity_id}'
+            'href' => '/creditcard/{vault_id}'
         ),
         array(
             'rel' => 'http://rel.totsy.com/entity/user',
@@ -70,9 +72,26 @@ class CreditCardResource extends AbstractResource
     {
         $this->_user = UserResource::authorizeUser($id);
 
-        return $this->getCollection(
-            array('customer_id' => $id, 'saved_by_customer' => 1)
-        );
+        // collect litle vault credit cards
+        $vaults = json_decode($this->getCollection(array('customer_id' => $id)), true);
+
+        // collect legacy cybersource credit card profiles
+        $profiles = Mage::getModel('paymentfactory/profile')->getCollection()
+            ->addFieldToFilter('customer_id', $id);
+
+        // format cybersource profiles into the new litle format expected
+        $formattedProfiles = array();
+        foreach ($profiles as $profile) {
+            $profile['type'] = $profile['card_type'];
+            $profile['last4'] = $profile['last4no'];
+            $profile['expiration_year'] = $profile['expire_year'];
+            $profile['expiration_month'] = $profile['expire_month'];
+            $profile['vault_id'] = $profile['subscription_id'];
+
+            $formattedProfiles[] = $this->_formatItem($profile);
+        }
+
+        return json_encode(array_merge($vaults, $formattedProfiles));
     }
 
     /**
@@ -96,12 +115,7 @@ class CreditCardResource extends AbstractResource
             );
         }
 
-        // setup some default data for creating a payment profile
-        $data['saved_by_customer'] = 1;
-        $data['email'] = $this->_user->getEmail();
-        $data['cc_type'] = $data['type'];
-        unset($data['type']);
-
+        /** @var $customerAddress \Mage_Customer_Model_Address */
         $customerAddress = Mage::getModel('customer/address');
         if (isset($data['links'])) {
             // fetch the billing address by URL
@@ -128,26 +142,80 @@ class CreditCardResource extends AbstractResource
                 ->save();
         }
 
-        try {
-            Mage::getModel('paymentfactory/tokenize')->createProfile(
-                new \Varien_Object($data),
-                new \Varien_Object($customerAddress->getData()),
-                $id,
-                $customerAddress->getId()
+        $expDate = str_pad($data['cc_exp_month'], 2, '0', STR_PAD_LEFT)
+            . substr($data['cc_exp_year'], -2);
+
+        $authData = array(
+            'orderId'     => $this->_user->getId(),
+            'amount'      => 100,
+            'id'          => 456,
+            'orderSource' => 'ecommerce',
+            'billToAddress' => array(
+                'name'    => $customerAddress->getFirstname() . ' ' . $customerAddress->getLastname(),
+                'city'    => $customerAddress->getCity(),
+                'state'   => $customerAddress->getRegion(),
+                'zip'     => $customerAddress->getPostcode(),
+                'country' => 'US'
+            ),
+            'card' => array(
+                'number'  => $data['cc_number'],
+                'expDate' => $expDate,
+                'cardValidationNum' => $data['cc_cid'],
+                'type' => 'AE' == $data['type'] ? 'AX' : $data['type']
+            )
+        );
+
+        $street = (array) $customerAddress->getStreet();
+        foreach ($street as $lineNumber => $streetName) {
+            $authData['billToAddress']['addressLine' . ($lineNumber+1)] = $streetName;
+        }
+
+        $request = new \LitleOnlineRequest();
+        $authResponse = $request->authorizationRequest($authData);
+        $transactionId =  \XmlParser::getNode($authResponse, 'litleTxnId');
+
+        if (empty($transactionId)) {
+            $authData['card']['number'] = str_repeat('X', 12) . substr($authData['card']['number'], -4);
+            $this->_logger->err("Received an empty transaction ID from Litle Online", $authData);
+        }
+
+        if ('VI' != $authData['card']['type']) {
+            $authReversalData = array(
+                'litleTxnId' => $transactionId,
+                'amount'     => 100
             );
-        } catch(\Mage_Core_Exception $e) {
-            $this->_logger->info($e->getMessage(), $e->getTrace());
-            throw new WebApplicationException(400, $e->getMessage());
+            $request = new \LitleOnlineRequest();
+            $request->authReversalRequest($authReversalData);
+        }
+
+        $vault  = Mage::getModel($this->_modelGroupName);
+
+        try {
+            $exists = Mage::getModel('palorus/vault')->getCustomerToken(
+                $this->_user,
+                Mage::getModel('Litle_CreditCard_Model_PaymentLogic')->getUpdater($authResponse, 'tokenResponse', 'litleToken')
+            );
+
+            if ($exists) {
+                $vault->load(Mage::getModel('Litle_CreditCard_Model_PaymentLogic')->getUpdater($authResponse, 'tokenResponse', 'litleToken'), 'token');
+            } else {
+                $vault->setData('token', Mage::getModel('Litle_CreditCard_Model_PaymentLogic')->getUpdater($authResponse, 'tokenResponse', 'litleToken'))
+                    ->setData('bin', Mage::getModel('Litle_CreditCard_Model_PaymentLogic')->getUpdater($authResponse, 'tokenResponse', 'bin'))
+                    ->setData('customer_id', $this->_user->getId())
+                    ->setData('type', $data['type'])
+                    ->setData('last4', substr($data['cc_number'], -4))
+                    ->setData('expiration_month', $data['cc_exp_month'])
+                    ->setData('expiration_year', $data['cc_exp_year'])
+                    ->setData('is_visible', '1')
+                    ->setData('address_id', $customerAddress->getId())
+                    ->save();
+            }
         } catch (\Exception $e) {
             $this->_logger->err($e->getMessage(), $e->getTrace());
             throw new WebApplicationException(500, $e->getMessage());
         }
 
-        $card = Mage::getModel($this->_modelGroupName)->loadByCcNumberWithId(
-            $data['cc_number'] . $id . $data['cc_exp_year'] . $data['cc_exp_month']
-        );
-
-        $response = $this->_formatItem($card);
+        $response = $this->_formatItem($vault);
 
         return new Response(
             201,
@@ -169,7 +237,16 @@ class CreditCardResource extends AbstractResource
         $card = $this->_model->load($id);
 
         if ($card->isObjectNew()) {
-            return new Response(404);
+            $card = Mage::getModel('paymentfactory/profile')->load($id, 'subscription_id');
+            if ($card->isObjectNew()) {
+                return new Response(404);
+            }
+
+            $card['type'] = $card['card_type'];
+            $card['last4'] = $card['last4no'];
+            $card['expiration_year'] = $card['expire_year'];
+            $card['expiration_month'] = $card['expire_month'];
+            $card['vault_id'] = $card['subscription_id'];
         }
 
         // ensure that the request is authorized for the card owner
@@ -191,7 +268,10 @@ class CreditCardResource extends AbstractResource
         $card = $this->_model->load($id);
 
         if ($card->isObjectNew()) {
-            return new Response(404);
+            $card = Mage::getModel('paymentfactory/profile')->load($id, 'subscription_id');
+            if ($card->isObjectNew()) {
+                return new Response(404);
+            }
         }
 
         // ensure that the request is authorized for the address owner

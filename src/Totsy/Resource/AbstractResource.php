@@ -70,7 +70,7 @@ abstract class AbstractResource
 
     public function __construct()
     {
-        $this->_model = \Mage::getSingleton($this->_modelGroupName);
+        $this->_model = \Mage::getModel($this->_modelGroupName);
 
         $this->_initLogger();
     }
@@ -129,8 +129,8 @@ abstract class AbstractResource
 
         $results = array();
         foreach ($hollowItems as $hollowItem) {
-            $item = $this->_model->load($hollowItem->getId());
-            $formattedItem = $this->_formatItem($item);;
+            $item = \Mage::getModel($this->_modelGroupName)->load($hollowItem->getId());
+            $formattedItem = $this->_formatItem($item);
             if (false !== $formattedItem) {
                 $results[] = $formattedItem;
             }

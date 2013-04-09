@@ -143,16 +143,22 @@ class OrderResource extends AbstractResource
             if (isset($requestData['payment']['links'])) {
                 $ccUrl = $requestData['payment']['links'][0]['href'];
                 $ccId = $this->_getEntityIdFromUrl($ccUrl);
-                $cc = Mage::getModel('paymentfactory/profile')->load($ccId);
-                if (!$cc->getId()) {
-                    throw new WebApplicationException(
-                        400,
-                        "Invalid Resource URL $ccUrl"
-                    );
-                }
+                $cc = Mage::getModel('palorus/vault')->load($ccId);
+                if ($cc->getId()) {
+                    $requestData['payment']['cc_vaulted'] = $ccId;
+                    $requestData['payment']['method'] = 'creditcard';
+                } else {
+                    $cc = Mage::getModel('paymentfactory/profile')->load($ccId, 'subscription_id');
+                    if (!$cc->getId()) {
+                        throw new WebApplicationException(
+                            400,
+                            "Invalid Resource URL $ccUrl"
+                        );
+                    }
 
-                $subId = $cc->getEncryptedSubscriptionId();
-                $requestData['payment']['cybersource_subid'] = $subId;
+                    $subId = $cc->getEncryptedSubscriptionId();
+                    $requestData['payment']['cybersource_subid'] = $subId;
+                }
 
                 // copy the address from the credit card to the billing
                 // address of this quote
@@ -186,11 +192,11 @@ class OrderResource extends AbstractResource
                 throw new WebApplicationException(500, $e->getMessage());
             }
 
-            if ($orderIds = Mage::getSingleton('core/session')->getOrderIds()) {
+            if ($orderIds = $session->getOrderIds()) {
                 $orderIdValues = array_keys($orderIds);
                 $order = Mage::getModel('sales/order')->load($orderIdValues[0]);
             } else {
-                $order = Mage::getModel('sales/order')->load($session->getLastOrderId());
+                $order = Mage::getModel('sales/order')->load($session->getData('last_order_id'));
             }
 
             // reset the local checkout session

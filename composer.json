@@ -1,30 +1,11 @@
 {
     "name": "Totsy-API",
     "description": "Totsy REST API",
-    "repositories": {
-        "360i-unofficial": {
-            "type": "package",
-            "package": {
-                "name": "360i/sonno",
-                "version": "0.2.0",
-                "source": {
-                    "url": "git://github.com/360i/sonno.git",
-                    "type": "git",
-                    "reference": "origin/master"
-                }
-            }
-        }
-    },
     "require": {
         "symfony/yaml": "2.1.3",
         "doctrine/common": "2.2.1",
         "monolog/monolog": "1.2.*",
         "guzzle/guzzle": "3.0.*",
-        "360i/sonno": "0.2.0"
-    },
-    "autoload": {
-        "psr-0": {
-            "Sonno": "vendor/360i/sonno/src/"
-        }
+        "360i/sonno": "0.2.1"
     }
 }

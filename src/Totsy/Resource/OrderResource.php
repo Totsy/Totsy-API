@@ -184,12 +184,6 @@ class OrderResource extends AbstractResource
 
             try {
                 $checkout->saveOrder();
-
-                /**
-                 * A line feed is added to the output buffer by the checkout
-                 * @todo locate the mysterious line feed character introduced
-                 */
-                ob_clean();
             } catch(\Mage_Core_Exception $e) {
                 $this->_logger->info($e->getMessage(), $e->getTrace());
                 throw new WebApplicationException(400, $e->getMessage());

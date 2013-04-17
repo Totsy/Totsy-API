@@ -148,7 +148,6 @@ class CreditCardResource extends AbstractResource
         $authData = array(
             'orderId'     => $this->_user->getId(),
             'amount'      => 100,
-            'id'          => 456,
             'orderSource' => 'ecommerce',
             'billToAddress' => array(
                 'name'    => $customerAddress->getFirstname() . ' ' . $customerAddress->getLastname(),

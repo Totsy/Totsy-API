@@ -171,11 +171,23 @@ class CreditCardResource extends AbstractResource
 
         $request = new \LitleOnlineRequest();
         $authResponse = $request->authorizationRequest($authData);
+
+        $response = \XmlParser::getNode($authResponse, 'response');
+        $message = \XmlParser::getNode($authResponse, 'message');
         $transactionId =  \XmlParser::getNode($authResponse, 'litleTxnId');
+
+        if ($response != '000') {
+            if ($message) {
+                throw new WebApplicationException(400, $message);
+            } else {
+                throw new WebApplicationException(500);
+            }
+        }
 
         if (empty($transactionId)) {
             $authData['card']['number'] = str_repeat('X', 12) . substr($authData['card']['number'], -4);
-            $this->_logger->err("Received an empty transaction ID from Litle Online", $authData);
+            $this->_logger->err("Received an empty transaction ID from Litle Online", array('request' => $authData, 'response' => $authResponse->saveXML()));
+            throw new WebApplicationException(500, "Received an empty transaction ID from Litle Online");
         }
 
         if ('VI' != $authData['card']['type']) {

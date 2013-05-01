@@ -160,7 +160,7 @@ class CreditCardResource extends AbstractResource
                 'number'  => $data['cc_number'],
                 'expDate' => $expDate,
                 'cardValidationNum' => $data['cc_cid'],
-                'type' => 'AE' == $data['type'] ? 'AX' : $data['type']
+                'type' => in_array($data['type'], array('AE', 'AM')) ? 'AX' : $data['type']
             )
         );
 

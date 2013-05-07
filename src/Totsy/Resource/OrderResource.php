@@ -192,7 +192,7 @@ class OrderResource extends AbstractResource
                 throw new WebApplicationException(500, $e->getMessage());
             }
 
-            if ($orderIds = $session->getOrderIds()) {
+            if ($orderIds = Mage::getSingleton('core/session')->getOrderIds()) {
                 $orderIdValues = array_keys($orderIds);
                 $order = Mage::getModel('sales/order')->load($orderIdValues[0]);
             } else {

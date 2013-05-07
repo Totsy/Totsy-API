@@ -118,6 +118,7 @@ class EventResource extends AbstractResource
 
                 if (('upcoming' == $when && 1 != $categoryInfo['club_only_event']) ||
                     (strtotime($categoryInfo['event_end_date']) > $now &&
+                        strtotime($categoryInfo['event_start_date']) < $now &&
                         $this->_countCategoryProducts($categoryInfo['entity_id']) &&
                         1 != $categoryInfo['club_only_event']
                     )
